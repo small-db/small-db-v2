@@ -1,0 +1,8 @@
+# ============================================================================ #
+# bazel
+# ============================================================================ #
+
+# The lock file stores exact versions of dependencies to ensure consistent builds.
+# See:
+# - https://bazel.build/external/lockfile
+MODULE.bazel.lock
