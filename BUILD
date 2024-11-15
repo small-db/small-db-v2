@@ -3,7 +3,6 @@ load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 cmake(
     name = "arrow",
     cache_entries = {
-        # "CMAKE_CXX_STANDARD": "17",
         "CMAKE_INSTALL_LIBDIR": "lib",
         "CMAKE_TOOLCHAIN_FILE": "",
         "CMAKE_C_FLAGS": "-fPIC -I/usr/include -fvisibility=hidden",
@@ -23,7 +22,6 @@ cmake(
     generate_args = [
         "-GNinja",
         "-DCMAKE_RANLIB=/usr/bin/ranlib",
-        "-DCMAKE_CXX_STANDARD=20",
     ],
     lib_source = "@arrow//:all",
     linkopts = ["-pthread"],
