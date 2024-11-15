@@ -7,9 +7,11 @@ cc_binary(
 cc_binary(
     name = "arrow_example",
     srcs = ["arrow_example.cc"],
-    copts = ["-Iexternal/libarrow/cpp/src"],
+    # copts = ["-Iexternal/libarrow/cpp/src"],
     # copts = ["-Iexternal/libarrow/cpp/src", "-Iexternal/libarrow/cpp/build/src"],
-    deps = ["@libarrow//:main"],
+    # deps = ["@arrow//:main"],
+    # deps = ["@arrow//:arrow_cmake"],
+    deps = ["//:arrow"],
     visibility = ["//visibility:public"],
 )
 
