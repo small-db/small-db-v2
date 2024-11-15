@@ -19,18 +19,20 @@ http_archive(
     name = "libarrow",
 
     # https://bazel.build/rules/lib/repo/http#http_archive-build_file
+    #
+    # Once the "build_file" is updated, bazel will re-run the download and patch process.
     build_file = "@//:libarrow.BUILD",
 
     # https://bazel.build/rules/lib/repo/http#http_archive-patch_cmds
     #
     # Tips:
     # - These commands run in separate shell environments, so "cd" command won't affect the following command.
-    # 
+    #
     # arrow's build manual:
     # https://arrow.apache.org/docs/developers/cpp/building.html#
     patch_cmds = [
         "mkdir cpp/build",
-        "cd cpp/build && cmake .. --preset ninja-debug-maximal",
+        "cd cpp/build && cmake .. --preset ninja-debug-minimal",
         "cd cpp/build && cmake --build .",
     ],
 
