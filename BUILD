@@ -6,6 +6,7 @@ test_suite(
 )
 
 alias(
-    name = "test",
-    actual = "//src/tmp:hello_world",
+    name = "example",
+    # actual = "//src/tmp:hello_world",
+    actual = "//src/tmp:arrow_example",
 )

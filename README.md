@@ -2,7 +2,7 @@
 
 ## Build System
 
-- [bazel](https://bazel.build/)
+- [bazel 7.4.1](https://bazel.build/)
 
 ## Style Guide
 
