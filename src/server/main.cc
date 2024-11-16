@@ -8,25 +8,26 @@
 #include <sys/epoll.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <unordered_map>
 
+// Must: define SPDLOG_ACTIVE_LEVEL before `#include "spdlog/spdlog.h"`
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/bin_to_hex.h"
+#include <mutex>
 
 #define BACKLOG 512
 #define MAX_EVENTS 128
 #define MAX_MESSAGE_LEN 2048
+
+class SocketsManager;
 
 class ReaderWriter
 {
 protected:
     static int32_t read_int32(int sockfd)
     {
-        // char buffer[MAX_MESSAGE_LEN];
-        // memset(buffer, 0, sizeof(buffer));
-        // int bytes_received_tmp = recv(sockfd, buffer, MAX_MESSAGE_LEN, 0);
-        // SPDLOG_DEBUG("received[{} bytes]: {}", bytes_received_tmp, spdlog::to_hex(buffer, buffer + bytes_received_tmp));
-
         int32_t network_value;
         ssize_t bytes_received = recv(sockfd, &network_value, sizeof(network_value), 0);
         if (bytes_received != sizeof(network_value))
@@ -65,6 +66,107 @@ public:
         // reply 'N' for no SSL support
         char SSLok = 'N';
         send(newsockfd, &SSLok, 1, 0);
+        SocketsManager::set_socket_state(newsockfd, SocketsManager::SocketState::NoSSLAcknowledged);
+    }
+};
+
+// template <>
+// class fmt::formatter<SocketsManager::SocketState>
+// {
+// public:
+//     constexpr auto parse(format_parse_context &ctx) { return ctx.begin(); }
+//     template <typename Context>
+//     constexpr auto format(SocketsManager::SocketState const &foo, Context &ctx) const
+//     {
+//         // return format_to(ctx.out(), "({}, {})", foo.a, foo.b); // --== KEY LINE ==--
+//         switch (state)
+//         {
+//         case SocketState::StartUp:
+//             return "StartUp";
+//         case SocketState::NoSSLAcknowledged:
+//             return "NoSSLAcknowledged";
+//         default:
+//             return "Unknown";
+//         }
+//     }
+// };
+
+class SocketsManager
+{
+public:
+    enum class SocketState
+    {
+        StartUp,
+        NoSSLAcknowledged,
+    };
+
+    static std::string format(SocketState state)
+    {
+        switch (state)
+        {
+        case SocketState::StartUp:
+            return "StartUp";
+        case SocketState::NoSSLAcknowledged:
+            return "NoSSLAcknowledged";
+        default:
+            return "Unknown";
+        }
+    }
+
+    // std::ostream &operator<<(std::ostream &os, SocketState state)
+    // {
+    //     return os << static_cast<int>(state);
+    // }
+
+private:
+    std::unordered_map<int, SocketState> socket_states;
+
+    // Static pointer to the Singleton instance
+    static SocketsManager *instancePtr;
+
+    // Mutex to ensure thread safety
+    static std::mutex mtx;
+
+    // Private Constructor
+    SocketsManager() {}
+
+public:
+    // Deleting the copy constructor to prevent copies
+    SocketsManager(const SocketsManager &obj) = delete;
+
+    // Static method to get the Singleton instance
+    static SocketsManager *getInstance()
+    {
+        if (instancePtr == nullptr)
+        {
+            std::lock_guard<std::mutex> lock(mtx);
+            if (instancePtr == nullptr)
+            {
+                instancePtr = new SocketsManager();
+            }
+        }
+        return instancePtr;
+    }
+
+    // TODO: protect the access to the socket_states map with a mutex
+    static SocketState get_socket_state(int sockfd)
+    {
+        auto instance = getInstance();
+
+        auto it = instance->socket_states.find(sockfd);
+        if (it == instance->socket_states.end())
+        {
+            // set the initial state
+            instance->socket_states[sockfd] = SocketState::StartUp;
+            return SocketState::StartUp;
+        }
+    }
+
+    // TODO: protect the access to the socket_states map with a mutex
+    static void set_socket_state(int sockfd, SocketState state)
+    {
+        auto instance = getInstance();
+        instance->socket_states[sockfd] = state;
     }
 };
 
@@ -161,9 +263,53 @@ int main(int argc, char *argv[])
             {
                 int newsockfd = events[i].data.fd;
 
-                SSLRequest::handle_ssl_request(newsockfd);
+                auto state = SocketsManager::get_socket_state(newsockfd);
+                switch (state)
+                {
+                case SocketsManager::SocketState::StartUp:
+                    SSLRequest::handle_ssl_request(newsockfd);
+                    break;
+
+                default:
+                    SPDLOG_DEBUG("unknown socket state: {}", SocketsManager::format(state));
+                    break;
+                }
 
                 int bytes_received = recv(newsockfd, buffer, MAX_MESSAGE_LEN, 0);
+
+                if (bytes_received < 0)
+                {
+                    // spdlog::error("Error receiving data: {}", strerror(errno));
+                    // close(newsockfd);
+                    // continue;
+
+                    // TODO:
+                    // - add case "EAGAIN", which is the same as "EWOULDBLOCK"
+                    switch (errno)
+                    {
+                    case EWOULDBLOCK:
+                        // Non-blocking socket operation would block
+                        SPDLOG_DEBUG("Would block, try again later");
+                        break;
+                    case ECONNREFUSED:
+                        SPDLOG_DEBUG("Connection refused");
+                        // Handle reconnection logic here
+                        break;
+                    case ETIMEDOUT:
+                        SPDLOG_DEBUG("Connection timed out");
+                        // Handle timeout logic here
+                        break;
+                    case ENOTCONN:
+                        SPDLOG_DEBUG("Socket is not connected");
+                        // Handle disconnection logic here
+                        break;
+                    default:
+                        SPDLOG_DEBUG("recv() failed: {}", strerror(errno));
+                        // Handle other errors
+                        break;
+                    }
+                    continue;
+                }
 
                 // log the message in hex format
                 SPDLOG_DEBUG("received[{} bytes]: {}", bytes_received, spdlog::to_hex(buffer, buffer + bytes_received));
