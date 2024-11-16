@@ -38,13 +38,15 @@ cmake(
     working_directory = "cpp",
 )
 
-make(
+cmake(
     name = "rocksdb",
-    args = [
-        "-j",
-        "static_lib",
+    build_args = ["-j"],
+    generate_args = [
+        "-DWITH_GFLAGS=OFF",
+        "-DROCKSDB_BUILD_SHARED=OFF",
     ],
-    out_static_libs = [
-        "librocksdb.a",
-    ],
+    lib_source = "@rocksdb//:all",
+    out_static_libs = ["librocksdb.a"],
+    targets = ["rocksdb"],
+    visibility = ["//visibility:public"],
 )
