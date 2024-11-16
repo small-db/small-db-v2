@@ -5,11 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Build Example (Debug)",
+            "name": "server",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bazel-bin/src/server/main",
-            "args": [],
+            "args": [
+                "5432"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
@@ -22,7 +24,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "Build Example (Debug)"
+            "preLaunchTask": "build server (debug)"
         }
     ]
 }

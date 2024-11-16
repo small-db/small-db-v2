@@ -34,7 +34,6 @@ protected:
             throw std::runtime_error("error reading int32_t from socket..");
         }
         int32_t value = ntohl(network_value);
-        SPDLOG_DEBUG("read_int32: {}, network_value: {}", value, network_value);
         return value;
     }
 };
