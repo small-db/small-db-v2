@@ -9,6 +9,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/bin_to_hex.h"
 
@@ -24,7 +25,7 @@ protected:
         // char buffer[MAX_MESSAGE_LEN];
         // memset(buffer, 0, sizeof(buffer));
         // int bytes_received_tmp = recv(sockfd, buffer, MAX_MESSAGE_LEN, 0);
-        // spdlog::debug("received[{} bytes]: {}", bytes_received_tmp, spdlog::to_hex(buffer, buffer + bytes_received_tmp));
+        // SPDLOG_DEBUG("received[{} bytes]: {}", bytes_received_tmp, spdlog::to_hex(buffer, buffer + bytes_received_tmp));
 
         int32_t network_value;
         ssize_t bytes_received = recv(sockfd, &network_value, sizeof(network_value), 0);
@@ -33,7 +34,7 @@ protected:
             throw std::runtime_error("error reading int32_t from socket..");
         }
         int32_t value = ntohl(network_value);
-        spdlog::debug("read_int32: {}, network_value: {}", value, network_value);
+        SPDLOG_DEBUG("read_int32: {}, network_value: {}", value, network_value);
         return value;
     }
 };
@@ -46,7 +47,7 @@ public:
 
     static void handle_ssl_request(int newsockfd)
     {
-        spdlog::debug("handling ssl request, newsockfd: {}", newsockfd);
+        SPDLOG_DEBUG("handling ssl request, newsockfd: {}", newsockfd);
 
         auto body_size = read_int32(newsockfd);
         if (body_size != BODY_SIZE)
@@ -56,9 +57,10 @@ public:
         }
 
         auto ssl_code = read_int32(newsockfd);
-        if (ssl_code == SSL_MAGIC_CODE)
+        if (ssl_code != SSL_MAGIC_CODE)
         {
-            throw std::runtime_error("invalid ssl code..");
+            auto error_msg = fmt::format("invalid ssl code: {}", ssl_code);
+            throw std::runtime_error(error_msg);
         }
 
         // reply 'N' for no SSL support
@@ -71,9 +73,13 @@ int main(int argc, char *argv[])
 {
     spdlog::set_level(spdlog::level::debug);
 
+    // ref:
+    // - https://github.com/gabime/spdlog/wiki/3.-Custom-formatting#pattern-flags
+    spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] [%@] %v");
+
     if (argc < 2)
     {
-        printf("Please give a port number: ./epoll_echo_server [port]\n");
+        SPDLOG_INFO("Please give a port number: ./epoll_echo_server [port]\n");
         exit(0);
     }
 
@@ -105,7 +111,7 @@ int main(int argc, char *argv[])
     {
         spdlog::error("spdlog::error listening..\n");
     }
-    printf("epoll echo server listening for connections on port: %d\n", portno);
+    SPDLOG_INFO("epoll echo server listening for connections on port: {}", portno);
 
     struct epoll_event ev, events[MAX_EVENTS];
     int new_events, sock_conn_fd, epollfd;
@@ -135,7 +141,7 @@ int main(int argc, char *argv[])
         for (int i = 0; i < new_events; ++i)
         {
             int event_fd = events[i].data.fd;
-            spdlog::debug("new event, fd: {}, sock_listen_fd: {}", event_fd, sock_listen_fd);
+            SPDLOG_DEBUG("new event, fd: {}, sock_listen_fd: {}", event_fd, sock_listen_fd);
 
             if (events[i].data.fd == sock_listen_fd)
             {
@@ -161,7 +167,7 @@ int main(int argc, char *argv[])
                 int bytes_received = recv(newsockfd, buffer, MAX_MESSAGE_LEN, 0);
 
                 // log the message in hex format
-                spdlog::debug("received[{} bytes]: {}", bytes_received, spdlog::to_hex(buffer, buffer + bytes_received));
+                SPDLOG_DEBUG("received[{} bytes]: {}", bytes_received, spdlog::to_hex(buffer, buffer + bytes_received));
 
                 if (bytes_received == SSLRequest::BODY_SIZE)
                 {
