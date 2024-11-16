@@ -37,3 +37,14 @@ cmake(
     visibility = ["//visibility:public"],
     working_directory = "cpp",
 )
+
+make(
+    name = "rocksdb",
+    args = [
+        "-j",
+        "static_lib",
+    ],
+    out_static_libs = [
+        "librocksdb.a",
+    ],
+)
