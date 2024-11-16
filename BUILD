@@ -55,10 +55,17 @@ cmake(
 cmake(
     name = "spdlog",
     build_args = ["-j"],
-    generate_args = [
-        "-DCMAKE_DEBUG_POSTFIX=\"\"",
-    ],
     lib_source = "@spdlog//:all",
-    out_static_libs = ["libspdlog.a"],
+    out_static_libs = select({
+        "//conditions:default": ["libspdlog.a"],
+
+        # spdlog doesn't care about CMAKE_DEBUG_POSTFIX, so we have to adapt to it.
+        ":debug": ["libspdlogd.a"],
+    }),
     visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "debug",
+    values = {"compilation_mode": "dbg"},
 )
