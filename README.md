@@ -7,3 +7,11 @@
 ## Style Guide
 
 - [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html)
+
+## Usage
+
+### Start Server
+
+```shell
+bazel run //src/server:main -- 5432
+```

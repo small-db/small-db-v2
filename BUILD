@@ -2,6 +2,7 @@ load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 
 cmake(
     name = "arrow",
+    build_args = ["-j"],
     cache_entries = {
         "CMAKE_INSTALL_LIBDIR": "lib",
         "CMAKE_TOOLCHAIN_FILE": "",
@@ -23,7 +24,6 @@ cmake(
         "-GNinja",
         "-DCMAKE_RANLIB=/usr/bin/ranlib",
     ],
-    build_args = ["-j"],
     lib_source = "@arrow//:all",
     linkopts = ["-pthread"],
 
@@ -55,6 +55,9 @@ cmake(
 cmake(
     name = "spdlog",
     build_args = ["-j"],
+    generate_args = [
+        "-DCMAKE_DEBUG_POSTFIX=\"\"",
+    ],
     lib_source = "@spdlog//:all",
     out_static_libs = ["libspdlog.a"],
     visibility = ["//visibility:public"],

@@ -10,13 +10,67 @@
 #include <arpa/inet.h>
 
 #include "spdlog/spdlog.h"
+#include "spdlog/fmt/bin_to_hex.h"
 
 #define BACKLOG 512
 #define MAX_EVENTS 128
 #define MAX_MESSAGE_LEN 2048
 
+class ReaderWriter
+{
+protected:
+    static int32_t read_int32(int sockfd)
+    {
+        // char buffer[MAX_MESSAGE_LEN];
+        // memset(buffer, 0, sizeof(buffer));
+        // int bytes_received_tmp = recv(sockfd, buffer, MAX_MESSAGE_LEN, 0);
+        // spdlog::debug("received[{} bytes]: {}", bytes_received_tmp, spdlog::to_hex(buffer, buffer + bytes_received_tmp));
+
+        int32_t network_value;
+        ssize_t bytes_received = recv(sockfd, &network_value, sizeof(network_value), 0);
+        if (bytes_received != sizeof(network_value))
+        {
+            throw std::runtime_error("error reading int32_t from socket..");
+        }
+        int32_t value = ntohl(network_value);
+        spdlog::debug("read_int32: {}, network_value: {}", value, network_value);
+        return value;
+    }
+};
+
+class SSLRequest : ReaderWriter
+{
+public:
+    static const int BODY_SIZE = 8;
+    static const int SSL_MAGIC_CODE = 80877103;
+
+    static void handle_ssl_request(int newsockfd)
+    {
+        spdlog::debug("handling ssl request, newsockfd: {}", newsockfd);
+
+        auto body_size = read_int32(newsockfd);
+        if (body_size != BODY_SIZE)
+        {
+            auto error_msg = fmt::format("invalid length of startup packet: {}", body_size);
+            throw std::runtime_error(error_msg);
+        }
+
+        auto ssl_code = read_int32(newsockfd);
+        if (ssl_code == SSL_MAGIC_CODE)
+        {
+            throw std::runtime_error("invalid ssl code..");
+        }
+
+        // reply 'N' for no SSL support
+        char SSLok = 'N';
+        send(newsockfd, &SSLok, 1, 0);
+    }
+};
+
 int main(int argc, char *argv[])
 {
+    spdlog::set_level(spdlog::level::debug);
+
     if (argc < 2)
     {
         printf("Please give a port number: ./epoll_echo_server [port]\n");
@@ -80,6 +134,9 @@ int main(int argc, char *argv[])
 
         for (int i = 0; i < new_events; ++i)
         {
+            int event_fd = events[i].data.fd;
+            spdlog::debug("new event, fd: {}, sock_listen_fd: {}", event_fd, sock_listen_fd);
+
             if (events[i].data.fd == sock_listen_fd)
             {
                 sock_conn_fd = accept4(sock_listen_fd, (struct sockaddr *)&client_addr, &client_len, SOCK_NONBLOCK);
@@ -98,10 +155,26 @@ int main(int argc, char *argv[])
             else
             {
                 int newsockfd = events[i].data.fd;
+
+                SSLRequest::handle_ssl_request(newsockfd);
+
                 int bytes_received = recv(newsockfd, buffer, MAX_MESSAGE_LEN, 0);
 
-                // log the message
-                printf("Received: %s\n", buffer);
+                // log the message in hex format
+                spdlog::debug("received[{} bytes]: {}", bytes_received, spdlog::to_hex(buffer, buffer + bytes_received));
+
+                if (bytes_received == SSLRequest::BODY_SIZE)
+                {
+                    int ssl_code = *(int *)buffer;
+                    if (ssl_code == SSLRequest::SSL_MAGIC_CODE)
+                    {
+                        spdlog::info("SSLRequest accepted");
+                    }
+                    else
+                    {
+                        spdlog::info("SSLRequest rejected");
+                    }
+                }
 
                 if (bytes_received <= 0)
                 {
@@ -110,7 +183,7 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    send(newsockfd, buffer, bytes_received, 0);
+                    // send(newsockfd, buffer, bytes_received, 0);
                 }
             }
         }
