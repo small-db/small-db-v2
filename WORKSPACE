@@ -60,3 +60,10 @@ http_archive(
     strip_prefix = "rocksdb-9.7.4",
     urls = ["https://github.com/facebook/rocksdb/archive/refs/tags/v9.7.4.tar.gz"],
 )
+
+http_archive(
+    name = "spdlog",
+    build_file_content = _ALL_CONTENT,
+    strip_prefix = "spdlog-1.15.0",
+    urls = ["https://github.com/gabime/spdlog/archive/refs/tags/v1.15.0.tar.gz"],
+)

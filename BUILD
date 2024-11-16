@@ -23,6 +23,7 @@ cmake(
         "-GNinja",
         "-DCMAKE_RANLIB=/usr/bin/ranlib",
     ],
+    build_args = ["-j"],
     lib_source = "@arrow//:all",
     linkopts = ["-pthread"],
 
@@ -48,5 +49,13 @@ cmake(
     lib_source = "@rocksdb//:all",
     out_static_libs = ["librocksdb.a"],
     targets = ["rocksdb"],
+    visibility = ["//visibility:public"],
+)
+
+cmake(
+    name = "spdlog",
+    build_args = ["-j"],
+    lib_source = "@spdlog//:all",
+    out_static_libs = ["libspdlog.a"],
     visibility = ["//visibility:public"],
 )
