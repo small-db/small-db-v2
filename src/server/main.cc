@@ -1,21 +1,23 @@
+#include <arpa/inet.h>
+#include <errno.h>
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <errno.h>
+#include <sys/epoll.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <sys/epoll.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#include <unistd.h>
+
 #include <unordered_map>
 
 // Must: define SPDLOG_ACTIVE_LEVEL before `#include "spdlog/spdlog.h"`
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 
-#include "spdlog/spdlog.h"
-#include "spdlog/fmt/bin_to_hex.h"
 #include <mutex>
+
+#include "spdlog/fmt/bin_to_hex.h"
+#include "spdlog/spdlog.h"
 
 #define BACKLOG 512
 #define MAX_EVENTS 128
@@ -29,7 +31,8 @@ protected:
     static int32_t read_int32(int sockfd)
     {
         int32_t network_value;
-        ssize_t bytes_received = recv(sockfd, &network_value, sizeof(network_value), 0);
+        ssize_t bytes_received =
+            recv(sockfd, &network_value, sizeof(network_value), 0);
         if (bytes_received != sizeof(network_value))
         {
             throw std::runtime_error("error reading int32_t from socket..");
@@ -38,58 +41,6 @@ protected:
         return value;
     }
 };
-
-class SSLRequest : ReaderWriter
-{
-public:
-    static const int BODY_SIZE = 8;
-    static const int SSL_MAGIC_CODE = 80877103;
-
-    static void handle_ssl_request(int newsockfd)
-    {
-        SPDLOG_DEBUG("handling ssl request, newsockfd: {}", newsockfd);
-
-        auto body_size = read_int32(newsockfd);
-        if (body_size != BODY_SIZE)
-        {
-            auto error_msg = fmt::format("invalid length of startup packet: {}", body_size);
-            throw std::runtime_error(error_msg);
-        }
-
-        auto ssl_code = read_int32(newsockfd);
-        if (ssl_code != SSL_MAGIC_CODE)
-        {
-            auto error_msg = fmt::format("invalid ssl code: {}", ssl_code);
-            throw std::runtime_error(error_msg);
-        }
-
-        // reply 'N' for no SSL support
-        char SSLok = 'N';
-        send(newsockfd, &SSLok, 1, 0);
-        SocketsManager::set_socket_state(newsockfd, SocketsManager::SocketState::NoSSLAcknowledged);
-    }
-};
-
-// template <>
-// class fmt::formatter<SocketsManager::SocketState>
-// {
-// public:
-//     constexpr auto parse(format_parse_context &ctx) { return ctx.begin(); }
-//     template <typename Context>
-//     constexpr auto format(SocketsManager::SocketState const &foo, Context &ctx) const
-//     {
-//         // return format_to(ctx.out(), "({}, {})", foo.a, foo.b); // --== KEY LINE ==--
-//         switch (state)
-//         {
-//         case SocketState::StartUp:
-//             return "StartUp";
-//         case SocketState::NoSSLAcknowledged:
-//             return "NoSSLAcknowledged";
-//         default:
-//             return "Unknown";
-//         }
-//     }
-// };
 
 class SocketsManager
 {
@@ -112,11 +63,6 @@ public:
             return "Unknown";
         }
     }
-
-    // std::ostream &operator<<(std::ostream &os, SocketState state)
-    // {
-    //     return os << static_cast<int>(state);
-    // }
 
 private:
     std::unordered_map<int, SocketState> socket_states;
@@ -160,6 +106,8 @@ public:
             instance->socket_states[sockfd] = SocketState::StartUp;
             return SocketState::StartUp;
         }
+
+        return it->second;
     }
 
     // TODO: protect the access to the socket_states map with a mutex
@@ -167,6 +115,39 @@ public:
     {
         auto instance = getInstance();
         instance->socket_states[sockfd] = state;
+    }
+};
+
+class SSLRequest : ReaderWriter
+{
+public:
+    static const int BODY_SIZE = 8;
+    static const int SSL_MAGIC_CODE = 80877103;
+
+    static void handle_ssl_request(int newsockfd)
+    {
+        SPDLOG_DEBUG("handling ssl request, newsockfd: {}", newsockfd);
+
+        auto body_size = read_int32(newsockfd);
+        if (body_size != BODY_SIZE)
+        {
+            auto error_msg =
+                fmt::format("invalid length of startup packet: {}", body_size);
+            throw std::runtime_error(error_msg);
+        }
+
+        auto ssl_code = read_int32(newsockfd);
+        if (ssl_code != SSL_MAGIC_CODE)
+        {
+            auto error_msg = fmt::format("invalid ssl code: {}", ssl_code);
+            throw std::runtime_error(error_msg);
+        }
+
+        // reply 'N' for no SSL support
+        char SSLok = 'N';
+        send(newsockfd, &SSLok, 1, 0);
+        SocketsManager::set_socket_state(
+            newsockfd, SocketsManager::SocketState::NoSSLAcknowledged);
     }
 };
 
@@ -205,14 +186,16 @@ int main(int argc, char *argv[])
     server_addr.sin_addr.s_addr = INADDR_ANY;
 
     // bind socket and listen for connections
-    if (bind(sock_listen_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
+    if (bind(sock_listen_fd, (struct sockaddr *)&server_addr,
+             sizeof(server_addr)) < 0)
         spdlog::error("spdlog::error binding socket..\n");
 
     if (listen(sock_listen_fd, BACKLOG) < 0)
     {
         spdlog::error("spdlog::error listening..\n");
     }
-    SPDLOG_INFO("epoll echo server listening for connections on port: {}", portno);
+    SPDLOG_INFO("epoll echo server listening for connections on port: {}",
+                portno);
 
     struct epoll_event ev, events[MAX_EVENTS];
     int new_events, sock_conn_fd, epollfd;
@@ -242,11 +225,13 @@ int main(int argc, char *argv[])
         for (int i = 0; i < new_events; ++i)
         {
             int event_fd = events[i].data.fd;
-            SPDLOG_DEBUG("new event, fd: {}, sock_listen_fd: {}", event_fd, sock_listen_fd);
+            SPDLOG_DEBUG("new event, fd: {}, sock_listen_fd: {}", event_fd,
+                         sock_listen_fd);
 
             if (events[i].data.fd == sock_listen_fd)
             {
-                sock_conn_fd = accept4(sock_listen_fd, (struct sockaddr *)&client_addr, &client_len, SOCK_NONBLOCK);
+                sock_conn_fd = accept4(sock_listen_fd, (struct sockaddr *)&client_addr,
+                                       &client_len, SOCK_NONBLOCK);
                 if (sock_conn_fd == -1)
                 {
                     spdlog::error("spdlog::error accepting new connection..\n");
@@ -271,7 +256,8 @@ int main(int argc, char *argv[])
                     break;
 
                 default:
-                    SPDLOG_DEBUG("unknown socket state: {}", SocketsManager::format(state));
+                    SPDLOG_DEBUG("unknown socket state: {}",
+                                 SocketsManager::format(state));
                     break;
                 }
 
@@ -312,7 +298,8 @@ int main(int argc, char *argv[])
                 }
 
                 // log the message in hex format
-                SPDLOG_DEBUG("received[{} bytes]: {}", bytes_received, spdlog::to_hex(buffer, buffer + bytes_received));
+                SPDLOG_DEBUG("received[{} bytes]: {}", bytes_received,
+                             spdlog::to_hex(buffer, buffer + bytes_received));
 
                 if (bytes_received == SSLRequest::BODY_SIZE)
                 {
