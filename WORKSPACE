@@ -97,3 +97,11 @@ http_archive(
     strip_prefix = "spdlog-1.15.0",
     urls = ["https://github.com/gabime/spdlog/archive/refs/tags/v1.15.0.tar.gz"],
 )
+
+# https://github.com/postgres/postgres/archive/refs/tags/REL_17_1.tar.gz
+http_archive(
+    name = "postgres",
+    build_file_content = _ALL_CONTENT,
+    strip_prefix = "postgres-REL_17_1",
+    urls = ["https://github.com/postgres/postgres/archive/refs/tags/REL_17_1.tar.gz"],
+)

@@ -1,4 +1,4 @@
-load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake", "configure_make")
 
 cmake(
     name = "arrow",
@@ -62,6 +62,29 @@ cmake(
         # spdlog doesn't care about CMAKE_DEBUG_POSTFIX, so we have to adapt to it.
         ":debug": ["libspdlogd.a"],
     }),
+    visibility = ["//visibility:public"],
+)
+
+configure_make(
+    name = "postgres",
+    args = ["-j 8"],
+    # sudo apt install -y bison flex
+    # ./configure --without-readline --without-zlib --without-icu
+    configure_options = [
+        "--without-readline",
+        "--without-zlib",
+        "--without-icu",
+    ],
+    env = {
+        "AR": "ar",
+    },
+    lib_source = "@postgres//:all",
+    out_static_libs = [
+        "libpq.a",
+        "libpgcommon.a",
+        "libpgport.a",
+        "libpgport_shlib.a",
+    ],
     visibility = ["//visibility:public"],
 )
 

@@ -4,5 +4,6 @@ cc_binary(
     visibility = ["//visibility:public"],
     deps = [
         "//:spdlog",
+        "//:postgres",
     ],
 )
