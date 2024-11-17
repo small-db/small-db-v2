@@ -6,24 +6,25 @@
     "configurations": [
         {
             "name": "server",
-            "type": "cppdbg",
+            // "type": "cppdbg",
+            "type": "lldb",
             "request": "launch",
             "program": "${workspaceFolder}/bazel-bin/src/server/main",
             "args": [
                 "5432"
             ],
-            "stopAtEntry": false,
+            // "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ],
+            // "environment": [],
+            // "externalConsole": false,
+            // "MIMode": "gdb",
+            // "setupCommands": [
+            //     {
+            //         "description": "Enable pretty-printing for gdb",
+            //         "text": "-enable-pretty-printing",
+            //         "ignoreFailures": true
+            //     }
+            // ],
             "preLaunchTask": "build server (debug)"
         }
     ]
