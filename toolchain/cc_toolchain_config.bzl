@@ -50,7 +50,7 @@ def _impl(ctx):
     return cc_common.create_cc_toolchain_config_info(
         ctx = ctx,
         cxx_builtin_include_directories = [
-            "/usr/lib/llvm-18/lib/clang/18/include",
+            "/usr/lib/gcc/x86_64-linux-gnu/13/include/",
             "/usr/include",
         ],
         toolchain_identifier = "local",
