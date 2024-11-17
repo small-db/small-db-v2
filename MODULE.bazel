@@ -4,3 +4,11 @@
 #
 # For more details, please check https://github.com/bazelbuild/bazel/issues/18958
 ###############################################################################
+
+"""TODO: write a description of the module here."""
+
+bazel_dep(name = "platforms", version = "0.0.10")
+register_toolchains(
+    "//toolchain:cc_toolchain_for_linux_x86_64",
+    "//toolchain:cc_toolchain_for_android_x86_64",
+)

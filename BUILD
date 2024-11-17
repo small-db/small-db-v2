@@ -67,7 +67,7 @@ cmake(
 
 configure_make(
     name = "postgres",
-    args = ["-j 8"],
+    args = ["-j"],
     # sudo apt install -y bison flex
     # ./configure --without-readline --without-zlib --without-icu
     configure_options = [
@@ -75,9 +75,9 @@ configure_make(
         "--without-zlib",
         "--without-icu",
     ],
-    env = {
-        "AR": "ar",
-    },
+    # env = {
+    #     "AR": "ar",
+    # },
     lib_source = "@postgres//:all",
     out_static_libs = [
         "libpq.a",
