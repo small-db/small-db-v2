@@ -75,11 +75,8 @@ configure_make(
         "--without-zlib",
         "--without-icu",
     ],
-    # env = {
-    #     "AR": "ar",
-    # },
     lib_source = "@postgres//:all",
-    # out_include_dir = "include/server",
+    includes = ["server"],
     out_static_libs = [
         "libpq.a",
         "libpgcommon.a",

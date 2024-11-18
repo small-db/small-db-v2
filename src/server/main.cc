@@ -18,13 +18,11 @@
 #include <spdlog/fmt/bin_to_hex.h>
 #include <spdlog/spdlog.h>
 
-// #include <libpq/libpq.h>
-
 #define BACKLOG 512
 #define MAX_EVENTS 128
 #define MAX_MESSAGE_LEN 2048
 
-class SocketsManager;
+using namespace std;
 
 class ReaderWriter {
 protected:
@@ -39,6 +37,13 @@ protected:
     return value;
   }
 };
+
+int32_t read_int32_chars(char *buffer) {
+  int32_t network_value;
+  memcpy(&network_value, buffer, sizeof(network_value));
+  int32_t value = ntohl(network_value);
+  return value;
+}
 
 class SocketsManager {
 public:
@@ -110,6 +115,13 @@ public:
 SocketsManager *SocketsManager::instancePtr = nullptr;
 std::mutex SocketsManager::mtx;
 
+// get a message with length word from connection
+string pq_getmessage(char *buffer) {
+  int len = read_int32_chars(buffer);
+  string message(buffer + 4, len);
+  return message;
+}
+
 class SSLRequest : ReaderWriter {
 public:
   static const int BODY_SIZE = 8;
@@ -172,8 +184,9 @@ int main(int argc, char *argv[]) {
 
   // bind socket and listen for connections
   if (bind(sock_listen_fd, (struct sockaddr *)&server_addr,
-           sizeof(server_addr)) < 0)
+           sizeof(server_addr)) < 0) {
     spdlog::error("spdlog::error binding socket..\n");
+  }
 
   if (listen(sock_listen_fd, BACKLOG) < 0) {
     spdlog::error("spdlog::error listening..\n");
@@ -272,21 +285,43 @@ int main(int argc, char *argv[]) {
         SPDLOG_DEBUG("received[{} bytes]: {}", bytes_received,
                      spdlog::to_hex(buffer, buffer + bytes_received));
 
-        if (bytes_received == SSLRequest::BODY_SIZE) {
-          int ssl_code = *(int *)buffer;
-          if (ssl_code == SSLRequest::SSL_MAGIC_CODE) {
-            spdlog::info("SSLRequest accepted");
-          } else {
-            spdlog::info("SSLRequest rejected");
+        string message = pq_getmessage(buffer);
+
+        // the first 4 bytes is version
+        string version(buffer + 4, 4);
+
+        unordered_map<string, string> params;
+        // key and value are separated by '\x00'
+        size_t pos = 8; // start after the version
+        while (pos < bytes_received) {
+          string key;
+          string value;
+
+          // Read key
+          while (pos < bytes_received && buffer[pos] != '\x00') {
+            key += buffer[pos];
+            pos++;
+          }
+          pos++; // skip the null character
+
+          // Read value
+          while (pos < bytes_received && buffer[pos] != '\x00') {
+            value += buffer[pos];
+            pos++;
+          }
+          pos++; // skip the null character
+
+          if (!key.empty()) {
+            params[key] = value;
           }
         }
 
-        if (bytes_received <= 0) {
-          epoll_ctl(epollfd, EPOLL_CTL_DEL, newsockfd, NULL);
-          shutdown(newsockfd, SHUT_RDWR);
-        } else {
-          // send(newsockfd, buffer, bytes_received, 0);
+        // Log the extracted key-value pairs
+        for (const auto &kv : params) {
+          SPDLOG_DEBUG("Key: {}, Value: {}", kv.first, kv.second);
         }
+
+        // send(newsockfd, buffer, bytes_received, 0);
       }
     }
   }
