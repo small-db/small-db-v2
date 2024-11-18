@@ -18,6 +18,8 @@
 #include <spdlog/fmt/bin_to_hex.h>
 #include <spdlog/spdlog.h>
 
+// #include "message.h"
+
 #define BACKLOG 512
 #define MAX_EVENTS 128
 #define MAX_MESSAGE_LEN 2048
@@ -151,11 +153,135 @@ public:
   }
 };
 
+class Message {
+protected:
+  void append_char(vector<char> &buffer, char value) {
+    buffer.push_back(value);
+  }
+
+  void append_int32(vector<char> &buffer, int32_t value) {
+    int32_t network_value = htonl(value);
+    const char *data = reinterpret_cast<const char *>(&network_value);
+    buffer.insert(buffer.end(), data, data + sizeof(network_value));
+  }
+
+  void append_cstring(vector<char> &buffer, const string &value) {
+    buffer.insert(buffer.end(), value.begin(), value.end());
+    buffer.push_back('\x00');
+  }
+
+public:
+  virtual void encode(vector<char> &buffer) = 0;
+};
+
+class AuthenticationOk : public Message {
+public:
+  AuthenticationOk() = default;
+  void encode(vector<char> &buffer) {
+    append_char(buffer, 'R');
+    append_int32(buffer, 8);
+    append_int32(buffer, 0);
+  }
+};
+
+class ParameterStatus : public Message {
+  const string key;
+  const string value;
+
+public:
+  ParameterStatus(const string &key, const string &value)
+      : key(key), value(value) {}
+
+  // ParameterStatus (B)
+  // Byte1('S')
+  // Identifies the message as a run-time parameter status report.
+  // Int32
+  // Length of message contents in bytes, including self.
+  // String
+  // The name of the run-time parameter being reported.
+  // String
+  // The current value of the parameter.
+  void encode(vector<char> &buffer) {
+    append_char(buffer, 'S');
+    append_int32(buffer, 4 + key.size() + 1 + value.size() + 1);
+    append_cstring(buffer, key);
+    append_cstring(buffer, value);
+  }
+};
+
+class BackendKeyData : public Message {
+public:
+  BackendKeyData() = default;
+
+  // BackendKeyData (B)
+  // Byte1('K')
+  // Identifies the message as cancellation key data. The frontend must save
+  // these values if it wishes to be able to issue CancelRequest messages later.
+  // Int32(12)
+  // Length of message contents in bytes, including self.
+  // Int32
+  // The process ID of this backend.
+  // Int32
+  // The secret key of this backend.
+  void encode(vector<char> &buffer) {
+    append_char(buffer, 'K');
+    append_int32(buffer, 12);
+
+    int32_t process_id = getpid();
+    append_int32(buffer, process_id);
+
+    srand(time(nullptr));
+    int32_t secret_key = rand();
+    append_int32(buffer, secret_key);
+  }
+};
+
+class ReadyForQuery : public Message {
+public:
+  ReadyForQuery() = default;
+
+  // ReadyForQuery (B)
+  // Byte1('Z')
+  // Identifies the message as a ready-for-query indicator.
+  // Int32(5)
+  // Length of message contents in bytes, including self.
+  // Byte1
+  // Current backend transaction status indicator. Possible values are 'I' if
+  // idle (not in a transaction block); 'T' if in a transaction block; or 'E' if
+  // in a failed transaction block (queries will be rejected until block is
+  // ended).
+  void encode(vector<char> &buffer) {
+    append_char(buffer, 'Z');
+    append_int32(buffer, 5);
+    append_char(buffer, 'I');
+  }
+};
+
+class NetworkPackage {
+private:
+  vector<Message *> messages;
+
+public:
+  NetworkPackage() = default;
+
+  void add_message(Message *message) { messages.push_back(message); }
+
+  void send_all(int sockfd) {
+    vector<char> buffer;
+    for (auto message : messages) {
+      message->encode(buffer);
+    }
+
+    send(sockfd, buffer.data(), buffer.size(), 0);
+  }
+};
+
 int main(int argc, char *argv[]) {
   spdlog::set_level(spdlog::level::debug);
 
   // ref:
-  // - https://github.com/gabime/spdlog/wiki/3.-Custom-formatting#pattern-flags
+  // -
+  // https://github.com/gabime/spdlog/wiki/3.-Custom-formatting#pattern-flags
   spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] [%@] %v");
 
   if (argc < 2) {
@@ -174,7 +300,9 @@ int main(int argc, char *argv[]) {
   // setup socket
   int sock_listen_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (sock_listen_fd < 0) {
-    spdlog::error("spdlog::error creating socket..");
+    // spdlog::error("spdlog::error creating socket..");
+    spdlog::error("Error creating socket: {}", strerror(errno));
+    exit(EXIT_FAILURE); // Exit the program if socket creation fails
   }
 
   memset((char *)&server_addr, 0, sizeof(server_addr));
@@ -290,7 +418,7 @@ int main(int argc, char *argv[]) {
         // the first 4 bytes is version
         string version(buffer + 4, 4);
 
-        unordered_map<string, string> params;
+        unordered_map<string, string> recv_params;
         // key and value are separated by '\x00'
         size_t pos = 8; // start after the version
         while (pos < bytes_received) {
@@ -312,16 +440,31 @@ int main(int argc, char *argv[]) {
           pos++; // skip the null character
 
           if (!key.empty()) {
-            params[key] = value;
+            recv_params[key] = value;
           }
         }
 
         // Log the extracted key-value pairs
-        for (const auto &kv : params) {
+        for (const auto &kv : recv_params) {
           SPDLOG_DEBUG("Key: {}, Value: {}", kv.first, kv.second);
         }
 
-        // send(newsockfd, buffer, bytes_received, 0);
+        NetworkPackage *network_package = new NetworkPackage();
+        network_package->add_message(new AuthenticationOk());
+        unordered_map<string, string> params{
+            {"server_encoding", "UTF8"},
+            {"client_encoding", "UTF8"},
+            {"DateStyle", "ISO YMD"},
+            {"integer_datetimes", "on"},
+        };
+        for (const auto &kv : params) {
+          network_package->add_message(
+              new ParameterStatus(kv.first, kv.second));
+        }
+        network_package->add_message(new BackendKeyData());
+        network_package->add_message(new ReadyForQuery());
+
+        network_package->send_all(newsockfd);
       }
     }
   }
