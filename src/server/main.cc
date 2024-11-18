@@ -11,13 +11,14 @@
 
 #include <unordered_map>
 
-// Must: define SPDLOG_ACTIVE_LEVEL before `#include "spdlog/spdlog.h"`
-#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
-
 #include <mutex>
 
-#include "spdlog/fmt/bin_to_hex.h"
-#include "spdlog/spdlog.h"
+// Must: define SPDLOG_ACTIVE_LEVEL before `#include "spdlog/spdlog.h"`
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+#include <spdlog/fmt/bin_to_hex.h>
+#include <spdlog/spdlog.h>
+
+// #include <libpq/libpq.h>
 
 #define BACKLOG 512
 #define MAX_EVENTS 128
