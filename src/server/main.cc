@@ -300,7 +300,7 @@ int main(int argc, char *argv[]) {
   int sock_listen_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (sock_listen_fd < 0) {
     // SPDLOG_ERROR("SPDLOG_ERROR creating socket..");
-    SPDLOG_ERROR("Error creating socket: {}", strerror(errno));
+    SPDLOG_ERROR("error creating socket: {}", strerror(errno));
     exit(EXIT_FAILURE); // Exit the program if socket creation fails
   }
 
@@ -466,25 +466,43 @@ int main(int argc, char *argv[]) {
           std::vector<char> buffer(MAX_MESSAGE_LEN);
           int bytes_received = recv(newsockfd, buffer.data(), buffer.size(), 0);
           if (bytes_received < 0) {
-            spdlog::error("Error receiving data: {}", strerror(errno));
+            spdlog::error("error receiving data: {}", strerror(errno));
             close(newsockfd);
             continue;
           } else if (bytes_received == 0) {
-            spdlog::info("Connection closed by peer");
+            spdlog::info("connection closed by peer");
             close(newsockfd);
             continue;
           }
 
           // Resize the buffer to the actual number of bytes received
-          buffer.resize(bytes_received);
+          // buffer.resize(bytes_received);
 
           // Log the message in hex format
           SPDLOG_DEBUG(
               "received[{} bytes]: {}", bytes_received,
               spdlog::to_hex(buffer.data(), buffer.data() + bytes_received));
 
-          // Process the received data
-          // ...
+          char message_type = buffer[0];
+          switch (message_type) {
+          case 'Q': {
+            // Query
+
+            // read length of the query
+            int32_t query_len = read_int32_chars(buffer.data() + 1);
+
+            // read the query
+            string query(buffer.data() + 5, query_len - 4);
+
+            SPDLOG_INFO("query: {}", query);
+
+            break;
+          }
+          default:
+            SPDLOG_ERROR("unknown message type: {}", message_type);
+            exit(EXIT_FAILURE);
+            break;
+          }
           break;
         }
 
