@@ -52,6 +52,7 @@ public:
   enum class SocketState {
     StartUp,
     NoSSLAcknowledged,
+    ReadyForQuery,
   };
 
   static std::string format(SocketState state) {
@@ -148,8 +149,6 @@ public:
     // reply 'N' for no SSL support
     char SSLok = 'N';
     send(newsockfd, &SSLok, 1, 0);
-    SocketsManager::set_socket_state(
-        newsockfd, SocketsManager::SocketState::NoSSLAcknowledged);
   }
 };
 
@@ -300,8 +299,8 @@ int main(int argc, char *argv[]) {
   // setup socket
   int sock_listen_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (sock_listen_fd < 0) {
-    // spdlog::error("spdlog::error creating socket..");
-    spdlog::error("Error creating socket: {}", strerror(errno));
+    // SPDLOG_ERROR("SPDLOG_ERROR creating socket..");
+    SPDLOG_ERROR("Error creating socket: {}", strerror(errno));
     exit(EXIT_FAILURE); // Exit the program if socket creation fails
   }
 
@@ -313,11 +312,11 @@ int main(int argc, char *argv[]) {
   // bind socket and listen for connections
   if (bind(sock_listen_fd, (struct sockaddr *)&server_addr,
            sizeof(server_addr)) < 0) {
-    spdlog::error("spdlog::error binding socket..\n");
+    SPDLOG_ERROR("error binding socket: {}", strerror(errno));
   }
 
   if (listen(sock_listen_fd, BACKLOG) < 0) {
-    spdlog::error("spdlog::error listening..\n");
+    SPDLOG_ERROR("error listening: {}", strerror(errno));
   }
   SPDLOG_INFO("epoll echo server listening for connections on port: {}",
               portno);
@@ -327,20 +326,20 @@ int main(int argc, char *argv[]) {
 
   epollfd = epoll_create(MAX_EVENTS);
   if (epollfd < 0) {
-    spdlog::error("spdlog::error creating epoll..\n");
+    SPDLOG_ERROR("SPDLOG_ERROR creating epoll..\n");
   }
   ev.events = EPOLLIN;
   ev.data.fd = sock_listen_fd;
 
   if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sock_listen_fd, &ev) == -1) {
-    spdlog::error("spdlog::error adding new listeding socket to epoll..\n");
+    SPDLOG_ERROR("SPDLOG_ERROR adding new listeding socket to epoll..\n");
   }
 
   while (1) {
     new_events = epoll_wait(epollfd, events, MAX_EVENTS, -1);
 
     if (new_events == -1) {
-      spdlog::error("spdlog::error in epoll_wait..\n");
+      SPDLOG_ERROR("SPDLOG_ERROR in epoll_wait..\n");
     }
 
     for (int i = 0; i < new_events; ++i) {
@@ -352,119 +351,149 @@ int main(int argc, char *argv[]) {
         sock_conn_fd = accept4(sock_listen_fd, (struct sockaddr *)&client_addr,
                                &client_len, SOCK_NONBLOCK);
         if (sock_conn_fd == -1) {
-          spdlog::error("spdlog::error accepting new connection..\n");
+          SPDLOG_ERROR("SPDLOG_ERROR accepting new connection..\n");
         }
 
         ev.events = EPOLLIN | EPOLLET;
         ev.data.fd = sock_conn_fd;
         if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sock_conn_fd, &ev) == -1) {
-          spdlog::error("spdlog::error adding new event to epoll..\n");
+          SPDLOG_ERROR("SPDLOG_ERROR adding new event to epoll..\n");
         }
       } else {
         int newsockfd = events[i].data.fd;
 
         auto state = SocketsManager::get_socket_state(newsockfd);
         switch (state) {
-        case SocketsManager::SocketState::StartUp:
+        case SocketsManager::SocketState::StartUp: {
           SSLRequest::handle_ssl_request(newsockfd);
+          SocketsManager::set_socket_state(
+              newsockfd, SocketsManager::SocketState::NoSSLAcknowledged);
           break;
+        }
+
+        case SocketsManager::SocketState::NoSSLAcknowledged: {
+          int bytes_received = recv(newsockfd, buffer, MAX_MESSAGE_LEN, 0);
+
+          if (bytes_received < 0) {
+            // TODO:
+            // - add case "EAGAIN", which is the same as "EWOULDBLOCK"
+            switch (errno) {
+            case EWOULDBLOCK:
+              // Non-blocking socket operation would block
+              SPDLOG_DEBUG("Would block, try again later");
+              break;
+            case ECONNREFUSED:
+              SPDLOG_DEBUG("Connection refused");
+              // Handle reconnection logic here
+              break;
+            case ETIMEDOUT:
+              SPDLOG_DEBUG("Connection timed out");
+              // Handle timeout logic here
+              break;
+            case ENOTCONN:
+              SPDLOG_DEBUG("Socket is not connected");
+              // Handle disconnection logic here
+              break;
+            default:
+              SPDLOG_DEBUG("recv() failed: {}", strerror(errno));
+              // Handle other errors
+              break;
+            }
+            continue;
+          }
+
+          // log the message in hex format
+          SPDLOG_DEBUG("received[{} bytes]: {}", bytes_received,
+                       spdlog::to_hex(buffer, buffer + bytes_received));
+
+          string message = pq_getmessage(buffer);
+
+          // the first 4 bytes is version
+          string version(buffer + 4, 4);
+
+          unordered_map<string, string> recv_params;
+          // key and value are separated by '\x00'
+          size_t pos = 8; // start after the version
+          while (pos < bytes_received) {
+            string key;
+            string value;
+
+            // Read key
+            while (pos < bytes_received && buffer[pos] != '\x00') {
+              key += buffer[pos];
+              pos++;
+            }
+            pos++; // skip the null character
+
+            // Read value
+            while (pos < bytes_received && buffer[pos] != '\x00') {
+              value += buffer[pos];
+              pos++;
+            }
+            pos++; // skip the null character
+
+            if (!key.empty()) {
+              recv_params[key] = value;
+            }
+          }
+
+          // Log the extracted key-value pairs
+          for (const auto &kv : recv_params) {
+            SPDLOG_DEBUG("Key: {}, Value: {}", kv.first, kv.second);
+          }
+
+          NetworkPackage *network_package = new NetworkPackage();
+          network_package->add_message(new AuthenticationOk());
+          unordered_map<string, string> params{
+              {"server_encoding", "UTF8"},
+              {"client_encoding", "UTF8"},
+              {"DateStyle", "ISO YMD"},
+              {"integer_datetimes", "on"},
+          };
+          for (const auto &kv : params) {
+            network_package->add_message(
+                new ParameterStatus(kv.first, kv.second));
+          }
+          network_package->add_message(new BackendKeyData());
+          network_package->add_message(new ReadyForQuery());
+
+          network_package->send_all(newsockfd);
+          SocketsManager::set_socket_state(
+              newsockfd, SocketsManager::SocketState::ReadyForQuery);
+          break;
+        }
+        case SocketsManager::SocketState::ReadyForQuery: {
+          std::vector<char> buffer(MAX_MESSAGE_LEN);
+          int bytes_received = recv(newsockfd, buffer.data(), buffer.size(), 0);
+          if (bytes_received < 0) {
+            spdlog::error("Error receiving data: {}", strerror(errno));
+            close(newsockfd);
+            continue;
+          } else if (bytes_received == 0) {
+            spdlog::info("Connection closed by peer");
+            close(newsockfd);
+            continue;
+          }
+
+          // Resize the buffer to the actual number of bytes received
+          buffer.resize(bytes_received);
+
+          // Log the message in hex format
+          SPDLOG_DEBUG(
+              "received[{} bytes]: {}", bytes_received,
+              spdlog::to_hex(buffer.data(), buffer.data() + bytes_received));
+
+          // Process the received data
+          // ...
+          break;
+        }
 
         default:
-          // SPDLOG_DEBUG("unknown socket state: {}",
-          //              SocketsManager::format(state));
+          SPDLOG_ERROR("unknown socket state: {}",
+                       SocketsManager::format(state));
+          exit(EXIT_FAILURE);
           break;
         }
-
-        int bytes_received = recv(newsockfd, buffer, MAX_MESSAGE_LEN, 0);
-
-        if (bytes_received < 0) {
-          // spdlog::error("Error receiving data: {}", strerror(errno));
-          // close(newsockfd);
-          // continue;
-
-          // TODO:
-          // - add case "EAGAIN", which is the same as "EWOULDBLOCK"
-          switch (errno) {
-          case EWOULDBLOCK:
-            // Non-blocking socket operation would block
-            SPDLOG_DEBUG("Would block, try again later");
-            break;
-          case ECONNREFUSED:
-            SPDLOG_DEBUG("Connection refused");
-            // Handle reconnection logic here
-            break;
-          case ETIMEDOUT:
-            SPDLOG_DEBUG("Connection timed out");
-            // Handle timeout logic here
-            break;
-          case ENOTCONN:
-            SPDLOG_DEBUG("Socket is not connected");
-            // Handle disconnection logic here
-            break;
-          default:
-            SPDLOG_DEBUG("recv() failed: {}", strerror(errno));
-            // Handle other errors
-            break;
-          }
-          continue;
-        }
-
-        // log the message in hex format
-        SPDLOG_DEBUG("received[{} bytes]: {}", bytes_received,
-                     spdlog::to_hex(buffer, buffer + bytes_received));
-
-        string message = pq_getmessage(buffer);
-
-        // the first 4 bytes is version
-        string version(buffer + 4, 4);
-
-        unordered_map<string, string> recv_params;
-        // key and value are separated by '\x00'
-        size_t pos = 8; // start after the version
-        while (pos < bytes_received) {
-          string key;
-          string value;
-
-          // Read key
-          while (pos < bytes_received && buffer[pos] != '\x00') {
-            key += buffer[pos];
-            pos++;
-          }
-          pos++; // skip the null character
-
-          // Read value
-          while (pos < bytes_received && buffer[pos] != '\x00') {
-            value += buffer[pos];
-            pos++;
-          }
-          pos++; // skip the null character
-
-          if (!key.empty()) {
-            recv_params[key] = value;
-          }
-        }
-
-        // Log the extracted key-value pairs
-        for (const auto &kv : recv_params) {
-          SPDLOG_DEBUG("Key: {}, Value: {}", kv.first, kv.second);
-        }
-
-        NetworkPackage *network_package = new NetworkPackage();
-        network_package->add_message(new AuthenticationOk());
-        unordered_map<string, string> params{
-            {"server_encoding", "UTF8"},
-            {"client_encoding", "UTF8"},
-            {"DateStyle", "ISO YMD"},
-            {"integer_datetimes", "on"},
-        };
-        for (const auto &kv : params) {
-          network_package->add_message(
-              new ParameterStatus(kv.first, kv.second));
-        }
-        network_package->add_message(new BackendKeyData());
-        network_package->add_message(new ReadyForQuery());
-
-        network_package->send_all(newsockfd);
       }
     }
   }
