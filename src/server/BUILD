@@ -5,5 +5,6 @@ cc_binary(
     deps = [
         "//:spdlog",
         # "//:postgres",
+        "//:libpg_query",
     ],
 )

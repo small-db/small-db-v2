@@ -74,3 +74,10 @@ http_archive(
     strip_prefix = "postgres-REL_17_1",
     urls = ["https://github.com/postgres/postgres/archive/refs/tags/REL_17_1.tar.gz"],
 )
+
+http_archive(
+    name = "libpg_query",
+    build_file_content = _ALL_CONTENT,
+    strip_prefix = "libpg_query-17-6.0.0",
+    urls = ["https://github.com/pganalyze/libpg_query/archive/refs/tags/17-6.0.0.tar.gz"],
+)

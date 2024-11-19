@@ -275,6 +275,8 @@ public:
   }
 };
 
+void handle_query(string &query) { SPDLOG_INFO("query: {}", query); }
+
 int main(int argc, char *argv[]) {
   spdlog::set_level(spdlog::level::debug);
 
@@ -493,9 +495,7 @@ int main(int argc, char *argv[]) {
 
             // read the query
             string query(buffer.data() + 5, query_len - 4);
-
-            SPDLOG_INFO("query: {}", query);
-
+            handle_query(query);
             break;
           }
           default:

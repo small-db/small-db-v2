@@ -1,4 +1,4 @@
-load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake", "configure_make")
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake", "configure_make", "make")
 
 cmake(
     name = "arrow",
@@ -75,14 +75,27 @@ configure_make(
         "--without-zlib",
         "--without-icu",
     ],
-    lib_source = "@postgres//:all",
     includes = ["server"],
+    lib_source = "@postgres//:all",
     out_static_libs = [
         "libpq.a",
         "libpgcommon.a",
         "libpgport.a",
         "libpgport_shlib.a",
     ],
+    visibility = ["//visibility:public"],
+)
+
+make(
+    name = "libpg_query",
+    args = [
+        "-j",
+    ],
+    # Specify the target since the default target will run "make install" and fail.
+    lib_source = "@libpg_query//:all",
+    out_lib_dir = "",
+    out_static_libs = ["libpg_query.a"],
+    targets = ["libpg_query.a"],
     visibility = ["//visibility:public"],
 )
 
