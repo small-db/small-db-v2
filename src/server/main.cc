@@ -15,11 +15,9 @@
 
 // Must: define SPDLOG_ACTIVE_LEVEL before `#include "spdlog/spdlog.h"`
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+// #include <pg_query.h>
 #include <spdlog/fmt/bin_to_hex.h>
 #include <spdlog/spdlog.h>
-// #include <pg_query.h>
-
-// #include "message.h"
 
 #define BACKLOG 512
 #define MAX_EVENTS 128

@@ -95,9 +95,8 @@ make(
     # Specify the target since the default target will run "make install" and fail.
     lib_source = "@libpg_query//:all",
     out_lib_dir = "",
-    # out_lib_dir = "/home/xiaochen/code/libpg_query",
     out_static_libs = ["libpg_query.a"],
-    postfix_script = "set -o xtrace\npwd\nls -l",
+    postfix_script = "set -o xtrace\npwd\n",
     targets = ["libpg_query.a"],
     visibility = ["//visibility:public"],
 )
