@@ -1,9 +1,9 @@
 cc_binary(
     name = "main",
     srcs = ["main.cc"],
-    includes = [
-        "/home/xiaochen/code/libpg_query",
-    ],
+    # includes = [
+    #     "/home/xiaochen/code/libpg_query",
+    # ],
     # linkopts = [
     #     "-L/home/xiaochen/code/libpg_query",
     #     "-lpg_query",
