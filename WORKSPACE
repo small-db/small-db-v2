@@ -4,15 +4,20 @@ workspace(name = "smalldb")
 # http_archive
 # ================================================================================ #
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:local.bzl", "new_local_repository")
 
 # ================================================================================ #
 # rules_foreign_cc lets us build C/C++ projects using cmake/make/etc.
 # ================================================================================ #
-http_archive(
+# http_archive(
+#     name = "rules_foreign_cc",
+#     sha256 = "a2e6fb56e649c1ee79703e99aa0c9d13c6cc53c8d7a0cbb8797ab2888bbc99a3",
+#     strip_prefix = "rules_foreign_cc-0.12.0",
+#     url = "https://github.com/bazelbuild/rules_foreign_cc/releases/download/0.12.0/rules_foreign_cc-0.12.0.tar.gz",
+# )
+local_repository(
     name = "rules_foreign_cc",
-    sha256 = "a2e6fb56e649c1ee79703e99aa0c9d13c6cc53c8d7a0cbb8797ab2888bbc99a3",
-    strip_prefix = "rules_foreign_cc-0.12.0",
-    url = "https://github.com/bazelbuild/rules_foreign_cc/releases/download/0.12.0/rules_foreign_cc-0.12.0.tar.gz",
+    path = "/home/xiaochen/code/rules_foreign_cc",
 )
 
 load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
@@ -80,4 +85,15 @@ http_archive(
     build_file_content = _ALL_CONTENT,
     strip_prefix = "libpg_query-17-6.0.0",
     urls = ["https://github.com/pganalyze/libpg_query/archive/refs/tags/17-6.0.0.tar.gz"],
+)
+
+# local_repository(
+#     name = "libexample",
+#     path = "/home/xiaochen/code/playground/cpp/libexample",
+# )
+
+new_local_repository(
+    name = "libexample",
+    build_file_content = _ALL_CONTENT,
+    path = "/home/xiaochen/code/playground/cpp/libexample",
 )

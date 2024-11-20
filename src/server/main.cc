@@ -415,7 +415,7 @@ int main(int argc, char *argv[]) {
 
           unordered_map<string, string> recv_params;
           // key and value are separated by '\x00'
-          size_t pos = 8; // start after the version
+          int pos = 8; // start after the version
           while (pos < bytes_received) {
             string key;
             string value;

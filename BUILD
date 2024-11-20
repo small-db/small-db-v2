@@ -59,7 +59,8 @@ cmake(
     out_static_libs = select({
         "//conditions:default": ["libspdlog.a"],
 
-        # spdlog doesn't care about CMAKE_DEBUG_POSTFIX, so we have to adapt to it.
+        # spdlog doesn't care about CMAKE_DEBUG_POSTFIX and produces a library with "d" postfix when
+        # building in debug mode. We can't change this behavior , so we have to adapt to it.
         ":debug": ["libspdlogd.a"],
     }),
     visibility = ["//visibility:public"],
@@ -94,8 +95,24 @@ make(
     # Specify the target since the default target will run "make install" and fail.
     lib_source = "@libpg_query//:all",
     out_lib_dir = "",
+    # out_lib_dir = "/home/xiaochen/code/libpg_query",
     out_static_libs = ["libpg_query.a"],
+    postfix_script = "set -o xtrace\npwd\nls -l",
     targets = ["libpg_query.a"],
+    visibility = ["//visibility:public"],
+)
+
+make(
+    name = "libexample",
+    args = [
+        "-j",
+    ],
+    # Specify the target since the default target will run "make install" and fail.
+    lib_source = "@libexample//:all",
+    # out_lib_dir = "",
+    # out_static_libs = ["libpg_query.a"],
+    # postfix_script = "set -o xtrace\npwd\nls -l",
+    targets = [""],
     visibility = ["//visibility:public"],
 )
 

@@ -7,17 +7,6 @@
 
 """TODO: write a description of the module here."""
 
-http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
-# Group the sources of the library so that CMake rule have access to it
-_ALL_CONTENT = """\
-filegroup(
-    name = "all",
-    srcs = glob(["**"]),
-    visibility = ["//visibility:public"],
-)
-"""
-
 # ================================================================================ #
 # Hedron's Compile Commands Extractor for Bazel
 # https://github.com/hedronvision/bazel-compile-commands-extractor
