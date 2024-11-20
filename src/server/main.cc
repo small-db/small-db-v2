@@ -17,7 +17,7 @@
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 #include <spdlog/fmt/bin_to_hex.h>
 #include <spdlog/spdlog.h>
-#include <pg_query.h>
+// #include <pg_query.h>
 
 // #include "message.h"
 
