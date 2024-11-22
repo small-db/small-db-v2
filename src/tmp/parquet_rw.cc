@@ -133,7 +133,7 @@ void read_single_column_chunk() {
   std::cout << std::endl;
 }
 
-void run() {
+void run_parquet() {
   std::shared_ptr<arrow::Table> table = generate_table();
   write_parquet_file(*table);
   read_whole_file();

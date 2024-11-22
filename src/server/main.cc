@@ -20,6 +20,13 @@
 #include <spdlog/fmt/bin_to_hex.h>
 #include <spdlog/spdlog.h>
 
+// #include <parquet_rw.h>
+// #include <tmp/parquet_rw.h>
+// #include "tmp/parquet_rw.h"
+// #include "parquet_rw.h"
+#include "src/tmp/parquet_rw.h"
+
+
 #define BACKLOG 512
 #define MAX_EVENTS 128
 #define MAX_MESSAGE_LEN 2048
@@ -381,6 +388,8 @@ void handle_query(string &query, int sockfd) {
 }
 
 int main(int argc, char *argv[]) {
+  run_parquet();
+
   spdlog::set_level(spdlog::level::debug);
 
   // ref:
