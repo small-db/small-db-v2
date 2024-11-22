@@ -169,6 +169,10 @@ protected:
     buffer.push_back('\x00');
   }
 
+  void append_vector(vector<char> &buffer, const vector<char> &value) {
+    buffer.insert(buffer.end(), value.begin(), value.end());
+  }
+
 public:
   virtual void encode(vector<char> &buffer) = 0;
 };
@@ -180,6 +184,15 @@ public:
     append_char(buffer, 'R');
     append_int32(buffer, 8);
     append_int32(buffer, 0);
+  }
+};
+
+class EmptyQueryResponse : public Message {
+public:
+  EmptyQueryResponse() = default;
+  void encode(vector<char> &buffer) {
+    append_char(buffer, 'I');
+    append_int32(buffer, 4);
   }
 };
 
@@ -207,16 +220,25 @@ public:
 
   void encode(vector<char> &buffer) {
     append_char(buffer, 'E');
-    append_int32(buffer, 8);
-    append_char(buffer, 'S');
-    append_cstring(buffer, "ERROR");
-    append_char(buffer, 'M');
-    append_cstring(buffer, "error message");
+
+    vector<char> field_severity = encode_severity();
+    vector<char> field_message = encode_message();
+
+    int32_t message_length =
+        4 + field_severity.size() + field_message.size() + 1;
+    SPDLOG_DEBUG("message_length: {}", message_length);
+    append_int32(buffer, message_length);
+    append_vector(buffer, field_severity);
+    append_vector(buffer, field_message);
+    append_char(buffer, '\x00');
+
+    SPDLOG_DEBUG("error response: {}",
+                 spdlog::to_hex(buffer.data(), buffer.data() + buffer.size()));
+    SPDLOG_DEBUG("error response: {}", string(buffer.begin(), buffer.end()));
   }
 
-  // return the length of the encoded message
-  int encode_severity(vector<char> &buffer) {
-    int original_size = buffer.size();
+  vector<char> encode_severity() {
+    vector<char> buffer;
 
     append_char(buffer, 'S');
     switch (severity) {
@@ -232,8 +254,16 @@ public:
     default:
       throw std::runtime_error("unsupported severity");
     }
+    return buffer;
+  }
 
-    return buffer.size() - original_size;
+  vector<char> encode_message() {
+    vector<char> buffer;
+
+    append_char(buffer, 'M');
+    append_cstring(buffer, error_message);
+
+    return buffer;
   }
 };
 
@@ -328,34 +358,25 @@ public:
   }
 };
 
-void handle_query(string &query) {
+void sendUnimplemented(int sockfd) {
+  NetworkPackage *network_package = new NetworkPackage();
+  // network_package->add_message(new ErrorResponse());
+  network_package->add_message(new EmptyQueryResponse());
+  network_package->send_all(sockfd);
+}
+
+void handle_query(string &query, int sockfd) {
   SPDLOG_INFO("query: {}", query);
 
   PgQueryParseResult result;
 
   result = pg_query_parse(query.c_str());
 
-  printf("%s\n", result.parse_tree);
+  SPDLOG_INFO("parse_tree: {}", result.parse_tree);
 
   pg_query_free_parse_result(result);
-}
 
-void sendUnimplemented(int sockfd) {
-  NetworkPackage *network_package = new NetworkPackage();
-  network_package->add_message(new ErrorResponse());
-  unordered_map<string, string> params{
-      {"server_encoding", "UTF8"},
-      {"client_encoding", "UTF8"},
-      {"DateStyle", "ISO YMD"},
-      {"integer_datetimes", "on"},
-  };
-  for (const auto &kv : params) {
-    network_package->add_message(new ParameterStatus(kv.first, kv.second));
-  }
-  network_package->add_message(new BackendKeyData());
-  network_package->add_message(new ReadyForQuery());
-
-  network_package->send_all(sockfd);
+  sendUnimplemented(sockfd);
 }
 
 int main(int argc, char *argv[]) {
@@ -382,10 +403,11 @@ int main(int argc, char *argv[]) {
   // setup socket
   int sock_listen_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (sock_listen_fd < 0) {
-    // SPDLOG_ERROR("SPDLOG_ERROR creating socket..");
     SPDLOG_ERROR("error creating socket: {}", strerror(errno));
     exit(EXIT_FAILURE); // Exit the program if socket creation fails
   }
+  int opt = 1;
+  setsockopt(sock_listen_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
   memset((char *)&server_addr, 0, sizeof(server_addr));
   server_addr.sin_family = AF_INET;
@@ -395,7 +417,9 @@ int main(int argc, char *argv[]) {
   // bind socket and listen for connections
   if (bind(sock_listen_fd, (struct sockaddr *)&server_addr,
            sizeof(server_addr)) < 0) {
-    SPDLOG_ERROR("error binding socket: {}", strerror(errno));
+    string error_msg = fmt::format("error binding socket: {}", strerror(errno));
+    SPDLOG_ERROR(error_msg);
+    throw std::runtime_error(error_msg);
   }
 
   if (listen(sock_listen_fd, BACKLOG) < 0) {
@@ -576,7 +600,7 @@ int main(int argc, char *argv[]) {
 
             // read the query
             string query(buffer.data() + 5, query_len - 4);
-            handle_query(query);
+            handle_query(query, newsockfd);
             break;
           }
           default:
