@@ -5,5 +5,7 @@ cc_binary(
     deps = [
         "//:libpg_query",
         "//:spdlog",
+
+        "//src/tmp:parquet_rw",
     ],
 )
