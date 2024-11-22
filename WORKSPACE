@@ -83,17 +83,10 @@ http_archive(
 http_archive(
     name = "libpg_query",
     build_file_content = _ALL_CONTENT,
-    strip_prefix = "libpg_query-17-6.0.0",
-    urls = ["https://github.com/pganalyze/libpg_query/archive/refs/tags/17-6.0.0.tar.gz"],
-)
-
-# local_repository(
-#     name = "libexample",
-#     path = "/home/xiaochen/code/playground/cpp/libexample",
-# )
-
-new_local_repository(
-    name = "libexample",
-    build_file_content = _ALL_CONTENT,
-    path = "/home/xiaochen/code/playground/cpp/libexample",
+    # strip_prefix = "libpg_query-17-6.0.0",
+    # urls = ["https://github.com/pganalyze/libpg_query/archive/refs/tags/17-6.0.0.tar.gz"],
+    strip_prefix = "libpg_query-xiaochen-17-6.0.0",
+    # we use a forked version of libpg_query since the origin's "make install" doesn't work
+    # with bazel
+    urls = ["https://github.com/small-db/libpg_query/archive/refs/tags/xiaochen-17-6.0.0.tar.gz"],
 )
