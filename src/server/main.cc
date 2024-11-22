@@ -183,6 +183,60 @@ public:
   }
 };
 
+class ErrorResponse : public Message {
+
+  enum class Severity {
+    ERROR,
+    FATAL,
+    PANIC,
+    WARNING,
+    NOTICE,
+    DEBUG,
+    INFO,
+    LOG,
+  };
+
+private:
+  const Severity severity;
+  const string error_message;
+
+public:
+  ErrorResponse(Severity severity = Severity::ERROR,
+                const string &error_message = "error message")
+      : severity(severity), error_message(error_message) {}
+
+  void encode(vector<char> &buffer) {
+    append_char(buffer, 'E');
+    append_int32(buffer, 8);
+    append_char(buffer, 'S');
+    append_cstring(buffer, "ERROR");
+    append_char(buffer, 'M');
+    append_cstring(buffer, "error message");
+  }
+
+  // return the length of the encoded message
+  int encode_severity(vector<char> &buffer) {
+    int original_size = buffer.size();
+
+    append_char(buffer, 'S');
+    switch (severity) {
+    case Severity::DEBUG:
+      append_cstring(buffer, "DEBUG");
+      break;
+    case Severity::INFO:
+      append_cstring(buffer, "INFO");
+      break;
+    case Severity::ERROR:
+      append_cstring(buffer, "ERROR");
+      break;
+    default:
+      throw std::runtime_error("unsupported severity");
+    }
+
+    return buffer.size() - original_size;
+  }
+};
+
 class ParameterStatus : public Message {
   const string key;
   const string value;
@@ -215,9 +269,8 @@ public:
   // BackendKeyData (B)
   // Byte1('K')
   // Identifies the message as cancellation key data. The frontend must save
-  // these values if it wishes to be able to issue CancelRequest messages later.
-  // Int32(12)
-  // Length of message contents in bytes, including self.
+  // these values if it wishes to be able to issue CancelRequest messages
+  // later. Int32(12) Length of message contents in bytes, including self.
   // Int32
   // The process ID of this backend.
   // Int32
@@ -246,8 +299,8 @@ public:
   // Length of message contents in bytes, including self.
   // Byte1
   // Current backend transaction status indicator. Possible values are 'I' if
-  // idle (not in a transaction block); 'T' if in a transaction block; or 'E' if
-  // in a failed transaction block (queries will be rejected until block is
+  // idle (not in a transaction block); 'T' if in a transaction block; or 'E'
+  // if in a failed transaction block (queries will be rejected until block is
   // ended).
   void encode(vector<char> &buffer) {
     append_char(buffer, 'Z');
@@ -275,7 +328,35 @@ public:
   }
 };
 
-void handle_query(string &query) { SPDLOG_INFO("query: {}", query); }
+void handle_query(string &query) {
+  SPDLOG_INFO("query: {}", query);
+
+  PgQueryParseResult result;
+
+  result = pg_query_parse(query.c_str());
+
+  printf("%s\n", result.parse_tree);
+
+  pg_query_free_parse_result(result);
+}
+
+void sendUnimplemented(int sockfd) {
+  NetworkPackage *network_package = new NetworkPackage();
+  network_package->add_message(new ErrorResponse());
+  unordered_map<string, string> params{
+      {"server_encoding", "UTF8"},
+      {"client_encoding", "UTF8"},
+      {"DateStyle", "ISO YMD"},
+      {"integer_datetimes", "on"},
+  };
+  for (const auto &kv : params) {
+    network_package->add_message(new ParameterStatus(kv.first, kv.second));
+  }
+  network_package->add_message(new BackendKeyData());
+  network_package->add_message(new ReadyForQuery());
+
+  network_package->send_all(sockfd);
+}
 
 int main(int argc, char *argv[]) {
   spdlog::set_level(spdlog::level::debug);
