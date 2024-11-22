@@ -362,6 +362,7 @@ void sendUnimplemented(int sockfd) {
   NetworkPackage *network_package = new NetworkPackage();
   // network_package->add_message(new ErrorResponse());
   network_package->add_message(new EmptyQueryResponse());
+  network_package->add_message(new ReadyForQuery());
   network_package->send_all(sockfd);
 }
 
