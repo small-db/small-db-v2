@@ -9,16 +9,16 @@ load("@bazel_tools//tools/build_defs/repo:local.bzl", "new_local_repository")
 # ================================================================================ #
 # rules_foreign_cc lets us build C/C++ projects using cmake/make/etc.
 # ================================================================================ #
-# http_archive(
-#     name = "rules_foreign_cc",
-#     sha256 = "a2e6fb56e649c1ee79703e99aa0c9d13c6cc53c8d7a0cbb8797ab2888bbc99a3",
-#     strip_prefix = "rules_foreign_cc-0.12.0",
-#     url = "https://github.com/bazelbuild/rules_foreign_cc/releases/download/0.12.0/rules_foreign_cc-0.12.0.tar.gz",
-# )
-local_repository(
+http_archive(
     name = "rules_foreign_cc",
-    path = "/home/xiaochen/code/rules_foreign_cc",
+    sha256 = "a2e6fb56e649c1ee79703e99aa0c9d13c6cc53c8d7a0cbb8797ab2888bbc99a3",
+    strip_prefix = "rules_foreign_cc-0.12.0",
+    url = "https://github.com/bazelbuild/rules_foreign_cc/releases/download/0.12.0/rules_foreign_cc-0.12.0.tar.gz",
 )
+# local_repository(
+#     name = "rules_foreign_cc",
+#     path = "/home/xiaochen/code/rules_foreign_cc",
+# )
 
 load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
 
@@ -80,13 +80,20 @@ http_archive(
     urls = ["https://github.com/postgres/postgres/archive/refs/tags/REL_17_1.tar.gz"],
 )
 
-http_archive(
+# http_archive(
+#     name = "libpg_query",
+#     build_file_content = _ALL_CONTENT,
+#     # strip_prefix = "libpg_query-17-6.0.0",
+#     # urls = ["https://github.com/pganalyze/libpg_query/archive/refs/tags/17-6.0.0.tar.gz"],
+#     strip_prefix = "libpg_query-xiaochen-17-6.0.0",
+#     # we use a forked version of libpg_query since the origin's "make install" doesn't work
+#     # with bazel
+#     urls = ["https://github.com/small-db/libpg_query/archive/refs/tags/xiaochen-17-6.0.0.tar.gz"],
+# )
+
+new_local_repository(
     name = "libpg_query",
     build_file_content = _ALL_CONTENT,
-    # strip_prefix = "libpg_query-17-6.0.0",
-    # urls = ["https://github.com/pganalyze/libpg_query/archive/refs/tags/17-6.0.0.tar.gz"],
-    strip_prefix = "libpg_query-xiaochen-17-6.0.0",
-    # we use a forked version of libpg_query since the origin's "make install" doesn't work
-    # with bazel
-    urls = ["https://github.com/small-db/libpg_query/archive/refs/tags/xiaochen-17-6.0.0.tar.gz"],
+    path = "../libpg_query",
 )
+
