@@ -17,6 +17,7 @@ namespace store {
 
 const string DATA_DIR = "data/";
 const string TABLE_SCHEMAS = "schemas";
+const string TABLE_TABLES = "tables";
 
 // "schemas" -> "schemas-2021-09-01-12-00-00.parquet"
 string gen_datafile_path(const string &tablename) {
