@@ -1,4 +1,3 @@
-#include <iostream>
 #include <spdlog/spdlog.h>
 #include <sys/stat.h> // For mkdir
 #include <unistd.h>   // For chdir
@@ -18,29 +17,38 @@ const string DATA_DIR = "data/";
 const string CATALOGS_FILE = "catalogs.parquet";
 
 void init_system_databases() {
+  // schema for "database schemas"
   auto type_tables = arrow::map(arrow::utf8(), arrow::uint64());
   std::shared_ptr<arrow::Schema> schema =
       arrow::schema({arrow::field("name", arrow::utf8()),
                      arrow::field("tables", type_tables)});
 
+  // schema.names for "database schemas"
   arrow::StringBuilder schema_names_builder;
-  PARQUET_THROW_NOT_OK(schema_names_builder.Append("some"));
-  PARQUET_THROW_NOT_OK(schema_names_builder.Append("string"));
-  PARQUET_THROW_NOT_OK(schema_names_builder.Append("content"));
-  PARQUET_THROW_NOT_OK(schema_names_builder.Append("in"));
-  PARQUET_THROW_NOT_OK(schema_names_builder.Append("rows"));
+  PARQUET_THROW_NOT_OK(schema_names_builder.Append("pg_catalog"));
   std::shared_ptr<arrow::Array> schema_names;
   PARQUET_THROW_NOT_OK(schema_names_builder.Finish(&schema_names));
 
-  arrow::StructBuilder tables_builder(type_tables, NULL, NULL);
-  PARQUET_THROW_NOT_OK(tables_builder.Append("some"));
+  // schema.tables for "database schemas"
+  arrow::StringBuilder key_builder;
+  arrow::UInt64Builder value_builder;
+  vector<shared_ptr<arrow::ArrayBuilder>> field_builders;
 
-  return arrow::Table::Make(schema, {schema_names, strarray});
+  shared_ptr<arrow::ArrayBuilder> keys_builder;
+  shared_ptr<arrow::ArrayBuilder> values_builder;
+  arrow::MapBuilder tables_builder(arrow::default_memory_pool(), keys_builder,
+                                   values_builder);
+  PARQUET_THROW_NOT_OK(tables_builder.Append());
+  PARQUET_THROW_NOT_OK(
+      keys_builder->AppendScalar(arrow::StringScalar("pg_database")));
+  PARQUET_THROW_NOT_OK(values_builder->AppendScalar(arrow::UInt64Scalar(1)));
+  std::shared_ptr<arrow::Array> tables;
+  PARQUET_THROW_NOT_OK(tables_builder.Finish(&tables));
 
-  // auto table_name = arrow::Field("name", arrow::utf8());
-  // auto table_id = arrow::Field("id", arrow::uint64());
-  // auto tables =
-  //     arrow::Field("tables", arrow::map(arrow::utf8(), arrow::uint64()));
+  // create the table
+  auto table = arrow::Table::Make(schema, {schema_names, tables});
+  SPDLOG_INFO("Generated table:\n{}", table->ToString());
+  exit(EXIT_SUCCESS);
 }
 
 void init_default_database() {}
@@ -62,11 +70,11 @@ void init() {
   // Check if CATALOGS_FILE exists
   if (access(CATALOGS_FILE.c_str(), F_OK) != 0) {
     // File does not exist, initialize the databases
-    cout << "Catalogs file not found. Initializing databases..." << endl;
+    SPDLOG_INFO("Catalogs file not found. Initializing databases...");
     init_system_databases();
     init_default_database();
   } else {
-    cout << "Catalogs file found. No initialization needed." << endl;
+    SPDLOG_INFO("Catalogs file found. No initialization needed.");
   }
 }
 
