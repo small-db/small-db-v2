@@ -389,6 +389,7 @@ void handle_query(string &query, int sockfd) {
 
 int main(int argc, char *argv[]) {
   run_parquet();
+  return 0;
 
   spdlog::set_level(spdlog::level::debug);
 

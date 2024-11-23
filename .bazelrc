@@ -1,2 +1,5 @@
 build --cxxopt="-std=c++17"
 build --cxxopt="-Wall"
+
+# specify the work directory as the current directory
+run --run_under="cd $PWD &&"
