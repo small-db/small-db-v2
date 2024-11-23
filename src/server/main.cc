@@ -20,11 +20,7 @@
 #include <spdlog/fmt/bin_to_hex.h>
 #include <spdlog/spdlog.h>
 
-// #include <parquet_rw.h>
-// #include <tmp/parquet_rw.h>
-// #include "tmp/parquet_rw.h"
-// #include "parquet_rw.h"
-#include "src/tmp/parquet_rw.h"
+#include "src/store/store.h"
 
 
 #define BACKLOG 512
@@ -388,9 +384,6 @@ void handle_query(string &query, int sockfd) {
 }
 
 int main(int argc, char *argv[]) {
-  run_parquet();
-  return 0;
-
   spdlog::set_level(spdlog::level::debug);
 
   // ref:
@@ -403,7 +396,8 @@ int main(int argc, char *argv[]) {
     exit(0);
   }
 
-  // some variables we need
+  store::init();
+
   int portno = strtol(argv[1], NULL, 10);
   struct sockaddr_in server_addr, client_addr;
   socklen_t client_len = sizeof(client_addr);

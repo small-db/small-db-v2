@@ -4,6 +4,7 @@ cc_library(
     hdrs = ["store.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "//:spdlog",
         "//:arrow",
     ],
 )

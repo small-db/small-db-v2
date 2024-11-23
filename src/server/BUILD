@@ -6,6 +6,6 @@ cc_binary(
         "//:libpg_query",
         "//:spdlog",
 
-        "//src/tmp:parquet_rw",
+        "//src/store:store",
     ],
 )
