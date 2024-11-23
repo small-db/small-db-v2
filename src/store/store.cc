@@ -101,31 +101,16 @@ void read_whole_file() {
 
 void init_default_database() {}
 
-// search for data files with prefix "tablename_"
+// search for data files with prefix "tablename-"
 bool table_exists(const string &tablename) {
-  for (const auto &entry : filesystem::directory_iterator(DATA_DIR)) {
-    SPDLOG_INFO("{}", entry.path());
-  }
-  exit(EXIT_SUCCESS);
-
-  // Open the data directory
-  DIR *dir = opendir(DATA_DIR.c_str());
-  if (dir == nullptr) {
-    SPDLOG_ERROR("Error opening data directory");
-    return false;
-  }
-
-  // Search for files with the specified prefix
-  struct dirent *entry;
-  string prefix = tablename + "_";
-  while ((entry = readdir(dir)) != nullptr) {
-    if (strncmp(entry->d_name, prefix.c_str(), prefix.size()) == 0) {
-      closedir(dir);
+  for (const auto &entry : filesystem::directory_iterator(".")) {
+    SPDLOG_INFO("{}", entry.path().filename().string());
+    auto entry_name = entry.path().filename().string();
+    string prefix = tablename + "-";
+    if (strncmp(entry_name.c_str(), prefix.c_str(), prefix.size()) == 0) {
       return true;
     }
   }
-
-  closedir(dir);
   return false;
 }
 
@@ -143,8 +128,6 @@ void init() {
     exit(EXIT_FAILURE);
   }
 
-  init_system_databases();
-
   // Check if CATALOGS_FILE exists
   if (table_exists(TABLE_SCHEMAS)) {
     SPDLOG_INFO("found existing table schemas");
@@ -153,6 +136,8 @@ void init() {
     init_system_databases();
     init_default_database();
   }
+
+  exit(0);
 }
 
 } // namespace store
