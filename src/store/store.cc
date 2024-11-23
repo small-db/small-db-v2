@@ -34,8 +34,8 @@ void init_system_databases() {
   arrow::UInt64Builder value_builder;
   vector<shared_ptr<arrow::ArrayBuilder>> field_builders;
 
-  shared_ptr<arrow::ArrayBuilder> keys_builder;
-  shared_ptr<arrow::ArrayBuilder> values_builder;
+  auto keys_builder = std::make_shared<arrow::StringBuilder>();
+  auto values_builder = std::make_shared<arrow::UInt64Builder>();
   arrow::MapBuilder tables_builder(arrow::default_memory_pool(), keys_builder,
                                    values_builder);
   PARQUET_THROW_NOT_OK(tables_builder.Append());
