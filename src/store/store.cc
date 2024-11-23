@@ -13,7 +13,6 @@ using namespace std;
 namespace store {
 
 const string DATA_DIR = "data/";
-
 const string CATALOGS_FILE = "catalogs.parquet";
 
 void init_system_databases() {
@@ -48,7 +47,16 @@ void init_system_databases() {
   // create the table
   auto table = arrow::Table::Make(schema, {schema_names, tables});
   SPDLOG_INFO("Generated table:\n{}", table->ToString());
-  exit(EXIT_SUCCESS);
+
+  // write to disk
+  std::shared_ptr<arrow::io::FileOutputStream> outfile;
+  PARQUET_ASSIGN_OR_THROW(outfile,
+                          arrow::io::FileOutputStream::Open(CATALOGS_FILE));
+  // The last argument to the function call is the size of the RowGroup in
+  // the parquet file. Normally you would choose this to be rather large but
+  // for the example, we use a small value to have multiple RowGroups.
+  PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(
+      *table, arrow::default_memory_pool(), outfile, 3));
 }
 
 void init_default_database() {}
