@@ -1,7 +1,7 @@
 cc_library(
-    name = "parquet_rw",
-    srcs = ["parquet_rw.cc"],
-    hdrs = ["parquet_rw.h"],
+    name = "store",
+    srcs = ["store.cc"],
+    hdrs = ["store.h"],
     visibility = ["//visibility:public"],
     deps = [
         "//:arrow",
