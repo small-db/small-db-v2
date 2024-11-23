@@ -1,5 +1,5 @@
 build --cxxopt="-std=c++17"
 build --cxxopt="-Wall"
 
-# specify the work directory as the current directory
+# change to the specific work directory
 run --run_under="cd /home/xiaochen/code/small-db-v2 &&"
