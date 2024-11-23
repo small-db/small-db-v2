@@ -1,3 +1,4 @@
+#include <iomanip>
 #include <spdlog/spdlog.h>
 #include <sys/stat.h> // For mkdir
 #include <unistd.h>   // For chdir
@@ -13,7 +14,28 @@ using namespace std;
 namespace store {
 
 const string DATA_DIR = "data/";
-const string CATALOGS_FILE = "catalogs.parquet";
+const string TABLE_SCHEMAS = "schemas";
+
+// "schemas" -> "schemas-2021-09-01-12-00-00.parquet"
+string gen_datafile_path(const string &tablename) {
+  // Get the current time
+  auto now = chrono::system_clock::now();
+  auto now_time_t = chrono::system_clock::to_time_t(now);
+  auto now_ns =
+      chrono::duration_cast<chrono::nanoseconds>(now.time_since_epoch())
+          .count() %
+      1000000000;
+
+  // Format the time into a string
+  stringstream ss;
+  ss << put_time(localtime(&now_time_t), "%Y-%m-%d-%H-%M-%S") << "-" << setw(9)
+     << setfill('0') << now_ns;
+
+  // Generate the file path
+  string filepath = tablename + "-" + ss.str() + ".parquet";
+  SPDLOG_INFO("generated file path: {}", filepath);
+  return filepath;
+}
 
 void init_system_databases() {
   // schema for "database schemas"
@@ -50,8 +72,8 @@ void init_system_databases() {
 
   // write to disk
   std::shared_ptr<arrow::io::FileOutputStream> outfile;
-  PARQUET_ASSIGN_OR_THROW(outfile,
-                          arrow::io::FileOutputStream::Open(CATALOGS_FILE));
+  PARQUET_ASSIGN_OR_THROW(outfile, arrow::io::FileOutputStream::Open(
+                                       gen_datafile_path(TABLE_SCHEMAS)));
   // The last argument to the function call is the size of the RowGroup in
   // the parquet file. Normally you would choose this to be rather large but
   // for the example, we use a small value to have multiple RowGroups.
@@ -60,10 +82,10 @@ void init_system_databases() {
 }
 
 void read_whole_file() {
-  SPDLOG_INFO("reading {} at once", CATALOGS_FILE);
+  SPDLOG_INFO("reading {} at once", TABLE_SCHEMAS);
   std::shared_ptr<arrow::io::ReadableFile> infile;
   PARQUET_ASSIGN_OR_THROW(
-      infile, arrow::io::ReadableFile::Open(CATALOGS_FILE,
+      infile, arrow::io::ReadableFile::Open(TABLE_SCHEMAS,
                                             arrow::default_memory_pool()));
 
   std::unique_ptr<parquet::arrow::FileReader> reader;
@@ -92,9 +114,10 @@ void init() {
   }
 
   init_system_databases();
+  exit(EXIT_SUCCESS);
 
   // Check if CATALOGS_FILE exists
-  if (access(CATALOGS_FILE.c_str(), F_OK) != 0) {
+  if (access(TABLE_SCHEMAS.c_str(), F_OK) != 0) {
     // File does not exist, initialize the databases
     init_system_databases();
     init_default_database();
@@ -102,7 +125,6 @@ void init() {
   }
 
   read_whole_file();
-  exit(EXIT_SUCCESS);
 }
 
 } // namespace store
