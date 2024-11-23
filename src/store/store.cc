@@ -1,3 +1,5 @@
+#include <dirent.h> // For opendir, readdir, closedir
+#include <filesystem>
 #include <iomanip>
 #include <spdlog/spdlog.h>
 #include <sys/stat.h> // For mkdir
@@ -99,6 +101,34 @@ void read_whole_file() {
 
 void init_default_database() {}
 
+// search for data files with prefix "tablename_"
+bool table_exists(const string &tablename) {
+  for (const auto &entry : filesystem::directory_iterator(DATA_DIR)) {
+    SPDLOG_INFO("{}", entry.path());
+  }
+  exit(EXIT_SUCCESS);
+
+  // Open the data directory
+  DIR *dir = opendir(DATA_DIR.c_str());
+  if (dir == nullptr) {
+    SPDLOG_ERROR("Error opening data directory");
+    return false;
+  }
+
+  // Search for files with the specified prefix
+  struct dirent *entry;
+  string prefix = tablename + "_";
+  while ((entry = readdir(dir)) != nullptr) {
+    if (strncmp(entry->d_name, prefix.c_str(), prefix.size()) == 0) {
+      closedir(dir);
+      return true;
+    }
+  }
+
+  closedir(dir);
+  return false;
+}
+
 void init() {
   // create the data directory if it does not exist
   if (access(DATA_DIR.c_str(), F_OK) != 0) {
@@ -114,17 +144,15 @@ void init() {
   }
 
   init_system_databases();
-  exit(EXIT_SUCCESS);
 
   // Check if CATALOGS_FILE exists
-  if (access(TABLE_SCHEMAS.c_str(), F_OK) != 0) {
-    // File does not exist, initialize the databases
+  if (table_exists(TABLE_SCHEMAS)) {
+    SPDLOG_INFO("found existing table schemas");
+  } else {
+    SPDLOG_INFO("table schemas not found, initializing system databases");
     init_system_databases();
     init_default_database();
-  } else {
   }
-
-  read_whole_file();
 }
 
 } // namespace store
