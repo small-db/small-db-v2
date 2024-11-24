@@ -19,6 +19,8 @@ const string DATA_DIR = "data/";
 const string TABLE_SCHEMAS = "schemas";
 const string TABLE_TABLES = "tables";
 
+const uint8_t TYPE_STRING = 20;
+
 // "schemas" -> "schemas-2021-09-01-12-00-00.parquet"
 string gen_datafile_path(const string &tablename) {
   // Get the current time
@@ -40,7 +42,7 @@ string gen_datafile_path(const string &tablename) {
   return filepath;
 }
 
-void init_system_databases() {
+void init_schemas() {
   // schema for "database schemas"
   auto type_tables = arrow::map(arrow::utf8(), arrow::uint64());
   std::shared_ptr<arrow::Schema> schema =
@@ -48,16 +50,12 @@ void init_system_databases() {
                      arrow::field("tables", type_tables)});
 
   // schema.names for "database schemas"
-  arrow::StringBuilder schema_names_builder;
+  auto schema_names_builder = arrow::StringBuilder();
   PARQUET_THROW_NOT_OK(schema_names_builder.Append("pg_catalog"));
   std::shared_ptr<arrow::Array> schema_names;
   PARQUET_THROW_NOT_OK(schema_names_builder.Finish(&schema_names));
 
   // schema.tables for "database schemas"
-  arrow::StringBuilder key_builder;
-  arrow::UInt64Builder value_builder;
-  vector<shared_ptr<arrow::ArrayBuilder>> field_builders;
-
   auto keys_builder = std::make_shared<arrow::StringBuilder>();
   auto values_builder = std::make_shared<arrow::UInt64Builder>();
   arrow::MapBuilder tables_builder(arrow::default_memory_pool(), keys_builder,
@@ -71,6 +69,38 @@ void init_system_databases() {
 
   // create the table
   auto table = arrow::Table::Make(schema, {schema_names, tables});
+  SPDLOG_INFO("generated table:\n{}", table->ToString());
+
+  // write to disk
+  std::shared_ptr<arrow::io::FileOutputStream> outfile;
+  PARQUET_ASSIGN_OR_THROW(outfile, arrow::io::FileOutputStream::Open(
+                                       gen_datafile_path(TABLE_SCHEMAS)));
+  // The last argument to the function call is the size of the RowGroup in
+  // the parquet file. Normally you would choose this to be rather large but
+  // for the example, we use a small value to have multiple RowGroups.
+  PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(
+      *table, arrow::default_memory_pool(), outfile, 30));
+}
+
+void init_tables() {
+  // schema for "database tables"
+  auto type_columns = arrow::struct_({arrow::field("name", arrow::utf8()),
+                                      arrow::field("type", arrow::uint8())});
+  std::shared_ptr<arrow::Schema> schema =
+      arrow::schema({arrow::field("name", arrow::utf8()),
+                     arrow::field("columns", type_columns)});
+
+  // schema.names for "database tables"
+  arrow::StringBuilder table_names_builder;
+  PARQUET_THROW_NOT_OK(table_names_builder.Append("pg_database"));
+  std::shared_ptr<arrow::Array> table_names;
+  PARQUET_THROW_NOT_OK(table_names_builder.Finish(&table_names));
+
+  // schema.columns for "database tables"
+  std::shared_ptr<arrow::Array> columns;
+
+  // create the table
+  auto table = arrow::Table::Make(schema, {table_names, columns});
   SPDLOG_INFO("generated table:\n{}", table->ToString());
 
   // write to disk
@@ -104,8 +134,9 @@ void init_default_database() {}
 
 // search for data files with prefix "tablename-"
 bool table_exists(const string &tablename) {
+  return false;
+
   for (const auto &entry : filesystem::directory_iterator(".")) {
-    SPDLOG_INFO("{}", entry.path().filename().string());
     auto entry_name = entry.path().filename().string();
     string prefix = tablename + "-";
     if (strncmp(entry_name.c_str(), prefix.c_str(), prefix.size()) == 0) {
@@ -119,13 +150,14 @@ void init() {
   // create the data directory if it does not exist
   if (access(DATA_DIR.c_str(), F_OK) != 0) {
     if (mkdir(DATA_DIR.c_str(), 0777) != 0) {
-      SPDLOG_ERROR("Error creating data directory");
+      SPDLOG_ERROR("error creating directory {}", DATA_DIR);
       exit(EXIT_FAILURE);
     }
   }
 
-  if (chdir(DATA_DIR.c_str()) != 0) {
-    perror("Error changing directory");
+  int ret = chdir(DATA_DIR.c_str());
+  if (ret != 0) {
+    SPDLOG_ERROR("error changing to directory {}, error: {}", DATA_DIR, ret);
     exit(EXIT_FAILURE);
   }
 
@@ -134,7 +166,7 @@ void init() {
     SPDLOG_INFO("found existing table schemas");
   } else {
     SPDLOG_INFO("table schemas not found, initializing system databases");
-    init_system_databases();
+    init_schemas();
     init_default_database();
   }
 

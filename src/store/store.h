@@ -1,7 +1,7 @@
 
 namespace store {
 
-void init_system_databases();
+void init_schemas();
 void init_default_database();
 void init();
 
