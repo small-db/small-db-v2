@@ -75,11 +75,8 @@ void init_schemas() {
   std::shared_ptr<arrow::io::FileOutputStream> outfile;
   PARQUET_ASSIGN_OR_THROW(outfile, arrow::io::FileOutputStream::Open(
                                        gen_datafile_path(TABLE_SCHEMAS)));
-  // The last argument to the function call is the size of the RowGroup in
-  // the parquet file. Normally you would choose this to be rather large but
-  // for the example, we use a small value to have multiple RowGroups.
   PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(
-      *table, arrow::default_memory_pool(), outfile, 30));
+      *table, arrow::default_memory_pool(), outfile, 300));
 }
 
 void init_tables() {
@@ -91,13 +88,23 @@ void init_tables() {
                      arrow::field("columns", type_columns)});
 
   // schema.names for "database tables"
-  arrow::StringBuilder table_names_builder;
+  auto table_names_builder = arrow::StringBuilder();
   PARQUET_THROW_NOT_OK(table_names_builder.Append("pg_database"));
   std::shared_ptr<arrow::Array> table_names;
   PARQUET_THROW_NOT_OK(table_names_builder.Finish(&table_names));
 
   // schema.columns for "database tables"
+  auto column_names_builder = std::make_shared<arrow::StringBuilder>();
+  auto column_types_builder = std::make_shared<arrow::UInt8Builder>();
+  vector<shared_ptr<arrow::ArrayBuilder>> field_builders = {
+      column_names_builder, column_types_builder};
+  arrow::StructBuilder columns_builder(
+      type_columns, arrow::default_memory_pool(), field_builders);
+  PARQUET_THROW_NOT_OK(columns_builder.Append());
+  PARQUET_THROW_NOT_OK(column_names_builder->Append("column1"));
+  PARQUET_THROW_NOT_OK(column_types_builder->Append(1));
   std::shared_ptr<arrow::Array> columns;
+  PARQUET_THROW_NOT_OK(columns_builder.Finish(&columns));
 
   // create the table
   auto table = arrow::Table::Make(schema, {table_names, columns});
@@ -107,11 +114,8 @@ void init_tables() {
   std::shared_ptr<arrow::io::FileOutputStream> outfile;
   PARQUET_ASSIGN_OR_THROW(outfile, arrow::io::FileOutputStream::Open(
                                        gen_datafile_path(TABLE_TABLES)));
-  // The last argument to the function call is the size of the RowGroup in
-  // the parquet file. Normally you would choose this to be rather large but
-  // for the example, we use a small value to have multiple RowGroups.
   PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(
-      *table, arrow::default_memory_pool(), outfile, 30));
+      *table, arrow::default_memory_pool(), outfile, 300));
 }
 
 void read_whole_file() {

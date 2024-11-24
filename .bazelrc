@@ -5,5 +5,8 @@ build --cxxopt="-Wall"
 build --compilation_mode=dbg
 
 # change to the specific work directory
-run --run_under="cd /home/xiaochen/code/small-db-v2 &&"
-build --run_under="cd /home/xiaochen/code/small-db-v2 &&" # all run args should be copied to build args to keep the ayalysis cache
+# run --run_under="cd /home/xiaochen/code/small-db-v2 &&"
+# build --run_under="cd /home/xiaochen/code/small-db-v2 &&" # all run args should be copied to build args to keep the ayalysis cache
+
+run --run_under="cd /home/xiaochen/code/small-db-v2 && valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt"
+# build --run_under="cd /home/xiaochen/code/small-db-v2 &&" # all run args should be copied to build args to keep the ayalysis cache
