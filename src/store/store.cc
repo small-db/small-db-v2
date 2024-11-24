@@ -167,6 +167,7 @@ void init() {
   } else {
     SPDLOG_INFO("table schemas not found, initializing system databases");
     init_schemas();
+    init_tables();
     init_default_database();
   }
 
