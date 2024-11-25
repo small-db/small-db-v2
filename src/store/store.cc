@@ -69,7 +69,6 @@ void init_schemas() {
 
   // create the table
   auto table = arrow::Table::Make(schema, {schema_names, tables});
-  SPDLOG_INFO("generated table:\n{}", table->ToString());
 
   // write to disk
   std::shared_ptr<arrow::io::FileOutputStream> outfile;
@@ -135,7 +134,6 @@ void init_tables() {
       arrow::schema({arrow::field("name", arrow::utf8()),
                      arrow::field("columns", type_columns)});
   auto table = arrow::Table::Make(schema, {table_names, columns_list});
-  SPDLOG_INFO("generated table:\n{}", table->ToString());
 
   // write to disk
   std::shared_ptr<arrow::io::FileOutputStream> outfile;
