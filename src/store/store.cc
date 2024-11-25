@@ -149,8 +149,6 @@ void init_default_database() {}
 
 // search for data files with prefix "tablename-"
 bool table_exists(const string &tablename) {
-  return false;
-
   for (const auto &entry : filesystem::directory_iterator(".")) {
     auto entry_name = entry.path().filename().string();
     string prefix = tablename + "-";
