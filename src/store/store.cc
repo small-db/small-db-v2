@@ -174,14 +174,12 @@ void init() {
     exit(EXIT_FAILURE);
   }
 
-  // Check if CATALOGS_FILE exists
-  if (table_exists(TABLE_SCHEMAS)) {
-    SPDLOG_INFO("found existing table schemas");
-  } else {
-    SPDLOG_INFO("table schemas not found, initializing system databases");
+  if (!table_exists(TABLE_SCHEMAS)) {
     init_schemas();
+  }
+
+  if (!table_exists(TABLE_TABLES)) {
     init_tables();
-    init_default_database();
   }
 
   exit(0);
