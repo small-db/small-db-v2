@@ -81,8 +81,9 @@ void init_schemas() {
 
 void init_tables() {
   // schema for "database tables"
-  auto type_columns = arrow::struct_({arrow::field("name", arrow::utf8()),
-                                      arrow::field("type", arrow::uint8())});
+  auto type_columns =
+      arrow::list(arrow::struct_({arrow::field("name", arrow::utf8()),
+                                  arrow::field("type", arrow::uint8())}));
   std::shared_ptr<arrow::Schema> schema =
       arrow::schema({arrow::field("name", arrow::utf8()),
                      arrow::field("columns", type_columns)});
@@ -96,13 +97,33 @@ void init_tables() {
   // schema.columns for "database tables"
   auto column_names_builder = std::make_shared<arrow::StringBuilder>();
   auto column_types_builder = std::make_shared<arrow::UInt8Builder>();
-  vector<shared_ptr<arrow::ArrayBuilder>> field_builders = {
-      column_names_builder, column_types_builder};
-  arrow::StructBuilder columns_builder(
-      type_columns, arrow::default_memory_pool(), field_builders);
+  shared_ptr<arrow::ArrayBuilder> field_builder =
+      std::make_shared<arrow::StructBuilder>(
+          arrow::struct_({arrow::field("name", arrow::utf8()),
+                          arrow::field("type", arrow::uint8())}));
+  arrow::ListBuilder columns_builder(arrow::default_memory_pool(),
+                                     field_builder, type_columns);
+
+  // column "datname"
   PARQUET_THROW_NOT_OK(columns_builder.Append());
-  PARQUET_THROW_NOT_OK(column_names_builder->Append("column1"));
-  PARQUET_THROW_NOT_OK(column_types_builder->Append(1));
+  PARQUET_THROW_NOT_OK(column_names_builder->Append("datname"));
+  PARQUET_THROW_NOT_OK(column_types_builder->Append(TYPE_STRING));
+
+  // column "datcollate"
+  PARQUET_THROW_NOT_OK(columns_builder.Append());
+  PARQUET_THROW_NOT_OK(column_names_builder->Append("datcollate"));
+  PARQUET_THROW_NOT_OK(column_types_builder->Append(TYPE_STRING));
+
+  // column "datctype"
+  PARQUET_THROW_NOT_OK(columns_builder.Append());
+  PARQUET_THROW_NOT_OK(column_names_builder->Append("datctype"));
+  PARQUET_THROW_NOT_OK(column_types_builder->Append(TYPE_STRING));
+
+  // column "datacl"
+  PARQUET_THROW_NOT_OK(columns_builder.Append());
+  PARQUET_THROW_NOT_OK(column_names_builder->Append("datacl"));
+  PARQUET_THROW_NOT_OK(column_types_builder->Append(TYPE_STRING));
+
   std::shared_ptr<arrow::Array> columns;
   PARQUET_THROW_NOT_OK(columns_builder.Finish(&columns));
 
