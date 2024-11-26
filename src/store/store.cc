@@ -143,20 +143,20 @@ void init_tables() {
       *table, arrow::default_memory_pool(), outfile, 300));
 }
 
-arrow::Status ScanSinkExample() {
-  ARROW_ASSIGN_OR_RAISE(std::shared_ptr<arrow::dataset::Dataset> dataset,
-                        GetDataset());
+// arrow::Status ScanSinkExample() {
+//   ARROW_ASSIGN_OR_RAISE(std::shared_ptr<arrow::dataset::Dataset> dataset,
+//                         GetDataset());
 
-  auto options = std::make_shared<arrow::dataset::ScanOptions>();
-  options->projection = cp::project({}, {}); // create empty projection
+//   auto options = std::make_shared<arrow::dataset::ScanOptions>();
+//   options->projection = cp::project({}, {}); // create empty projection
 
-  // construct the scan node
-  auto scan_node_options = arrow::dataset::ScanNodeOptions{dataset, options};
+//   // construct the scan node
+//   auto scan_node_options = arrow::dataset::ScanNodeOptions{dataset, options};
 
-  ac::Declaration scan{"scan", std::move(scan_node_options)};
+//   ac::Declaration scan{"scan", std::move(scan_node_options)};
 
-  return ExecutePlanAndCollectAsTable(std::move(scan));
-}
+//   return ExecutePlanAndCollectAsTable(std::move(scan));
+// }
 
 void init_default_database() {}
 
