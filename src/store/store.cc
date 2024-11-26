@@ -143,6 +143,19 @@ void init_tables() {
       *table, arrow::default_memory_pool(), outfile, 300));
 }
 
+// arrow::Status ExecutePlanAndCollectAsTable(arrow::acero::Declaration plan) {
+//   // collect sink_reader into a Table
+//   std::shared_ptr<arrow::Table> response_table;
+//   ARROW_ASSIGN_OR_RAISE(response_table,
+//                         ac::DeclarationToTable(std::move(plan)));
+
+//   std::cout << "Results : " << response_table->ToString() << std::endl;
+
+//   return arrow::Status::OK();
+// }
+
+arrow::Status ScanSinkExample() {}
+
 // arrow::Status ScanSinkExample() {
 //   ARROW_ASSIGN_OR_RAISE(std::shared_ptr<arrow::dataset::Dataset> dataset,
 //                         GetDataset());
@@ -153,7 +166,7 @@ void init_tables() {
 //   // construct the scan node
 //   auto scan_node_options = arrow::dataset::ScanNodeOptions{dataset, options};
 
-//   ac::Declaration scan{"scan", std::move(scan_node_options)};
+//   arrow::acero::Declaration scan{"scan", std::move(scan_node_options)};
 
 //   return ExecutePlanAndCollectAsTable(std::move(scan));
 // }

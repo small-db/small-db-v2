@@ -9,6 +9,7 @@ cmake(
         "CMAKE_C_FLAGS": "-fPIC -I/usr/include -fvisibility=hidden",
         "CMAKE_CXX_FLAGS": "-fPIC -I/usr/include -fvisibility=hidden",
         "EP_COMMON_CMAKE_ARGS": "-DWITH_OPENSSL=OFF",
+        "ARROW_ACERO": "ON",
         "ARROW_BUILD_SHARED": "OFF",
         "ARROW_BUILD_STATIC": "ON",
         "ARROW_BUILD_TESTS": "OFF",
