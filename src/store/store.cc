@@ -24,6 +24,12 @@
 #include <arrow/dataset/plan.h>
 #include <arrow/dataset/scanner.h>
 
+// arrow util
+#include <arrow/util/future.h>
+#include <arrow/util/range.h>
+#include <arrow/util/thread_pool.h>
+#include <arrow/util/vector.h>
+
 #include <parquet/arrow/reader.h>
 #include <parquet/arrow/writer.h>
 #include <parquet/exception.h>

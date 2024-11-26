@@ -5,7 +5,6 @@ cc_binary(
     deps = [
         "//:libpg_query",
         "//:spdlog",
-
-        "//src/store:store",
+        "//src/store",
     ],
 )
