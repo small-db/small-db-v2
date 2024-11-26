@@ -12,6 +12,7 @@ cmake(
         "ARROW_BUILD_SHARED": "OFF",
         "ARROW_BUILD_STATIC": "ON",
         "ARROW_BUILD_TESTS": "OFF",
+        "ARROW_DATASET": "ON",
         "ARROW_PARQUET": "ON",
         "ARROW_JEMALLOC": "OFF",
         "ARROW_IPC": "OFF",
