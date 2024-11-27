@@ -65,30 +65,33 @@ string gen_datafile_path(const string &tablename) {
   return filepath;
 }
 
-// arrow::Status ExecutePlanAndCollectAsTable(arrow::acero::Declaration plan) {
-//   // collect sink_reader into a Table
-//   std::shared_ptr<arrow::Table> response_table;
-//   ARROW_ASSIGN_OR_RAISE(response_table,
-//                         arrow::acero::DeclarationToTable(std::move(plan)));
+arrow::Status ExecutePlanAndCollectAsTable(arrow::acero::Declaration plan) {
+  // collect sink_reader into a Table
+  std::shared_ptr<arrow::Table> response_table;
+  ARROW_ASSIGN_OR_RAISE(response_table,
+                        arrow::acero::DeclarationToTable(std::move(plan)));
 
-//   SPDLOG_INFO("results : {}", response_table->ToString());
-//   return arrow::Status::OK();
-// }
+  SPDLOG_INFO("results : {}", response_table->ToString());
+  return arrow::Status::OK();
+}
 
-// arrow::Status ScanSinkExample(shared_ptr<arrow::Table> table) {
-//   auto dataset = std::make_shared<arrow::dataset::InMemoryDataset>(table);
+arrow::Status ScanSinkExample(shared_ptr<arrow::Table> table) {
+  // ensure arrow::dataset node factories are in the registry
+  arrow::dataset::internal::Initialize();
 
-//   auto options = std::make_shared<arrow::dataset::ScanOptions>();
-//   options->projection =
-//       arrow::compute::project({}, {}); // create empty projection
+  auto dataset = std::make_shared<arrow::dataset::InMemoryDataset>(table);
 
-//   // construct the scan node
-//   auto scan_node_options = arrow::dataset::ScanNodeOptions{dataset, options};
+  auto options = std::make_shared<arrow::dataset::ScanOptions>();
+  options->projection =
+      arrow::compute::project({}, {}); // create empty projection
 
-//   arrow::acero::Declaration scan{"scan", std::move(scan_node_options)};
+  // construct the scan node
+  auto scan_node_options = arrow::dataset::ScanNodeOptions{dataset, options};
 
-//   return ExecutePlanAndCollectAsTable(std::move(scan));
-// }
+  arrow::acero::Declaration scan{"scan", std::move(scan_node_options)};
+
+  return ExecutePlanAndCollectAsTable(std::move(scan));
+}
 
 void init_schemas() {
   // schema for "database schemas"
@@ -190,11 +193,11 @@ void init_tables() {
   PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(
       *table, arrow::default_memory_pool(), outfile, 300));
 
-  // arrow::Status status = ScanSinkExample(table);
+  arrow::Status status = ScanSinkExample(table);
 
-  // if (!status.ok()) {
-  //   SPDLOG_ERROR("error occurred: {}", status.message());
-  // }
+  if (!status.ok()) {
+    SPDLOG_ERROR("error occurred: {}", status.message());
+  }
 }
 
 void init_default_database() {}
@@ -233,6 +236,8 @@ void init() {
   if (!table_exists(TABLE_TABLES)) {
     init_tables();
   }
+
+  init_tables();
 
   exit(0);
 }
