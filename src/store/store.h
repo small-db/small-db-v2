@@ -1,5 +1,5 @@
 #pragma once
 
 namespace store {
-void Init();
+void init();
 } // namespace store

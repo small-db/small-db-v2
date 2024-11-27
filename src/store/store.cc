@@ -212,7 +212,7 @@ bool table_exists(const string &tablename) {
   return false;
 }
 
-void Init() {
+void init() {
   // create the data directory if it does not exist
   if (access(DATA_DIR.c_str(), F_OK) != 0) {
     if (mkdir(DATA_DIR.c_str(), 0777) != 0) {

@@ -396,7 +396,7 @@ int main(int argc, char *argv[]) {
     exit(0);
   }
 
-  store::Init();
+  store::init();
 
   int portno = strtol(argv[1], NULL, 10);
   struct sockaddr_in server_addr, client_addr;
