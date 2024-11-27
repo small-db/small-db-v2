@@ -9,26 +9,26 @@
 #include <arrow/api.h>
 #include <arrow/io/api.h>
 
-// arrow acero
-#include <arrow/acero/exec_plan.h>
+// // arrow acero
+// #include <arrow/acero/exec_plan.h>
 
-// arrow compute
-#include <arrow/compute/api.h>
-#include <arrow/compute/api_vector.h>
-#include <arrow/compute/cast.h>
+// // arrow compute
+// #include <arrow/compute/api.h>
+// #include <arrow/compute/api_vector.h>
+// #include <arrow/compute/cast.h>
 
-// arrow dataset
-#include <arrow/dataset/dataset.h>
-#include <arrow/dataset/file_base.h>
-#include <arrow/dataset/file_parquet.h>
-#include <arrow/dataset/plan.h>
-#include <arrow/dataset/scanner.h>
+// // arrow dataset
+// #include <arrow/dataset/dataset.h>
+// #include <arrow/dataset/file_base.h>
+// #include <arrow/dataset/file_parquet.h>
+// #include <arrow/dataset/plan.h>
+// #include <arrow/dataset/scanner.h>
 
-// arrow util
-#include <arrow/util/future.h>
-#include <arrow/util/range.h>
-#include <arrow/util/thread_pool.h>
-#include <arrow/util/vector.h>
+// // arrow util
+// #include <arrow/util/future.h>
+// #include <arrow/util/range.h>
+// #include <arrow/util/thread_pool.h>
+// #include <arrow/util/vector.h>
 
 #include <parquet/arrow/reader.h>
 #include <parquet/arrow/writer.h>
@@ -65,30 +65,30 @@ string gen_datafile_path(const string &tablename) {
   return filepath;
 }
 
-arrow::Status ExecutePlanAndCollectAsTable(arrow::acero::Declaration plan) {
-  // collect sink_reader into a Table
-  std::shared_ptr<arrow::Table> response_table;
-  ARROW_ASSIGN_OR_RAISE(response_table,
-                        arrow::acero::DeclarationToTable(std::move(plan)));
+// arrow::Status ExecutePlanAndCollectAsTable(arrow::acero::Declaration plan) {
+//   // collect sink_reader into a Table
+//   std::shared_ptr<arrow::Table> response_table;
+//   ARROW_ASSIGN_OR_RAISE(response_table,
+//                         arrow::acero::DeclarationToTable(std::move(plan)));
 
-  SPDLOG_INFO("results : {}", response_table->ToString());
-  return arrow::Status::OK();
-}
+//   SPDLOG_INFO("results : {}", response_table->ToString());
+//   return arrow::Status::OK();
+// }
 
-arrow::Status ScanSinkExample(shared_ptr<arrow::Table> table) {
-  auto dataset = std::make_shared<arrow::dataset::InMemoryDataset>(table);
+// arrow::Status ScanSinkExample(shared_ptr<arrow::Table> table) {
+//   auto dataset = std::make_shared<arrow::dataset::InMemoryDataset>(table);
 
-  auto options = std::make_shared<arrow::dataset::ScanOptions>();
-  options->projection =
-      arrow::compute::project({}, {}); // create empty projection
+//   auto options = std::make_shared<arrow::dataset::ScanOptions>();
+//   options->projection =
+//       arrow::compute::project({}, {}); // create empty projection
 
-  // construct the scan node
-  auto scan_node_options = arrow::dataset::ScanNodeOptions{dataset, options};
+//   // construct the scan node
+//   auto scan_node_options = arrow::dataset::ScanNodeOptions{dataset, options};
 
-  arrow::acero::Declaration scan{"scan", std::move(scan_node_options)};
+//   arrow::acero::Declaration scan{"scan", std::move(scan_node_options)};
 
-  return ExecutePlanAndCollectAsTable(std::move(scan));
-}
+//   return ExecutePlanAndCollectAsTable(std::move(scan));
+// }
 
 void init_schemas() {
   // schema for "database schemas"
@@ -190,11 +190,11 @@ void init_tables() {
   PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(
       *table, arrow::default_memory_pool(), outfile, 300));
 
-  arrow::Status status = ScanSinkExample(table);
+  // arrow::Status status = ScanSinkExample(table);
 
-  if (!status.ok()) {
-    SPDLOG_ERROR("error occurred: {}", status.message());
-  }
+  // if (!status.ok()) {
+  //   SPDLOG_ERROR("error occurred: {}", status.message());
+  // }
 }
 
 void init_default_database() {}
