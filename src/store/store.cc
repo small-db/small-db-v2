@@ -45,7 +45,7 @@ const string TABLE_TABLES = "tables";
 const uint8_t TYPE_STRING = 20;
 
 // "schemas" -> "schemas-2021-09-01-12-00-00.parquet"
-string gen_datafile_path(const string &tablename) {
+string GenDatafilePath(const string &tablename) {
   // Get the current time
   auto now = chrono::system_clock::now();
   auto now_time_t = chrono::system_clock::to_time_t(now);
@@ -93,7 +93,7 @@ arrow::Status ScanSinkExample(shared_ptr<arrow::Table> table) {
   return ExecutePlanAndCollectAsTable(std::move(scan));
 }
 
-void init_schemas() {
+void InitSchemas() {
   // schema for "database schemas"
   auto type_tables = arrow::map(arrow::utf8(), arrow::uint64());
   std::shared_ptr<arrow::Schema> schema =
@@ -124,12 +124,12 @@ void init_schemas() {
   // write to disk
   std::shared_ptr<arrow::io::FileOutputStream> outfile;
   PARQUET_ASSIGN_OR_THROW(outfile, arrow::io::FileOutputStream::Open(
-                                       gen_datafile_path(TABLE_SCHEMAS)));
+                                       GenDatafilePath(TABLE_SCHEMAS)));
   PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(
       *table, arrow::default_memory_pool(), outfile, 300));
 }
 
-void init_tables() {
+void InitTables() {
   auto pool = arrow::default_memory_pool();
 
   // declare custom types
@@ -189,7 +189,7 @@ void init_tables() {
   // write to disk
   std::shared_ptr<arrow::io::FileOutputStream> outfile;
   PARQUET_ASSIGN_OR_THROW(outfile, arrow::io::FileOutputStream::Open(
-                                       gen_datafile_path(TABLE_TABLES)));
+                                       GenDatafilePath(TABLE_TABLES)));
   PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(
       *table, arrow::default_memory_pool(), outfile, 300));
 
@@ -200,10 +200,8 @@ void init_tables() {
   }
 }
 
-void init_default_database() {}
-
 // search for data files with prefix "tablename-"
-bool table_exists(const string &tablename) {
+bool TableExists(const string &tablename) {
   for (const auto &entry : filesystem::directory_iterator(".")) {
     auto entry_name = entry.path().filename().string();
     string prefix = tablename + "-";
@@ -214,7 +212,7 @@ bool table_exists(const string &tablename) {
   return false;
 }
 
-void init() {
+void Init() {
   // create the data directory if it does not exist
   if (access(DATA_DIR.c_str(), F_OK) != 0) {
     if (mkdir(DATA_DIR.c_str(), 0777) != 0) {
@@ -229,15 +227,15 @@ void init() {
     exit(EXIT_FAILURE);
   }
 
-  if (!table_exists(TABLE_SCHEMAS)) {
-    init_schemas();
+  if (!TableExists(TABLE_SCHEMAS)) {
+    InitSchemas();
   }
 
-  if (!table_exists(TABLE_TABLES)) {
-    init_tables();
+  if (!TableExists(TABLE_TABLES)) {
+    InitTables();
   }
 
-  init_tables();
+  InitTables();
 
   exit(0);
 }
