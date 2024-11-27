@@ -9,26 +9,26 @@
 #include <arrow/api.h>
 #include <arrow/io/api.h>
 
-// // arrow acero
-// #include <arrow/acero/exec_plan.h>
+// arrow acero
+#include <arrow/acero/exec_plan.h>
 
-// // arrow compute
-// #include <arrow/compute/api.h>
-// #include <arrow/compute/api_vector.h>
-// #include <arrow/compute/cast.h>
+// arrow compute
+#include <arrow/compute/api.h>
+#include <arrow/compute/api_vector.h>
+#include <arrow/compute/cast.h>
 
-// // arrow dataset
-// #include <arrow/dataset/dataset.h>
-// #include <arrow/dataset/file_base.h>
-// #include <arrow/dataset/file_parquet.h>
-// #include <arrow/dataset/plan.h>
-// #include <arrow/dataset/scanner.h>
+// arrow dataset
+#include <arrow/dataset/dataset.h>
+#include <arrow/dataset/file_base.h>
+#include <arrow/dataset/file_parquet.h>
+#include <arrow/dataset/plan.h>
+#include <arrow/dataset/scanner.h>
 
-// // arrow util
-// #include <arrow/util/future.h>
-// #include <arrow/util/range.h>
-// #include <arrow/util/thread_pool.h>
-// #include <arrow/util/vector.h>
+// arrow util
+#include <arrow/util/future.h>
+#include <arrow/util/range.h>
+#include <arrow/util/thread_pool.h>
+#include <arrow/util/vector.h>
 
 #include <parquet/arrow/reader.h>
 #include <parquet/arrow/writer.h>
