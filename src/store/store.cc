@@ -65,7 +65,8 @@ string gen_datafile_path(const string &tablename) {
   return filepath;
 }
 
-arrow::Status execute_plan_and_collect_as_table(arrow::acero::Declaration plan) {
+arrow::Status
+execute_plan_and_collect_as_table(arrow::acero::Declaration plan) {
   // collect sink_reader into a Table
   std::shared_ptr<arrow::Table> response_table;
   ARROW_ASSIGN_OR_RAISE(response_table,
@@ -200,6 +201,46 @@ void init_tables() {
   }
 }
 
+void init_demo() {
+  auto pool = arrow::default_memory_pool();
+
+  // i
+  auto i_builder = arrow::Int64Builder();
+  PARQUET_THROW_NOT_OK(i_builder.Append(101));
+  PARQUET_THROW_NOT_OK(i_builder.Append(102));
+  PARQUET_THROW_NOT_OK(i_builder.Append(103));
+  PARQUET_THROW_NOT_OK(i_builder.Append(104));
+  shared_ptr<arrow::Array> i_list;
+  PARQUET_THROW_NOT_OK(i_builder.Finish(&i_list));
+
+  // b
+  auto b_builder = arrow::BooleanBuilder();
+  PARQUET_THROW_NOT_OK(b_builder.Append(true));
+  PARQUET_THROW_NOT_OK(b_builder.Append(false));
+  PARQUET_THROW_NOT_OK(b_builder.Append(true));
+  PARQUET_THROW_NOT_OK(b_builder.Append(false));
+  shared_ptr<arrow::Array> b_list;
+  PARQUET_THROW_NOT_OK(b_builder.Finish(&b_list));
+
+  // create the table
+  std::shared_ptr<arrow::Schema> schema = arrow::schema(
+      {arrow::field("i", arrow::int64()), arrow::field("b", arrow::boolean())});
+  auto table = arrow::Table::Make(schema, {i_list, b_list});
+
+  // write to disk
+  std::shared_ptr<arrow::io::FileOutputStream> outfile;
+  PARQUET_ASSIGN_OR_THROW(outfile,
+                          arrow::io::FileOutputStream::Open("demo.parquet"));
+  PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(
+      *table, arrow::default_memory_pool(), outfile, 300));
+
+  arrow::Status status = scan_sink_example(table);
+
+  if (!status.ok()) {
+    SPDLOG_ERROR("error occurred: {}", status.message());
+  }
+}
+
 // search for data files with prefix "tablename-"
 bool table_exists(const string &tablename) {
   for (const auto &entry : filesystem::directory_iterator(".")) {
@@ -235,7 +276,7 @@ void init() {
     init_tables();
   }
 
-  init_tables();
+  init_demo();
 
   exit(0);
 }

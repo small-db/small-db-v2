@@ -6,5 +6,6 @@ cc_binary(
         "//:libpg_query",
         "//:spdlog",
         "//src/store",
+        "//src/query",
     ],
 )
