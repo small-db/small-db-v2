@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+#include <spdlog/spdlog.h>
+
 #include <arrow/api.h>
 #include <arrow/compute/api.h>
 #include <arrow/engine/api.h>
@@ -23,6 +25,8 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+
+#include "query.h"
 
 namespace eng = arrow::engine;
 namespace cp = arrow::compute;
@@ -96,56 +100,24 @@ GetSubstraitFromServer(const std::string &filename) {
     ],
     "extension_uris": [
       {
-        "extension_uri_anchor": 7,
-        "uri": "https://github.com/apache/arrow/blob/main/format/substrait/extension_types.yaml"
-      }
+        "extensionUriAnchor": 1,
+        "uri": "https://github.com/substrait-io/substrait/blob/main/extensions/functions_arithmetic.yaml"
+      },
     ],
-    "extensions": [
-      {"extension_type": {
-        "extension_uri_reference": 7,
-        "type_anchor": 42,
-        "name": "null"
-      }},
-      {"extension_function": {
-        "extension_uri_reference": 7,
-        "function_anchor": 42,
-        "name": "add"
-      }}
-    ]
+      "extensions": [
+    {
+      "extensionFunction": {
+        "extensionUriReference": 1,
+        "functionAnchor": 1,
+        "name": "add",
+      }
+    },
+  ],
   })";
 
-  substrait_json = R"({
-    "relations": [
-      {"rel": {
-        "read": {
-          "base_schema": {
-            "struct": {
-              "types": [ {"i64": {}}, {"bool": {}} ]
-            },
-            "names": ["i", "b"]
-          },
-          "local_files": {
-            "items": [
-              {
-                "uri_file": "file://FILENAME_PLACEHOLDER",
-                "parquet": {}
-              }
-            ]
-          }
-        }
-      }}
-    ],
-    "extension_uris": [
-      {
-        "extension_uri_anchor": 7,
-        "uri": "https://github.com/apache/arrow/blob/main/format/substrait/extension_types.yaml"
-      },
-      {
-        "extensionUriAnchor": 3,
-        "uri": "https://github.com/substrait-io/substrait/blob/main/extensions/functions_arithmetic_decimal.yaml"
-      },
-    ],
-  })";
+  SPDLOG_INFO("in_query: {}", in_query);
+  SPDLOG_INFO("out_query: {}", out_query);
+
   std::string filename_placeholder = "FILENAME_PLACEHOLDER";
   substrait_json.replace(substrait_json.find(filename_placeholder),
                          filename_placeholder.size(), filename);
@@ -153,7 +125,8 @@ GetSubstraitFromServer(const std::string &filename) {
 }
 
 arrow::Status RunSubstraitConsumer() {
-  std::string filename = "./data/demo.parquet";
+  // std::string filename = "./data/demo.parquet";
+  std::string filename = "/home/xiaochen/code/small-db-v2/data/demo.parquet";
 
   // Plans arrive at the consumer serialized in a Buffer, using the binary
   // protobuf serialization of a substrait Plan
