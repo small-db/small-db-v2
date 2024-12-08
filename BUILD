@@ -34,9 +34,10 @@ cmake(
     # These files will be put into dozens of directories, one of which is:
     # ./bazel-bin/arrow/lib/
     out_static_libs = [
-        "libparquet.a",
-        "libarrow_dataset.a",
+        "libarrow_substrait.a",
         "libarrow_acero.a",
+        "libarrow_dataset.a",
+        "libparquet.a",
         "libarrow.a",
         "libarrow_bundled_dependencies.a",
     ],

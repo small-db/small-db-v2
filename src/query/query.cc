@@ -28,6 +28,8 @@ namespace eng = arrow::engine;
 namespace cp = arrow::compute;
 namespace ac = arrow::acero;
 
+namespace query {
+
 class IgnoringConsumer : public ac::SinkNodeConsumer {
 public:
   explicit IgnoringConsumer(size_t tag) : tag_{tag} {}
@@ -224,3 +226,5 @@ void run() {
     std::cerr << status.ToString() << std::endl;
   }
 }
+
+} // namespace query

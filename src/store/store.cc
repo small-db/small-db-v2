@@ -274,7 +274,7 @@ void init() {
     init_tables();
   }
 
-  init_demo();
+  // init_demo();
 }
 
 } // namespace store
