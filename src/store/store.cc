@@ -202,8 +202,6 @@ void init_tables() {
 }
 
 void init_demo() {
-  auto pool = arrow::default_memory_pool();
-
   // i
   auto i_builder = arrow::Int64Builder();
   PARQUET_THROW_NOT_OK(i_builder.Append(101));
@@ -234,11 +232,11 @@ void init_demo() {
   PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(
       *table, arrow::default_memory_pool(), outfile, 300));
 
-  arrow::Status status = scan_sink_example(table);
+  // arrow::Status status = scan_sink_example(table);
 
-  if (!status.ok()) {
-    SPDLOG_ERROR("error occurred: {}", status.message());
-  }
+  // if (!status.ok()) {
+  //   SPDLOG_ERROR("error occurred: {}", status.message());
+  // }
 }
 
 // search for data files with prefix "tablename-"
@@ -277,8 +275,6 @@ void init() {
   }
 
   init_demo();
-
-  exit(0);
 }
 
 } // namespace store

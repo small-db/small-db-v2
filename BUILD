@@ -13,6 +13,7 @@ cmake(
         "ARROW_BUILD_SHARED": "OFF",
         "ARROW_BUILD_STATIC": "ON",
         "ARROW_BUILD_TESTS": "OFF",
+        "ARROW_BUILD_UTILITIES": "ON",
         "ARROW_DATASET": "ON",
         "ARROW_PARQUET": "ON",
         "ARROW_JEMALLOC": "OFF",
@@ -20,6 +21,7 @@ cmake(
         "ARROW_DEPENDENCY_SOURCE": "BUNDLED",
         "ARROW_WITH_SNAPPY": "ON",
         "ARROW_WITH_ZSTD": "ON",
+        "ARROW_SUBSTRAIT": "ON",
         "CMAKE_OSX_DEPLOYMENT_TARGET": "12",
     },
     generate_args = [

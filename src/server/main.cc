@@ -20,8 +20,8 @@
 #include <spdlog/fmt/bin_to_hex.h>
 #include <spdlog/spdlog.h>
 
+#include "src/query/query.h"
 #include "src/store/store.h"
-
 
 #define BACKLOG 512
 #define MAX_EVENTS 128
@@ -397,6 +397,10 @@ int main(int argc, char *argv[]) {
   }
 
   store::init();
+
+  query::run();
+
+  exit(0);
 
   int portno = strtol(argv[1], NULL, 10);
   struct sockaddr_in server_addr, client_addr;
