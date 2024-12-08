@@ -77,7 +77,7 @@ private:
 arrow::Future<std::shared_ptr<arrow::Buffer>>
 GetSubstraitFromServer(const std::string &filename) {
   // Emulate server interaction by parsing hard coded JSON
-  std::string substrait_json = R"({
+  std::string substrait_json = R"(
     "relations": [
       {"rel": {
         "read": {
@@ -113,7 +113,8 @@ GetSubstraitFromServer(const std::string &filename) {
       }
     },
   ],
-  })";
+  }
+  )";
 
   SPDLOG_INFO("in_query: {}", in_query);
   SPDLOG_INFO("out_query: {}", out_query);
