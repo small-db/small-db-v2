@@ -23,6 +23,11 @@ cmake(
         "ARROW_WITH_ZSTD": "ON",
         "ARROW_SUBSTRAIT": "ON",
         "CMAKE_OSX_DEPLOYMENT_TARGET": "12",
+        # The BUILD_WARNING_LEVEL CMake option switches between sets of predetermined compiler warning levels that we use for code tidiness. For release builds, the default warning level is PRODUCTION, while for debug builds the default is CHECKIN.
+        # When using CHECKIN for debug builds, -Werror is added when using gcc and clang, causing build failures for any warning, and /WX is set with MSVC having the same effect.
+        # see:
+        # https://arrow.apache.org/docs/developers/cpp/development.html#compiler-warning-levels
+        "BUILD_WARNING_LEVEL": "PRODUCTION",
     },
     generate_args = [
         "-GNinja",
