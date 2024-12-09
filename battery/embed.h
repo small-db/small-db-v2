@@ -8,7 +8,6 @@
 
 namespace b {
     struct EmbedInternal {
-
         class EmbeddedFile {
             public:
             constexpr EmbeddedFile () = default;
@@ -51,9 +50,6 @@ namespace b {
             private:
             std::string_view m_data;
             std::string_view m_filename;
-#ifndef B_PRODUCTION_MODE
-            std::string_view m_fullFilepath;
-#endif
         }; // class EmbeddedFile
 
         static EmbeddedFile simple_resources_banner_txt;
