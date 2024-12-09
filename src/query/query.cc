@@ -117,6 +117,7 @@ GetSubstraitFromServer(const std::string &filename) {
   // SPDLOG_INFO("in_query: {}", in_query);
   // SPDLOG_INFO("out_query: {}", out_query);
   // SPDLOG_INFO("message: {}", message);
+  print_embed();
 
   std::string filename_placeholder = "FILENAME_PLACEHOLDER";
   substrait_json.replace(substrait_json.find(filename_placeholder),

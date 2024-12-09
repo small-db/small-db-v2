@@ -1,4 +1,4 @@
-#include "battery/embed.hpp"
+#include "battery/embed.h"
 #include <iostream>
 
 namespace query {
