@@ -78,46 +78,45 @@ arrow::Future<std::shared_ptr<arrow::Buffer>>
 GetSubstraitFromServer(const std::string &filename) {
   // Emulate server interaction by parsing hard coded JSON
   std::string substrait_json = R"(
+  {
     "relations": [
-      {"rel": {
-        "read": {
-          "base_schema": {
-            "struct": {
-              "types": [ {"i64": {}}, {"bool": {}} ]
-            },
-            "names": ["i", "b"]
-          },
-          "local_files": {
-            "items": [
-              {
-                "uri_file": "file://FILENAME_PLACEHOLDER",
-                "parquet": {}
-              }
-            ]
-          }
+        {
+            "rel": {
+                "read": {
+                    "base_schema": {
+                        "struct": {
+                            "types": [
+                                {
+                                    "i64": {}
+                                },
+                                {
+                                    "bool": {}
+                                }
+                            ]
+                        },
+                        "names": [
+                            "i",
+                            "b"
+                        ]
+                    },
+                    "local_files": {
+                        "items": [
+                            {
+                                "uri_file": "file://FILENAME_PLACEHOLDER",
+                                "parquet": {}
+                            }
+                        ]
+                    }
+                }
+            }
         }
-      }}
     ],
-    "extension_uris": [
-      {
-        "extensionUriAnchor": 1,
-        "uri": "https://github.com/substrait-io/substrait/blob/main/extensions/functions_arithmetic.yaml"
-      },
-    ],
-      "extensions": [
-    {
-      "extensionFunction": {
-        "extensionUriReference": 1,
-        "functionAnchor": 1,
-        "name": "add",
-      }
-    },
-  ],
-  }
+}
   )";
 
-  SPDLOG_INFO("in_query: {}", in_query);
-  SPDLOG_INFO("out_query: {}", out_query);
+  // SPDLOG_INFO("in_query: {}", in_query);
+  // SPDLOG_INFO("out_query: {}", out_query);
+  // SPDLOG_INFO("message: {}", message);
 
   std::string filename_placeholder = "FILENAME_PLACEHOLDER";
   substrait_json.replace(substrait_json.find(filename_placeholder),

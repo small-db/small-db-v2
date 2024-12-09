@@ -19,53 +19,6 @@
                             "b"
                         ]
                     },
-                    "scalarFunction": {
-                        "functionReference": 5,
-                        "outputType": {
-                            "decimal": {
-                                "scale": 2,
-                                "precision": 38,
-                                "nullability": "NULLABILITY_NULLABLE"
-                            }
-                        },
-                        "arguments": [
-                            {
-                                "value": {
-                                    "cast": {
-                                        "type": {
-                                            "decimal": {
-                                                "scale": 2,
-                                                "precision": 10,
-                                                "nullability": "NULLABILITY_REQUIRED"
-                                            }
-                                        },
-                                        "input": {
-                                            "selection": {
-                                                "directReference": {
-                                                    "structField": {
-                                                        "field": 1
-                                                    }
-                                                },
-                                                "rootReference": {}
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "value": {
-                                    "selection": {
-                                        "directReference": {
-                                            "structField": {
-                                                "field": 3
-                                            }
-                                        },
-                                        "rootReference": {}
-                                    }
-                                }
-                            }
-                        ],
-                    },
                     "local_files": {
                         "items": [
                             {
@@ -77,20 +30,5 @@
                 }
             }
         }
-    ],
-    "extension_uris": [
-        {
-            "extensionUriAnchor": 1,
-            "uri": "https://github.com/substrait-io/substrait/blob/main/extensions/functions_arithmetic.yaml"
-        },
-    ],
-    "extensions": [
-        {
-            "extensionFunction": {
-                "extensionUriReference": 1,
-                "functionAnchor": 1,
-                "name": "add",
-            },
-        },
     ],
 }
