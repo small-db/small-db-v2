@@ -114,6 +114,13 @@ GetSubstraitFromServer(const std::string &filename) {
 }
   )";
 
+  // const char message[] = {
+  // #embed "xc_simple_substrait.json"
+  // ,'\0' // null terminator
+  // };
+
+  // std::string substrait_json(message);
+
   // SPDLOG_INFO("in_query: {}", in_query);
   // SPDLOG_INFO("out_query: {}", out_query);
   // SPDLOG_INFO("message: {}", message);

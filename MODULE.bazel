@@ -5,7 +5,7 @@
 # For more details, please check https://github.com/bazelbuild/bazel/issues/18958
 ###############################################################################
 
-"""TODO: write a description of the module here."""
+"""small-db-v2 is an experimental project for studying of ACID / Distributed ACID"""
 
 # ================================================================================ #
 # Hedron's Compile Commands Extractor for Bazel
@@ -19,4 +19,12 @@ git_override(
     commit = "4f28899228fb3ad0126897876f147ca15026151e",
     # Replace the commit hash (above) with the latest (https://github.com/hedronvision/bazel-compile-commands-extractor/commits/main).
     # Even better, set up Renovate and let it do the work for you (see "Suggestion: Updates" in the README).
+)
+
+# ================================================================================ #
+# custom toolchain
+# ================================================================================ #
+bazel_dep(name = "platforms", version = "0.0.10")
+register_toolchains(
+    "//toolchain:cc_toolchain_for_linux_x86_64"
 )
