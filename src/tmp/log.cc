@@ -1,6 +1,6 @@
 // NB: must define SPDLOG_ACTIVE_LEVEL before `#include "spdlog/spdlog.h"` to
 // make "SPDLOG_<LEVEL>" macros work
-// #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 // fmtlib/fmt has "consteval" error in C++20 and later, use
 // "SPDLOG_USE_STD_FORMAT" for C++20 and later
 //
@@ -11,7 +11,7 @@
 // ref:
 // https://github.com/fmtlib/fmt/issues/2438
 // #define SPDLOG_USE_STD_FORMAT
-// #include <spdlog/fmt/bin_to_hex.h>
+#include <spdlog/fmt/bin_to_hex.h> // spdlog::to_hex
 #include <spdlog/spdlog.h>
 
 
@@ -26,14 +26,22 @@ int main() {
     SPDLOG_INFO("Hello, World!");
     SPDLOG_DEBUG("Hello, World!");
 
-    // SPDLOG_DEBUG("Hello, World!, {}", 42);
-    // // fmt::format("print a number: {}", 13);
-    // auto msg = std::format("print a number: {}", 13);
-    // SPDLOG_DEBUG("msg: {}", msg);
+    SPDLOG_DEBUG("Hello, World!, {}", 42);
 
-    // std::vector<char> data = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'};
-    // char data[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j' };
+    {
+        // fmt::format("print a number: {}", 13);
+        // auto msg = std::format("print a number: {}", 13);
+        // SPDLOG_DEBUG("msg: {}", msg);
+    }
+
+    // std::vector<char> data = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+    // 'j'}; char data[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j' };
+    // auto msg    = spdlog::to_hex(data, data + 3);
+    // SPDLOG_DEBUG("hex data: {}", msg);
     // SPDLOG_DEBUG("hex data: {}", spdlog::to_hex(data, data + 3));
+
+    std::vector<char> v(200, 0x0b);
+    spdlog::info("Some buffer {}", spdlog::to_hex(v));
 
     return 0;
 }
