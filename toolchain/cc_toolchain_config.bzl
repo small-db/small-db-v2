@@ -23,11 +23,11 @@ def _impl(ctx):
         ),
         tool_path(
             name="ld",
-            path="/usr/bin/ld",
+            path="/usr/lib/llvm-20/bin/ld.lld",
         ),
         tool_path(
             name="ar",
-            path="/usr/bin/ar",
+            path="/usr/lib/llvm-20/bin/llvm-ar",
         ),
         tool_path(
             name="cpp",
@@ -63,6 +63,7 @@ def _impl(ctx):
                             flag_group(
                                 flags=[
                                     "-lstdc++",
+                                    "-lm",
                                 ],
                             ),
                         ]
