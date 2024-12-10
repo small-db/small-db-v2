@@ -66,24 +66,13 @@ cmake(
 
 cmake(
     name = "spdlog",
-    cache_entries = {
-    #     "SPDLOG_BUILD_EXAMPLE": "OFF",
-    #     "SPDLOG_BUILD_TESTS": "OFF",
-    #     # "SPDLOG_BUILD_BENCH": "OFF",
-    #     # "SPDLOG_FMT_EXTERNAL": "ON",
-    #     # "SPDLOG_USE_STD_FORMAT": "ON",
-        "CMAKE_CXX_FLAGS": "-std=c++23",
-    },
-    # generate_args = [
-    #     "-DSPDLOG_USE_STD_FORMAT=ON",
-    # ],
     build_args = ["-j"],
     lib_source = "@spdlog//:all",
     out_static_libs = select({
         "//conditions:default": ["libspdlog.a"],
 
         # spdlog produces a library with "d" postfix when building in debug mode.
-        # 
+        #
         # The ideal approach is to use CMAKE_DEBUG_POSTFIX so the library name is consistent with the default one, but spdlog doesn't support this option. So we have to adapt to it.
         ":debug": ["libspdlogd.a"],
     }),

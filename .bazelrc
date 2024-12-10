@@ -1,12 +1,9 @@
-# build --cxxopt="-std=c++23"
 build --cxxopt="-std=c++17"
-# build --cxxopt="-std=c++20"
 build --cxxopt="-Wall"
 
 # Specify the compiler
 build --action_env=CC=clang-20
 build --action_env=CXX=clang++-20
-# build --action_env=CXX=clang++-18
 
 # build with debug mode
 build --compilation_mode=dbg
