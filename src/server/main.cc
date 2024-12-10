@@ -137,13 +137,13 @@ class SSLRequest : ReaderWriter {
 
         auto body_size = read_int32(newsockfd);
         if (body_size != BODY_SIZE) {
-            auto error_msg = std::format("invalid length of startup packet: {}", body_size);
+            auto error_msg = fmt::format("invalid length of startup packet: {}", body_size);
             throw std::runtime_error(error_msg);
         }
 
         auto ssl_code = read_int32(newsockfd);
         if (ssl_code != SSL_MAGIC_CODE) {
-            auto error_msg = std::format("invalid ssl code: {}", ssl_code);
+            auto error_msg = fmt::format("invalid ssl code: {}", ssl_code);
             throw std::runtime_error(error_msg);
         }
 
@@ -414,7 +414,7 @@ int main(int argc, char* argv[]) {
 
     // bind socket and listen for connections
     if (bind(sock_listen_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
-        string error_msg = std::format("error binding socket: {}", strerror(errno));
+        string error_msg = fmt::format("error binding socket: {}", strerror(errno));
         SPDLOG_ERROR(error_msg);
         throw std::runtime_error(error_msg);
     }
