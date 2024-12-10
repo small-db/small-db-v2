@@ -24,3 +24,7 @@ git_override(
 # ================================================================================ #
 # custom toolchain
 # ================================================================================ #
+bazel_dep(name = "platforms", version = "0.0.10")
+register_toolchains(
+    "//toolchain:xc_toolchain_clang20",
+)
