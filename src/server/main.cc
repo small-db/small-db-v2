@@ -16,8 +16,8 @@
 #include <pg_query.h>
 
 // Must: define SPDLOG_ACTIVE_LEVEL before `#include "spdlog/spdlog.h"`
-#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
-#include <spdlog/fmt/bin_to_hex.h>
+// #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+// #include <spdlog/fmt/bin_to_hex.h>
 #include <spdlog/spdlog.h>
 
 #include "src/query/query.h"

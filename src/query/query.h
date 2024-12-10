@@ -2,5 +2,5 @@
 
 namespace query {
 void run();
-void print_embed();
+// void print_embed();
 } // namespace query
