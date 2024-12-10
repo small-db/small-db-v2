@@ -1,9 +1,8 @@
-cc_library(
-    name = "parquet_rw",
-    srcs = ["parquet_rw.cc"],
-    hdrs = ["parquet_rw.h"],
+cc_binary(
+    name = "main",
+    srcs = ["log.cc"],
     visibility = ["//visibility:public"],
     deps = [
-        "//:arrow",
+        "//:spdlog",
     ],
 )

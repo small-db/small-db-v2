@@ -1,19 +1,24 @@
-# build --cxxopt="-std=c++23"
+build --cxxopt="-std=c++23"
 # build --cxxopt="-std=c++17"
-build --cxxopt="-std=c++20"
+# build --cxxopt="-std=c++20"
 build --cxxopt="-Wall"
 
 # Specify the compiler
 build --action_env=CC=clang-20
 build --action_env=CXX=clang++-20
+# build --action_env=CXX=clang++-18
 
 # build with debug mode
 build --compilation_mode=dbg
 
-# change to the specific work directory
+# ============================================================================ #
+# run in specific directory, so the output files can be found easily
+# ============================================================================ #
 run --run_under="cd /home/xiaochen/code/small-db-v2 &&"
 build --run_under="cd /home/xiaochen/code/small-db-v2 &&" # all run args should be copied to build args to keep the ayalysis cache
 
-# # [FOR DEBUG] run with valgrind
+# ============================================================================ #
+# [FOR DEBUG] run with valgrind
+# ============================================================================ #
 # run --run_under="cd /home/xiaochen/code/small-db-v2 && valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt"
 # build --run_under="cd /home/xiaochen/code/small-db-v2 && valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt"

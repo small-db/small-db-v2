@@ -385,10 +385,6 @@ void handle_query(string &query, int sockfd) {
 
 int main(int argc, char *argv[]) {
   spdlog::set_level(spdlog::level::debug);
-
-  // ref:
-  // -
-  // https://github.com/gabime/spdlog/wiki/3.-Custom-formatting#pattern-flags
   spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] [%@] %v");
 
   if (argc < 2) {
