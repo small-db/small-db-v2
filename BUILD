@@ -66,13 +66,14 @@ cmake(
 
 cmake(
     name = "spdlog",
-    # cache_entries = {
+    cache_entries = {
     #     "SPDLOG_BUILD_EXAMPLE": "OFF",
     #     "SPDLOG_BUILD_TESTS": "OFF",
     #     # "SPDLOG_BUILD_BENCH": "OFF",
     #     # "SPDLOG_FMT_EXTERNAL": "ON",
     #     # "SPDLOG_USE_STD_FORMAT": "ON",
-    # },
+        "CMAKE_CXX_FLAGS": "-std=c++23",
+    },
     # generate_args = [
     #     "-DSPDLOG_USE_STD_FORMAT=ON",
     # ],

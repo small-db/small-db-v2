@@ -15,10 +15,21 @@
 
 #include <pg_query.h>
 
-// Must: define SPDLOG_ACTIVE_LEVEL before `#include "spdlog/spdlog.h"`
-// #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
-// #include <spdlog/fmt/bin_to_hex.h>
+// NB: must define SPDLOG_ACTIVE_LEVEL before `#include "spdlog/spdlog.h"` to
+// make "SPDLOG_<LEVEL>" macros work
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+// fmtlib/fmt has "consteval" error in C++20 and later, use
+// "SPDLOG_USE_STD_FORMAT" for C++20 and later
+//
+// error:
+// call to consteval function 'fmt::basic_format_string<...>' is not a constant
+// expression
+//
+// ref:
+// https://github.com/fmtlib/fmt/issues/2438
+#define SPDLOG_USE_STD_FORMAT
 #include <spdlog/spdlog.h>
+// #include <spdlog/fmt/bin_to_hex.h>
 
 #include "src/query/query.h"
 #include "src/store/store.h"
@@ -139,13 +150,13 @@ public:
     auto body_size = read_int32(newsockfd);
     if (body_size != BODY_SIZE) {
       auto error_msg =
-          fmt::format("invalid length of startup packet: {}", body_size);
+          std::format("invalid length of startup packet: {}", body_size);
       throw std::runtime_error(error_msg);
     }
 
     auto ssl_code = read_int32(newsockfd);
     if (ssl_code != SSL_MAGIC_CODE) {
-      auto error_msg = fmt::format("invalid ssl code: {}", ssl_code);
+      auto error_msg = std::format("invalid ssl code: {}", ssl_code);
       throw std::runtime_error(error_msg);
     }
 
@@ -422,7 +433,7 @@ int main(int argc, char *argv[]) {
   // bind socket and listen for connections
   if (bind(sock_listen_fd, (struct sockaddr *)&server_addr,
            sizeof(server_addr)) < 0) {
-    string error_msg = fmt::format("error binding socket: {}", strerror(errno));
+    string error_msg = std::format("error binding socket: {}", strerror(errno));
     SPDLOG_ERROR(error_msg);
     throw std::runtime_error(error_msg);
   }
