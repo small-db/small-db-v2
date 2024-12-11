@@ -2,25 +2,11 @@ cc_library(
     name = "query",
     srcs = [
         "query.cc",
-        # "embed_example.cc",
-        # "xc_simple_substrait.json",
     ],
     hdrs = ["query.h"],
-    data = [":embed_files"],
-    # data = ["xc_simple_substrait.json"],
-    # additional_compiler_inputs = ["simple.json"],
     visibility = ["//visibility:public"],
     deps = [
         "//:arrow",
         "//:spdlog",
-        # "//battery:embed",
-        # ":embed_files",
-    ],
-)
-
-filegroup(
-    name = "embed_files",
-    srcs = [
-        "xc_simple_substrait.json",
     ],
 )
