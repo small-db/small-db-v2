@@ -5,8 +5,8 @@
 # build --action_env=CC=clang-20
 # build --action_env=CXX=clang++-20
 
-# # build with debug mode
-# build --compilation_mode=dbg
+# build with debug mode
+build --compilation_mode=dbg
 
 # # ============================================================================ #
 # # run in specific directory, so the output files can be found easily
