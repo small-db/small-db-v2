@@ -78,43 +78,6 @@ namespace query {
     arrow::Future<std::shared_ptr<arrow::Buffer>> GetSubstraitFromServer(
     const std::string& filename) {
         // Emulate server interaction by parsing hard coded JSON
-        //   std::string substrait_json = R"(
-        //   {
-        //     "relations": [
-        //         {
-        //             "rel": {
-        //                 "read": {
-        //                     "base_schema": {
-        //                         "struct": {
-        //                             "types": [
-        //                                 {
-        //                                     "i64": {}
-        //                                 },
-        //                                 {
-        //                                     "bool": {}
-        //                                 }
-        //                             ]
-        //                         },
-        //                         "names": [
-        //                             "i",
-        //                             "b"
-        //                         ]
-        //                     },
-        //                     "local_files": {
-        //                         "items": [
-        //                             {
-        //                                 "uri_file": "file://FILENAME_PLACEHOLDER",
-        //                                 "parquet": {}
-        //                             }
-        //                         ]
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     ],
-        // }
-        //   )";
-
         const char message[] = {
             #embed "xc_simple_substrait.json"
             , '\0' // null terminator
