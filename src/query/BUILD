@@ -6,7 +6,7 @@ cc_library(
         # "xc_simple_substrait.json",
     ],
     hdrs = ["query.h"],
-    # data = ["simple.json"],
+    data = ["xc_simple_substrait.json"],
     # additional_compiler_inputs = ["simple.json"],
     visibility = ["//visibility:public"],
     deps = [

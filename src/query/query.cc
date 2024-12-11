@@ -29,183 +29,177 @@
 #include "query.h"
 
 namespace eng = arrow::engine;
-namespace cp = arrow::compute;
-namespace ac = arrow::acero;
+namespace cp  = arrow::compute;
+namespace ac  = arrow::acero;
 
 namespace query {
 
-class IgnoringConsumer : public ac::SinkNodeConsumer {
-public:
-  explicit IgnoringConsumer(size_t tag) : tag_{tag} {}
-
-  arrow::Status Init(const std::shared_ptr<arrow::Schema> &schema,
-                     ac::BackpressureControl *backpressure_control,
-                     ac::ExecPlan *plan) override {
-    return arrow::Status::OK();
-  }
-
-  arrow::Status Consume(cp::ExecBatch batch) override {
-    // Consume a batch of data
-    // (just print its row count to stdout)
-    std::cout << "-" << tag_ << " consumed " << batch.length << " rows"
-              << std::endl;
-    std::cout << "-" << tag_ << " batch: " << batch.ToString() << std::endl;
-    return arrow::Status::OK();
-  }
-
-  arrow::Future<> Finish() override {
-    // Signal to the consumer that the last batch has been delivered
-    // (we don't do any real work in this consumer so mark it finished
-    // immediately)
-    //
-    // The returned future should only finish when all outstanding tasks have
-    // completed (after this method is called Consume is guaranteed not to be
-    // called again)
-    std::cout << "-" << tag_ << " finished" << std::endl;
-    return arrow::Future<>::MakeFinished();
-  }
-
-private:
-  // A unique label for instances to help distinguish logging output if a plan
-  // has multiple sinks
-  //
-  // In this example, this is set to the zero-based index of the relation tree
-  // in the plan
-  size_t tag_;
-};
-
-arrow::Future<std::shared_ptr<arrow::Buffer>>
-GetSubstraitFromServer(const std::string &filename) {
-  // Emulate server interaction by parsing hard coded JSON
-  std::string substrait_json = R"(
-  {
-    "relations": [
-        {
-            "rel": {
-                "read": {
-                    "base_schema": {
-                        "struct": {
-                            "types": [
-                                {
-                                    "i64": {}
-                                },
-                                {
-                                    "bool": {}
-                                }
-                            ]
-                        },
-                        "names": [
-                            "i",
-                            "b"
-                        ]
-                    },
-                    "local_files": {
-                        "items": [
-                            {
-                                "uri_file": "file://FILENAME_PLACEHOLDER",
-                                "parquet": {}
-                            }
-                        ]
-                    }
-                }
-            }
+    class IgnoringConsumer : public ac::SinkNodeConsumer {
+        public:
+        explicit IgnoringConsumer(size_t tag) : tag_{ tag } {
         }
-    ],
-}
-  )";
 
-  // const char message[] = {
-  // #embed "xc_simple_substrait.json"
-  // ,'\0' // null terminator
-  // };
+        arrow::Status Init(const std::shared_ptr<arrow::Schema>& schema,
+        ac::BackpressureControl* backpressure_control,
+        ac::ExecPlan* plan) override {
+            return arrow::Status::OK();
+        }
 
-  // std::string substrait_json(message);
+        arrow::Status Consume(cp::ExecBatch batch) override {
+            // Consume a batch of data
+            // (just print its row count to stdout)
+            std::cout << "-" << tag_ << " consumed " << batch.length << " rows"
+                      << std::endl;
+            std::cout << "-" << tag_ << " batch: " << batch.ToString() << std::endl;
+            return arrow::Status::OK();
+        }
 
-  // SPDLOG_INFO("in_query: {}", in_query);
-  // SPDLOG_INFO("out_query: {}", out_query);
-  // SPDLOG_INFO("message: {}", message);
-  // print_embed();
+        arrow::Future<> Finish() override {
+            // Signal to the consumer that the last batch has been delivered
+            // (we don't do any real work in this consumer so mark it finished
+            // immediately)
+            //
+            // The returned future should only finish when all outstanding tasks
+            // have completed (after this method is called Consume is guaranteed
+            // not to be called again)
+            std::cout << "-" << tag_ << " finished" << std::endl;
+            return arrow::Future<>::MakeFinished();
+        }
 
-  std::string filename_placeholder = "FILENAME_PLACEHOLDER";
-  substrait_json.replace(substrait_json.find(filename_placeholder),
-                         filename_placeholder.size(), filename);
-  return eng::internal::SubstraitFromJSON("Plan", substrait_json);
-}
+        private:
+        // A unique label for instances to help distinguish logging output if a
+        // plan has multiple sinks
+        //
+        // In this example, this is set to the zero-based index of the relation
+        // tree in the plan
+        size_t tag_;
+    };
 
-arrow::Status RunSubstraitConsumer() {
-  // std::string filename = "./data/demo.parquet";
-  std::string filename = "/home/xiaochen/code/small-db-v2/data/demo.parquet";
+    arrow::Future<std::shared_ptr<arrow::Buffer>> GetSubstraitFromServer(
+    const std::string& filename) {
+        // Emulate server interaction by parsing hard coded JSON
+        //   std::string substrait_json = R"(
+        //   {
+        //     "relations": [
+        //         {
+        //             "rel": {
+        //                 "read": {
+        //                     "base_schema": {
+        //                         "struct": {
+        //                             "types": [
+        //                                 {
+        //                                     "i64": {}
+        //                                 },
+        //                                 {
+        //                                     "bool": {}
+        //                                 }
+        //                             ]
+        //                         },
+        //                         "names": [
+        //                             "i",
+        //                             "b"
+        //                         ]
+        //                     },
+        //                     "local_files": {
+        //                         "items": [
+        //                             {
+        //                                 "uri_file": "file://FILENAME_PLACEHOLDER",
+        //                                 "parquet": {}
+        //                             }
+        //                         ]
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     ],
+        // }
+        //   )";
 
-  // Plans arrive at the consumer serialized in a Buffer, using the binary
-  // protobuf serialization of a substrait Plan
-  auto maybe_serialized_plan = GetSubstraitFromServer(filename).result();
-  ARROW_RETURN_NOT_OK(maybe_serialized_plan.status());
-  ARROW_ASSIGN_OR_RAISE(std::shared_ptr<arrow::Buffer> serialized_plan,
-                        std::move(maybe_serialized_plan));
+        const char message[] = {
+            #embed "xc_simple_substrait.json"
+            , '\0' // null terminator
+        };
 
-  // Print the received plan to stdout as JSON
-  ARROW_ASSIGN_OR_RAISE(
-      auto plan_json, eng::internal::SubstraitToJSON("Plan", *serialized_plan));
+        std::string substrait_json(message);
 
-  std::cout << std::string(50, '#')
-            << " received substrait::Plan:" << std::endl;
-  std::cout << plan_json << std::endl;
+        SPDLOG_INFO("substrait_json: {}", substrait_json);
 
-  // The data sink(s) for plans is/are implicit in substrait plans, but explicit
-  // in Arrow. Therefore, deserializing a plan requires a factory for consumers:
-  // each time the root of a substrait relation tree is deserialized, an Arrow
-  // consumer is constructed into which its batches will be piped.
-  std::vector<std::shared_ptr<ac::SinkNodeConsumer>> consumers;
-  std::function<std::shared_ptr<ac::SinkNodeConsumer>()> consumer_factory =
-      [&] {
-        // All batches produced by the plan will be fed into IgnoringConsumers:
-        auto tag = consumers.size();
-        consumers.emplace_back(new IgnoringConsumer{tag});
-        return consumers.back();
-      };
+        std::string filename_placeholder = "FILENAME_PLACEHOLDER";
+        substrait_json.replace(substrait_json.find(filename_placeholder),
+        filename_placeholder.size(), filename);
+        return eng::internal::SubstraitFromJSON("Plan", substrait_json);
+    }
 
-  // Deserialize each relation tree in the substrait plan to an Arrow compute
-  // Declaration
-  arrow::Result<std::vector<ac::Declaration>> maybe_decls =
-      eng::DeserializePlans(*serialized_plan, consumer_factory);
-  ARROW_RETURN_NOT_OK(maybe_decls.status());
-  ARROW_ASSIGN_OR_RAISE(std::vector<ac::Declaration> decls,
-                        std::move(maybe_decls));
+    arrow::Status RunSubstraitConsumer() {
+        // std::string filename = "./data/demo.parquet";
+        std::string filename =
+        "/home/xiaochen/code/small-db-v2/data/demo.parquet";
 
-  // It's safe to drop the serialized plan; we don't leave references to its
-  // memory
-  serialized_plan.reset();
+        // Plans arrive at the consumer serialized in a Buffer, using the binary
+        // protobuf serialization of a substrait Plan
+        auto maybe_serialized_plan = GetSubstraitFromServer(filename).result();
+        ARROW_RETURN_NOT_OK(maybe_serialized_plan.status());
+        ARROW_ASSIGN_OR_RAISE(std::shared_ptr<arrow::Buffer> serialized_plan,
+        std::move(maybe_serialized_plan));
 
-  // Construct an empty plan (note: configure Function registry and ThreadPool
-  // here)
-  ARROW_ASSIGN_OR_RAISE(std::shared_ptr<ac::ExecPlan> plan,
-                        ac::ExecPlan::Make());
+        // Print the received plan to stdout as JSON
+        ARROW_ASSIGN_OR_RAISE(auto plan_json,
+        eng::internal::SubstraitToJSON("Plan", *serialized_plan));
 
-  // Add decls to plan (note: configure ExecNode registry before this point)
-  for (const ac::Declaration &decl : decls) {
-    ARROW_RETURN_NOT_OK(decl.AddToPlan(plan.get()).status());
-  }
+        std::cout << std::string(50, '#') << " received substrait::Plan:" << std::endl;
+        std::cout << plan_json << std::endl;
 
-  // Validate the plan and print it to stdout
-  ARROW_RETURN_NOT_OK(plan->Validate());
-  std::cout << std::string(50, '#')
-            << " produced arrow::ExecPlan:" << std::endl;
-  std::cout << plan->ToString() << std::endl;
+        // The data sink(s) for plans is/are implicit in substrait plans, but explicit
+        // in Arrow. Therefore, deserializing a plan requires a factory for consumers:
+        // each time the root of a substrait relation tree is deserialized, an Arrow
+        // consumer is constructed into which its batches will be piped.
+        std::vector<std::shared_ptr<ac::SinkNodeConsumer>> consumers;
+        std::function<std::shared_ptr<ac::SinkNodeConsumer>()> consumer_factory = [&] {
+            // All batches produced by the plan will be fed into IgnoringConsumers:
+            auto tag = consumers.size();
+            consumers.emplace_back(new IgnoringConsumer{ tag });
+            return consumers.back();
+        };
 
-  // Start the plan...
-  std::cout << std::string(50, '#') << " consuming batches:" << std::endl;
-  plan->StartProducing();
+        // Deserialize each relation tree in the substrait plan to an Arrow
+        // compute Declaration
+        arrow::Result<std::vector<ac::Declaration>> maybe_decls =
+        eng::DeserializePlans(*serialized_plan, consumer_factory);
+        ARROW_RETURN_NOT_OK(maybe_decls.status());
+        ARROW_ASSIGN_OR_RAISE(std::vector<ac::Declaration> decls, std::move(maybe_decls));
 
-  // ... and wait for it to finish
-  ARROW_RETURN_NOT_OK(plan->finished().status());
-  return arrow::Status::OK();
-}
+        // It's safe to drop the serialized plan; we don't leave references to
+        // its memory
+        serialized_plan.reset();
 
-void run() {
-  auto status = RunSubstraitConsumer();
-  if (!status.ok()) {
-    std::cerr << status.ToString() << std::endl;
-  }
-}
+        // Construct an empty plan (note: configure Function registry and
+        // ThreadPool here)
+        ARROW_ASSIGN_OR_RAISE(std::shared_ptr<ac::ExecPlan> plan, ac::ExecPlan::Make());
+
+        // Add decls to plan (note: configure ExecNode registry before this point)
+        for (const ac::Declaration& decl : decls) {
+            ARROW_RETURN_NOT_OK(decl.AddToPlan(plan.get()).status());
+        }
+
+        // Validate the plan and print it to stdout
+        ARROW_RETURN_NOT_OK(plan->Validate());
+        std::cout << std::string(50, '#') << " produced arrow::ExecPlan:" << std::endl;
+        std::cout << plan->ToString() << std::endl;
+
+        // Start the plan...
+        std::cout << std::string(50, '#') << " consuming batches:" << std::endl;
+        plan->StartProducing();
+
+        // ... and wait for it to finish
+        ARROW_RETURN_NOT_OK(plan->finished().status());
+        return arrow::Status::OK();
+    }
+
+    void run() {
+        auto status = RunSubstraitConsumer();
+        if (!status.ok()) {
+            std::cerr << status.ToString() << std::endl;
+        }
+    }
 
 } // namespace query

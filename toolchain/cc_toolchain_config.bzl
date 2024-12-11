@@ -79,6 +79,7 @@ def _impl(ctx):
         cxx_builtin_include_directories=[
             "/usr/lib/llvm-20/lib/clang/20/include",
             "/usr/include",
+            "/home/xiaochen/code/small-db-v2/src/query",  # Add this line
         ],
         toolchain_identifier="k8-toolchain",
         host_system_name="local",
