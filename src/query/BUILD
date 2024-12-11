@@ -13,5 +13,13 @@ cc_library(
         "//:arrow",
         "//:spdlog",
         # "//battery:embed",
+        ":embed_files",
+    ],
+)
+
+filegroup(
+    name = "embed_files",
+    srcs = [
+        "xc_simple_substrait.json",
     ],
 )
