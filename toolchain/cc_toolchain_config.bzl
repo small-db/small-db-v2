@@ -79,7 +79,8 @@ def _impl(ctx):
         cxx_builtin_include_directories=[
             "/usr/lib/llvm-20/lib/clang/20/include",
             "/usr/include",
-            "/home/xiaochen/code/small-db-v2/src/query",  # Add this line
+            # note that we must use absolute path here since clang embeds the file using absolute path
+            "/home/xiaochen/code/small-db-v2/src/query",
         ],
         toolchain_identifier="k8-toolchain",
         host_system_name="local",
