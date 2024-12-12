@@ -1,8 +1,13 @@
-load(":cc_toolchain_config.bzl", "cc_toolchain_config_clang20")
+load(
+    ":cc_toolchain_config.bzl",
+    "cc_toolchain_config_clang20",
+    "cc_toolchain_config_gcc13",
+)
 
 package(default_visibility = ["//visibility:public"])
 
 cc_toolchain_config_clang20(name = "toolchain_config_clang20")
+
 cc_toolchain_config_gcc13(name = "toolchain_config_gcc13")
 
 filegroup(name = "empty")
