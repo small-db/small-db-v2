@@ -46,6 +46,7 @@ http_archive(
     build_file_content = _ALL_CONTENT,
     strip_prefix = "arrow-apache-arrow-18.0.0",
     urls = ["https://github.com/apache/arrow/archive/refs/tags/apache-arrow-18.0.0.tar.gz"],
+    integrity = "sha256-nEc/LJkUxZq1cXYclJfPDlz9PqM193gszGEh9cuZrps=",
 )
 
 http_archive(
@@ -79,6 +80,7 @@ http_archive(
     # urls = ["https://github.com/pganalyze/libpg_query/archive/refs/tags/17-6.0.0.tar.gz"],
     strip_prefix = "libpg_query-xiaochen-17-6.0.0",
     urls = ["https://github.com/small-db/libpg_query/archive/refs/tags/xiaochen-17-6.0.0.tar.gz"],
+    integrity = "sha256-6E6WccCYz2mLtA2gj5q8Vq+lMi4OOcmrB1Gc3M1HLQc=",
 )
 
 # ================================================================================ #
