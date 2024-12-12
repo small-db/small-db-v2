@@ -60,7 +60,7 @@ http_archive(
     build_file_content = _ALL_CONTENT,
     strip_prefix = "spdlog-1.15.0",
     urls = ["https://github.com/gabime/spdlog/archive/refs/tags/v1.15.0.tar.gz"],
-    sha256 = "mWJkjJtPGnu8dv2NkXJVW60Ycf2xT/T4Qu+HlJaCyqU=",
+    integrity = "sha256-mWJkjJtPGnu8dv2NkXJVW60Ycf2xT/T4Qu+HlJaCyqU=",
 )
 
 http_archive(
