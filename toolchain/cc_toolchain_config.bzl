@@ -104,7 +104,7 @@ def impl_gcc13(ctx):
     tool_paths = [
         tool_path(
             name="gcc",
-            path="/usr/bin/gcc-13",
+            path="/usr/bin/gcc-12",
         ),
         tool_path(
             name="ld",

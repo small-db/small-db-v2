@@ -4,7 +4,7 @@ workspace(name = "smalldb")
 # http_archive
 # ================================================================================ #
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bazel_tools//tools/build_defs/repo:local.bzl", "new_local_repository")
+# load("@bazel_tools//tools/build_defs/repo:local.bzl", "new_local_repository")
 
 # ================================================================================ #
 # rules_foreign_cc lets us build C/C++ projects using cmake/make/etc.
@@ -43,7 +43,7 @@ bazel_features_deps()
 #   "external/_main~_repo_rules~liburing"
 # ================================================================================ #
 
-# Group the sources of the library so that CMake rule have access to it
+# A generic content for all http_archive rules.
 _ALL_CONTENT = """\
 filegroup(
     name = "all",
@@ -52,33 +52,33 @@ filegroup(
 )
 """
 
-http_archive(
-    name = "arrow",
-    build_file_content = _ALL_CONTENT,
-    strip_prefix = "arrow-apache-arrow-18.0.0",
-    urls = ["https://github.com/apache/arrow/archive/refs/tags/apache-arrow-18.0.0.tar.gz"],
-)
+# http_archive(
+#     name = "arrow",
+#     build_file_content = _ALL_CONTENT,
+#     strip_prefix = "arrow-apache-arrow-18.0.0",
+#     urls = ["https://github.com/apache/arrow/archive/refs/tags/apache-arrow-18.0.0.tar.gz"],
+# )
 
-http_archive(
-    name = "rocksdb",
-    build_file_content = _ALL_CONTENT,
-    strip_prefix = "rocksdb-9.7.4",
-    urls = ["https://github.com/facebook/rocksdb/archive/refs/tags/v9.7.4.tar.gz"],
-)
+# http_archive(
+#     name = "rocksdb",
+#     build_file_content = _ALL_CONTENT,
+#     strip_prefix = "rocksdb-9.7.4",
+#     urls = ["https://github.com/facebook/rocksdb/archive/refs/tags/v9.7.4.tar.gz"],
+# )
 
-http_archive(
-    name = "spdlog",
-    build_file_content = _ALL_CONTENT,
-    strip_prefix = "spdlog-1.15.0",
-    urls = ["https://github.com/gabime/spdlog/archive/refs/tags/v1.15.0.tar.gz"],
-)
+# http_archive(
+#     name = "spdlog",
+#     build_file_content = _ALL_CONTENT,
+#     strip_prefix = "spdlog-1.15.0",
+#     urls = ["https://github.com/gabime/spdlog/archive/refs/tags/v1.15.0.tar.gz"],
+# )
 
-http_archive(
-    name = "postgres",
-    build_file_content = _ALL_CONTENT,
-    strip_prefix = "postgres-REL_17_1",
-    urls = ["https://github.com/postgres/postgres/archive/refs/tags/REL_17_1.tar.gz"],
-)
+# http_archive(
+#     name = "postgres",
+#     build_file_content = _ALL_CONTENT,
+#     strip_prefix = "postgres-REL_17_1",
+#     urls = ["https://github.com/postgres/postgres/archive/refs/tags/REL_17_1.tar.gz"],
+# )
 
 # http_archive(
 #     name = "libpg_query",
@@ -91,9 +91,20 @@ http_archive(
 #     urls = ["https://github.com/small-db/libpg_query/archive/refs/tags/xiaochen-17-6.0.0.tar.gz"],
 # )
 
-new_local_repository(
-    name = "libpg_query",
-    build_file_content = _ALL_CONTENT,
-    path = "../libpg_query",
-)
+# # we use a forked version of libpg_query since the origin's "make install" doesn't work
+# # with bazel
+# http_archive(
+#     name = "libpg_query",
+#     build_file_content = _ALL_CONTENT,
+#     # strip_prefix = "libpg_query-17-6.0.0",
+#     # urls = ["https://github.com/pganalyze/libpg_query/archive/refs/tags/17-6.0.0.tar.gz"],
+#     strip_prefix = "libpg_query-xiaochen-17-6.0.0",
+#     urls = ["https://github.com/small-db/libpg_query/archive/refs/tags/xiaochen-17-6.0.0.tar.gz"],
+# )
+
+# new_local_repository(
+#     name = "libpg_query",
+#     build_file_content = _ALL_CONTENT,
+#     path = "../libpg_query",
+# )
 
