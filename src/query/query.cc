@@ -84,10 +84,6 @@ namespace query {
         // };
         const char message[] = {
             'a',
-            'b',
-            'c',
-            'd',
-            'e',
             '\0', // null terminator
         };
 
@@ -102,7 +98,6 @@ namespace query {
     }
 
     arrow::Status RunSubstraitConsumer() {
-        // std::string filename = "./data/demo.parquet";
         std::string filename =
         "/home/xiaochen/code/small-db-v2/data/demo.parquet";
 
