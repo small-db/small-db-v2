@@ -32,3 +32,17 @@ toolchain(
     toolchain = ":xc_cc_toolchain_clang20",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
+
+toolchain(
+    name = "xc_toolchain_gcc13",
+    exec_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+    target_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+    toolchain = ":xc_cc_toolchain_clang20",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+)

@@ -1,4 +1,4 @@
-# build --cxxopt="-std=c++17"
+build --cxxopt="-std=c++17"
 # build --cxxopt="-Wall"
 
 # # Specify the compiler
@@ -9,7 +9,7 @@
 build --compilation_mode=dbg
 
 # suppress warning "#embed is a Clang extension"
-build --cxxopt="-Wno-c23-extensions"
+# build --cxxopt="-Wno-c23-extensions"
 
 # # ============================================================================ #
 # # run in specific directory, so the output files can be found easily
