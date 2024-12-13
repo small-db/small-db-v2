@@ -260,6 +260,8 @@ void init() {
     }
   }
 
+  return;
+
   int ret = chdir(DATA_DIR.c_str());
   if (ret != 0) {
     SPDLOG_ERROR("error changing to directory {}, error: {}", DATA_DIR, ret);

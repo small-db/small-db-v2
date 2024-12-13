@@ -19,7 +19,7 @@ def impl_clang20(ctx):
     tool_paths = [
         tool_path(
             name="gcc",
-            path="/usr/lib/llvm-20/bin/clang-20",
+            path="/usr/lib/llvm-20/bin/clang-21",
         ),
         tool_path(
             name="ld",
