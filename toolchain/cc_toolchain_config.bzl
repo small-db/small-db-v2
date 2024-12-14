@@ -12,6 +12,11 @@ load(
     "tool_path",
 )
 
+all_compile_actions = [
+    ACTION_NAMES.c_compile,
+    ACTION_NAMES.cpp_compile,
+]
+
 all_link_actions = [
     ACTION_NAMES.cpp_link_executable,
     ACTION_NAMES.cpp_link_dynamic_library,
@@ -68,7 +73,6 @@ def impl_clang20(ctx):
                                 flags=[
                                     "-lstdc++",
                                     "-lm",
-                                    "-Wno-c23-extensions",
                                 ],
                             ),
                         ]
@@ -148,6 +152,18 @@ def impl_gcc13(ctx):
             enabled=True,
             flag_sets=[
                 flag_set(
+                    actions=all_compile_actions,
+                    flag_groups=(
+                        [
+                            flag_group(
+                                flags=[
+                                    "-lstdc++",
+                                ],
+                            ),
+                        ]
+                    ),
+                ),
+                flag_set(
                     actions=all_link_actions,
                     flag_groups=(
                         [
@@ -168,7 +184,12 @@ def impl_gcc13(ctx):
         ctx=ctx,
         features=features,
         cxx_builtin_include_directories=[
+            "/usr/include/c++/13",
+            "/usr/include/x86_64-linux-gnu/c++/13",
+            "/usr/include/c++/13/backward",
             "/usr/lib/gcc/x86_64-linux-gnu/13/include",
+            "/usr/local/include",
+            "/usr/include/x86_64-linux-gnu",
             "/usr/include",
         ],
         toolchain_identifier="k8-toolchain",
