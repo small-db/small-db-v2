@@ -168,50 +168,13 @@ def impl_gcc13(ctx):
         feature(
             name="default_compile_flags",
             enabled=True,
-            flag_sets=[
-                # flag_set(
-                #     actions=all_compile_actions,
-                #     flag_groups=(
-                #         [
-                #             flag_group(
-                #                 flags=[
-                #                     "-lstdc++",
-                #                     "-std=c++17",
-                #                     "-fstack-protector-strong",
-                #                     "-Wformat",
-                #                     "-Wformat-security",
-                #                     "-fstack-clash-protection",
-                #                     "-fcf-protection",
-                #                 ],
-                #             ),
-                #         ]
-                #     ),
-                # ),
-                # flag_set(
-                #     actions=all_link_actions,
-                #     flag_groups=(
-                #         [
-                #             flag_group(
-                #                 flags=[
-                #                     # "-lstdc++",
-                #                     # "-std=c++11",
-                #                     # "-lm",
-                #                     # "-lgcc_s",
-                #                     # "-lgcc",
-                #                     # "-lc",
-                #                     # "-D_GLIBCXX_USE_CXX11_ABI=1",
-                #                 ],
-                #             ),
-                #         ]
-                #     ),
-                # ),
-            ],
+            flag_sets=[],
         ),
     ]
 
     return cc_common.create_cc_toolchain_config_info(
         ctx=ctx,
-        # features=features,
+        features=features,
         cxx_builtin_include_directories=[
             "/usr/lib/gcc/x86_64-linux-gnu/13/include",
             "/usr/include",
