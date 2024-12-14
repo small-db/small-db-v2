@@ -20,7 +20,6 @@ all_compile_actions = [
 all_link_actions = [
     # needed by "spdlog"
     ACTION_NAMES.cpp_link_executable,
-
     # ACTION_NAMES.cpp_link_dynamic_library,
     # ACTION_NAMES.cpp_link_nodeps_dynamic_library,
 ]
@@ -65,9 +64,21 @@ def impl_clang20(ctx):
 
     features = [
         feature(
-            name="default_linker_flags",
+            name="xc_flags",
             enabled=True,
             flag_sets=[
+                flag_set(
+                    actions=all_compile_actions,
+                    flag_groups=(
+                        [
+                            flag_group(
+                                flags=[
+                                    "-Wno-c23-extensions",
+                                ]
+                            ),
+                        ]
+                    ),
+                ),
                 flag_set(
                     actions=all_link_actions,
                     flag_groups=(
@@ -76,7 +87,6 @@ def impl_clang20(ctx):
                                 flags=[
                                     # needed when ((c++ stdlib api is used) AND (compiler is clang))
                                     "-lstdc++",
-
                                     # needed when (compiler is clang)
                                     # most libraries require the "math" library
                                     "-lm",
