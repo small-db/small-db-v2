@@ -132,7 +132,8 @@ def impl_gcc13(ctx):
     tool_paths = [
         tool_path(
             name="gcc",
-            path="/usr/bin/g++-13",
+            # path="/usr/bin/g++-13",
+            path="/usr/bin/gcc-13",
         ),
         tool_path(
             name="ld",
@@ -168,7 +169,24 @@ def impl_gcc13(ctx):
         feature(
             name="default_compile_flags",
             enabled=True,
-            flag_sets=[],
+            flag_sets=[
+                flag_set(
+                    actions=all_link_actions,
+                    flag_groups=(
+                        [
+                            flag_group(
+                                flags=[
+                                    # needed when ((c++ stdlib api is used) AND (compiler is clang))
+                                    "-lstdc++",
+                                    # needed when (compiler is clang)
+                                    # most libraries require the "math" library
+                                    "-lm",
+                                ],
+                            ),
+                        ]
+                    ),
+                ),
+            ],
         ),
     ]
 
