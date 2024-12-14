@@ -18,9 +18,11 @@ all_compile_actions = [
 ]
 
 all_link_actions = [
+    # needed by "spdlog"
     ACTION_NAMES.cpp_link_executable,
-    ACTION_NAMES.cpp_link_dynamic_library,
-    ACTION_NAMES.cpp_link_nodeps_dynamic_library,
+
+    # ACTION_NAMES.cpp_link_dynamic_library,
+    # ACTION_NAMES.cpp_link_nodeps_dynamic_library,
 ]
 
 
@@ -71,8 +73,10 @@ def impl_clang20(ctx):
                         [
                             flag_group(
                                 flags=[
+                                    # needed by "spdlog"
                                     "-lstdc++",
-                                    "-lm",
+
+                                    # "-lm",
                                 ],
                             ),
                         ]
@@ -151,18 +155,24 @@ def impl_gcc13(ctx):
             name="default_compile_flags",
             enabled=True,
             flag_sets=[
-                flag_set(
-                    actions=all_compile_actions,
-                    flag_groups=(
-                        [
-                            flag_group(
-                                flags=[
-                                    "-lstdc++",
-                                ],
-                            ),
-                        ]
-                    ),
-                ),
+                # flag_set(
+                #     actions=all_compile_actions,
+                #     flag_groups=(
+                #         [
+                #             flag_group(
+                #                 flags=[
+                #                     "-lstdc++",
+                #                     "-std=c++17",
+                #                     "-fstack-protector-strong",
+                #                     "-Wformat",
+                #                     "-Wformat-security",
+                #                     "-fstack-clash-protection",
+                #                     "-fcf-protection",
+                #                 ],
+                #             ),
+                #         ]
+                #     ),
+                # ),
                 flag_set(
                     actions=all_link_actions,
                     flag_groups=(
@@ -170,7 +180,12 @@ def impl_gcc13(ctx):
                             flag_group(
                                 flags=[
                                     "-lstdc++",
-                                    "-lm",
+                                    # "-std=c++11",
+                                    # "-lm",
+                                    # "-lgcc_s",
+                                    # "-lgcc",
+                                    # "-lc",
+                                    # "-D_GLIBCXX_USE_CXX11_ABI=1",
                                 ],
                             ),
                         ]
