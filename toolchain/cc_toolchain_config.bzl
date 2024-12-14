@@ -1,3 +1,7 @@
+"""
+TODO: add module docstring
+"""
+
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
 
 load(
@@ -8,7 +12,7 @@ load(
     "tool_path",
 )
 
-all_link_actions = [  # NEW
+all_link_actions = [
     ACTION_NAMES.cpp_link_executable,
     ACTION_NAMES.cpp_link_dynamic_library,
     ACTION_NAMES.cpp_link_nodeps_dynamic_library,
@@ -100,11 +104,12 @@ cc_toolchain_config_clang20 = rule(
     provides=[CcToolchainConfigInfo],
 )
 
+
 def impl_gcc13(ctx):
     tool_paths = [
         tool_path(
             name="gcc",
-            path="/usr/bin/gcc-12",
+            path="/usr/bin/gcc-13",
         ),
         tool_path(
             name="ld",
@@ -162,10 +167,8 @@ def impl_gcc13(ctx):
         ctx=ctx,
         features=features,
         cxx_builtin_include_directories=[
-            "/usr/lib/llvm-20/lib/clang/20/include",
+            "/usr/lib/gcc/x86_64-linux-gnu/13/include",
             "/usr/include",
-            # note that we must use absolute path here since clang embeds the file using absolute path
-            "/home/xiaochen/code/small-db-v2/src/query",
         ],
         toolchain_identifier="k8-toolchain",
         host_system_name="local",
