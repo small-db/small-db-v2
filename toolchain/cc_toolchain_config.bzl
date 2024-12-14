@@ -74,10 +74,12 @@ def impl_clang20(ctx):
                         [
                             flag_group(
                                 flags=[
-                                    # needed when api from "C++ Standard Library" is used
+                                    # needed when ((c++ stdlib api is used) AND (compiler is clang))
                                     "-lstdc++",
 
-                                    # "-lm",
+                                    # needed when (compiler is clang)
+                                    # most libraries require the "math" library
+                                    "-lm",
                                 ],
                             ),
                         ]
