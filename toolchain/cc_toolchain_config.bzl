@@ -30,7 +30,7 @@ def impl_clang20(ctx):
     tool_paths = [
         tool_path(
             name="gcc",
-            path="/usr/lib/llvm-20/bin/clang-20",
+            path="/usr/lib/llvm-20/bin/clang++",
         ),
         tool_path(
             name="ld",
@@ -67,21 +67,21 @@ def impl_clang20(ctx):
             name="default_linker_flags",
             enabled=True,
             flag_sets=[
-                flag_set(
-                    actions=all_link_actions,
-                    flag_groups=(
-                        [
-                            flag_group(
-                                flags=[
-                                    # needed by "spdlog"
-                                    "-lstdc++",
+                # flag_set(
+                #     actions=all_link_actions,
+                #     flag_groups=(
+                #         [
+                #             flag_group(
+                #                 flags=[
+                #                     # needed when api from "C++ Standard Library" is used
+                #                     "-lstdc++",
 
-                                    # "-lm",
-                                ],
-                            ),
-                        ]
-                    ),
-                ),
+                #                     # "-lm",
+                #                 ],
+                #             ),
+                #         ]
+                #     ),
+                # ),
             ],
         ),
     ]
@@ -92,6 +92,7 @@ def impl_clang20(ctx):
         cxx_builtin_include_directories=[
             "/usr/lib/llvm-20/lib/clang/20/include",
             "/usr/include",
+            # directory which contains embedded files
             # note that we must use absolute path here since clang embeds the file using absolute path
             "/home/xiaochen/code/small-db-v2/src/query",
         ],
@@ -118,7 +119,7 @@ def impl_gcc13(ctx):
     tool_paths = [
         tool_path(
             name="gcc",
-            path="/usr/bin/gcc-13",
+            path="/usr/bin/g++-13",
         ),
         tool_path(
             name="ld",
@@ -173,38 +174,33 @@ def impl_gcc13(ctx):
                 #         ]
                 #     ),
                 # ),
-                flag_set(
-                    actions=all_link_actions,
-                    flag_groups=(
-                        [
-                            flag_group(
-                                flags=[
-                                    "-lstdc++",
-                                    # "-std=c++11",
-                                    # "-lm",
-                                    # "-lgcc_s",
-                                    # "-lgcc",
-                                    # "-lc",
-                                    # "-D_GLIBCXX_USE_CXX11_ABI=1",
-                                ],
-                            ),
-                        ]
-                    ),
-                ),
+                # flag_set(
+                #     actions=all_link_actions,
+                #     flag_groups=(
+                #         [
+                #             flag_group(
+                #                 flags=[
+                #                     # "-lstdc++",
+                #                     # "-std=c++11",
+                #                     # "-lm",
+                #                     # "-lgcc_s",
+                #                     # "-lgcc",
+                #                     # "-lc",
+                #                     # "-D_GLIBCXX_USE_CXX11_ABI=1",
+                #                 ],
+                #             ),
+                #         ]
+                #     ),
+                # ),
             ],
         ),
     ]
 
     return cc_common.create_cc_toolchain_config_info(
         ctx=ctx,
-        features=features,
+        # features=features,
         cxx_builtin_include_directories=[
-            "/usr/include/c++/13",
-            "/usr/include/x86_64-linux-gnu/c++/13",
-            "/usr/include/c++/13/backward",
             "/usr/lib/gcc/x86_64-linux-gnu/13/include",
-            "/usr/local/include",
-            "/usr/include/x86_64-linux-gnu",
             "/usr/include",
         ],
         toolchain_identifier="k8-toolchain",
