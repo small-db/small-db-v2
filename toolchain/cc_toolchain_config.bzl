@@ -30,7 +30,8 @@ def impl_clang20(ctx):
     tool_paths = [
         tool_path(
             name="gcc",
-            path="/usr/lib/llvm-20/bin/clang++",
+            # path="/usr/lib/llvm-20/bin/clang++",
+            path="/usr/lib/llvm-20/bin/clang",
         ),
         tool_path(
             name="ld",
@@ -67,21 +68,21 @@ def impl_clang20(ctx):
             name="default_linker_flags",
             enabled=True,
             flag_sets=[
-                # flag_set(
-                #     actions=all_link_actions,
-                #     flag_groups=(
-                #         [
-                #             flag_group(
-                #                 flags=[
-                #                     # needed when api from "C++ Standard Library" is used
-                #                     "-lstdc++",
+                flag_set(
+                    actions=all_link_actions,
+                    flag_groups=(
+                        [
+                            flag_group(
+                                flags=[
+                                    # needed when api from "C++ Standard Library" is used
+                                    "-lstdc++",
 
-                #                     # "-lm",
-                #                 ],
-                #             ),
-                #         ]
-                #     ),
-                # ),
+                                    # "-lm",
+                                ],
+                            ),
+                        ]
+                    ),
+                ),
             ],
         ),
     ]
