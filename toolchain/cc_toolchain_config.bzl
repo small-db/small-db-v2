@@ -148,7 +148,7 @@ def impl_gcc13(ctx):
 
     features = [
         feature(
-            name="default_linker_flags",
+            name="default_compile_flags",
             enabled=True,
             flag_sets=[
                 flag_set(
