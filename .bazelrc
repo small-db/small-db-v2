@@ -1,4 +1,9 @@
 # ============================================================================ #
+# default
+# ============================================================================ #
+build --compilation_mode=dbg
+
+# ============================================================================ #
 # config: debug
 # ============================================================================ #
 build:debug --sandbox_debug
@@ -19,9 +24,6 @@ build:default-toolchain --cxxopt="-std=c++17"
 
 # build --cxxopt="-std=c++17"
 # build --cxxopt="-Wall"
-
-# build with debug mode
-build --compilation_mode=dbg
 
 # suppress warning "#embed is a Clang extension"
 # build --cxxopt="-Wno-c23-extensions"
