@@ -206,7 +206,6 @@ def impl_gcc13(ctx):
         abi_version="unknown",
         abi_libc_version="unknown",
         tool_paths=tool_paths,
-        name="local",
     )
 
 

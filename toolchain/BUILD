@@ -66,16 +66,16 @@ toolchain(
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
 
-toolchain(
-    name = "xc_toolchain_default",
-    exec_compatible_with = [
-        "@platforms//cpu:x86_64",
-        "@platforms//os:linux",
-    ],
-    target_compatible_with = [
-        "@platforms//cpu:x86_64",
-        "@platforms//os:linux",
-    ],
-    toolchain = "@local_config_cc//:cc-compiler-k8",
-    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
-)
+# toolchain(
+#     name = "xc_toolchain_default",
+#     exec_compatible_with = [
+#         "@platforms//cpu:x86_64",
+#         "@platforms//os:linux",
+#     ],
+#     target_compatible_with = [
+#         "@platforms//cpu:x86_64",
+#         "@platforms//os:linux",
+#     ],
+#     toolchain = "@local_config_cc//:cc-compiler-k8",
+#     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+# )

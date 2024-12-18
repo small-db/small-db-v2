@@ -90,5 +90,5 @@ bazel_dep(name = "platforms", version = "0.0.10")
 register_toolchains(
     "//toolchain:xc_toolchain_clang20",
     "//toolchain:xc_toolchain_gcc13",
-    "//toolchain:xc_toolchain_default",
+    # "//toolchain:xc_toolchain_default",
 )

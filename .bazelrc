@@ -1,10 +1,16 @@
 # ============================================================================ #
-# debug
+# config: debug
 # ============================================================================ #
 build:debug --sandbox_debug
 build:debug --verbose_failures
 build:debug --subcommands
 build:debug --toolchain_resolution_debug='.*'
+
+# ============================================================================ #
+# config: default-toolchain
+# ============================================================================ #
+build:default-toolchain --config=debug
+build:default-toolchain --extra_toolchains='@local_config_cc_toolchains//:cc-toolchain-k8'
 
 # ============================================================================ #
 # others
