@@ -176,9 +176,9 @@ def impl_gcc13(ctx):
                         [
                             flag_group(
                                 flags=[
-                                    # needed when ((c++ stdlib api is used) AND (compiler is clang))
+                                    # needed when ((c++ stdlib api is used) AND (compiler is gcc))
                                     "-lstdc++",
-                                    # needed when (compiler is clang)
+                                    # needed when ((c++ math api is used) AND (compiler is gcc))
                                     # most libraries require the "math" library
                                     "-lm",
                                 ],
@@ -202,10 +202,11 @@ def impl_gcc13(ctx):
         target_system_name="local",
         target_cpu="k8",
         target_libc="unknown",
-        compiler="clang",
+        compiler="gcc",
         abi_version="unknown",
         abi_libc_version="unknown",
         tool_paths=tool_paths,
+        name="local",
     )
 
 
