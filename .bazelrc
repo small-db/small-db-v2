@@ -11,6 +11,7 @@ build:debug --toolchain_resolution_debug='.*'
 # ============================================================================ #
 build:default-toolchain --config=debug
 build:default-toolchain --extra_toolchains='@local_config_cc_toolchains//:cc-toolchain-k8'
+build:default-toolchain --cxxopt="-std=c++17"
 
 # ============================================================================ #
 # others
