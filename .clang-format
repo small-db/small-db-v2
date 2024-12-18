@@ -398,3 +398,7 @@ SpacesInParentheses: false
 # SpacesInSquareBrackets (bool)
 # If true, spaces will be inserted after [ and before ].
 SpacesInSquareBrackets: false
+
+# TODO: this does not work as expected
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html#indentppdirectives
+# IndentPPDirectives: AfterHash
