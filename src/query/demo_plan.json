@@ -17,36 +17,6 @@
     "relations": [
         {
             "rel": {
-                "read": {
-                    "base_schema": {
-                        "struct": {
-                            "types": [
-                                {
-                                    "i64": {}
-                                },
-                                {
-                                    "bool": {}
-                                }
-                            ]
-                        },
-                        "names": [
-                            "i",
-                            "b"
-                        ]
-                    },
-                    "local_files": {
-                        "items": [
-                            {
-                                "uri_file": "file://FILENAME_PLACEHOLDER",
-                                "parquet": {}
-                            }
-                        ]
-                    }
-                }
-            }
-        },
-        {
-            "rel": {
                 "project": {
                     "input": {
                         "read": {
@@ -80,6 +50,17 @@
                         "scalar_function": {
                             "function_reference": 1,
                             "arguments": [
+                                {
+                                    "value": {
+                                        "selection": {
+                                            "direct_reference": {
+                                                "struct_filed": {
+                                                    "field": "i"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
                                 {
                                     "value": {
                                         "selection": {
