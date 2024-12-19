@@ -28,11 +28,11 @@ build:default-toolchain --cxxopt="-std=c++17"
 # suppress warning "#embed is a Clang extension"
 # build --cxxopt="-Wno-c23-extensions"
 
-# # ============================================================================ #
-# # run in specific directory, so the output files can be found easily
-# # ============================================================================ #
+# ============================================================================ #
+# run in specific directory, so the output files can be found easily
+# ============================================================================ #
 # run --run_under="cd /home/xiaochen/code/small-db-v2 &&"
-# build --run_under="cd /home/xiaochen/code/small-db-v2 &&" # all run args should be copied to build args to keep the ayalysis cache
+build --run_under="cd /home/xiaochen/code/small-db-v2 &&" # all run args should be copied to build args to keep the ayalysis cache
 
 # # ============================================================================ #
 # # [FOR DEBUG] run with valgrind

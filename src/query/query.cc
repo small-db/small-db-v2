@@ -79,17 +79,22 @@ namespace query {
     const std::string& filename) {
         // Emulate server interaction by parsing hard coded JSON
         const char message[] = {
-#embed "demo_plan.json"
+            #embed "demo_plan.json"
             , '\0' // null terminator
         };
 
         std::string substrait_json(message);
 
-        SPDLOG_INFO("substrait_json: {}", substrait_json);
 
         std::string filename_placeholder = "FILENAME_PLACEHOLDER";
-        substrait_json.replace(substrait_json.find(filename_placeholder),
-        filename_placeholder.size(), filename);
+
+        while (true) {
+            auto pos = substrait_json.find(filename_placeholder);
+            if (pos == std::string::npos) {
+                break;
+            }
+            substrait_json.replace(pos, filename_placeholder.size(), filename);
+        }
         return eng::internal::SubstraitFromJSON("Plan", substrait_json);
     }
 
