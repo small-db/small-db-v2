@@ -1,6 +1,7 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <netinet/in.h>
+#include <pg_query.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,17 +10,14 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <unordered_map>
-
 #include <mutex>
-
-#include <pg_query.h>
+#include <unordered_map>
 
 // set level for "SPDLOG_<LEVEL>" macros
 // NB: must define SPDLOG_ACTIVE_LEVEL before `#include "spdlog/spdlog.h"`
 // to make it works
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
-#include <spdlog/fmt/bin_to_hex.h> // spdlog::to_hex (doesn't work in C++20 and later version)
+#include <spdlog/fmt/bin_to_hex.h>  // spdlog::to_hex (doesn't work in C++20 and later version)
 #include <spdlog/spdlog.h>
 
 #include "src/query/query.h"
@@ -33,10 +31,11 @@
 using namespace std;
 
 class ReaderWriter {
-    protected:
+   protected:
     static int32_t read_int32(int sockfd) {
         int32_t network_value;
-        ssize_t bytes_received = recv(sockfd, &network_value, sizeof(network_value), 0);
+        ssize_t bytes_received =
+            recv(sockfd, &network_value, sizeof(network_value), 0);
         if (bytes_received != sizeof(network_value)) {
             throw std::runtime_error("error reading int32_t from socket..");
         }
@@ -53,7 +52,7 @@ int32_t read_int32_chars(char* buffer) {
 }
 
 class SocketsManager {
-    public:
+   public:
     enum class SocketState {
         StartUp,
         NoSSLAcknowledged,
@@ -62,13 +61,16 @@ class SocketsManager {
 
     static std::string format(SocketState state) {
         switch (state) {
-        case SocketState::StartUp: return "StartUp";
-        case SocketState::NoSSLAcknowledged: return "NoSSLAcknowledged";
-        default: return "Unknown";
+            case SocketState::StartUp:
+                return "StartUp";
+            case SocketState::NoSSLAcknowledged:
+                return "NoSSLAcknowledged";
+            default:
+                return "Unknown";
         }
     }
 
-    private:
+   private:
     std::unordered_map<int, SocketState> socket_states;
 
     // Static pointer to the Singleton instance
@@ -78,10 +80,9 @@ class SocketsManager {
     static std::mutex mtx;
 
     // Private Constructor
-    SocketsManager() {
-    }
+    SocketsManager() {}
 
-    public:
+   public:
     // Deleting the copy constructor to prevent copies
     SocketsManager(const SocketsManager& obj) = delete;
 
@@ -112,7 +113,7 @@ class SocketsManager {
 
     // TODO: protect the access to the socket_states map with a mutex
     static void set_socket_state(int sockfd, SocketState state) {
-        auto instance                   = getInstance();
+        auto instance = getInstance();
         instance->socket_states[sockfd] = state;
     }
 };
@@ -129,8 +130,8 @@ string pq_getmessage(char* buffer) {
 }
 
 class SSLRequest : ReaderWriter {
-    public:
-    static const int BODY_SIZE      = 8;
+   public:
+    static const int BODY_SIZE = 8;
     static const int SSL_MAGIC_CODE = 80877103;
 
     static void handle_ssl_request(int newsockfd) {
@@ -138,7 +139,8 @@ class SSLRequest : ReaderWriter {
 
         auto body_size = read_int32(newsockfd);
         if (body_size != BODY_SIZE) {
-            auto error_msg = fmt::format("invalid length of startup packet: {}", body_size);
+            auto error_msg =
+                fmt::format("invalid length of startup packet: {}", body_size);
             throw std::runtime_error(error_msg);
         }
 
@@ -155,14 +157,14 @@ class SSLRequest : ReaderWriter {
 };
 
 class Message {
-    protected:
+   protected:
     void append_char(vector<char>& buffer, char value) {
         buffer.push_back(value);
     }
 
     void append_int32(vector<char>& buffer, int32_t value) {
         int32_t network_value = htonl(value);
-        const char* data      = reinterpret_cast<const char*>(&network_value);
+        const char* data = reinterpret_cast<const char*>(&network_value);
         buffer.insert(buffer.end(), data, data + sizeof(network_value));
     }
 
@@ -175,12 +177,12 @@ class Message {
         buffer.insert(buffer.end(), value.begin(), value.end());
     }
 
-    public:
+   public:
     virtual void encode(vector<char>& buffer) = 0;
 };
 
 class AuthenticationOk : public Message {
-    public:
+   public:
     AuthenticationOk() = default;
     void encode(vector<char>& buffer) {
         append_char(buffer, 'R');
@@ -190,7 +192,7 @@ class AuthenticationOk : public Message {
 };
 
 class EmptyQueryResponse : public Message {
-    public:
+   public:
     EmptyQueryResponse() = default;
     void encode(vector<char>& buffer) {
         append_char(buffer, 'I');
@@ -199,7 +201,6 @@ class EmptyQueryResponse : public Message {
 };
 
 class ErrorResponse : public Message {
-
     enum class Severity {
         ERROR,
         FATAL,
@@ -211,31 +212,34 @@ class ErrorResponse : public Message {
         LOG,
     };
 
-    private:
+   private:
     const Severity severity;
     const string error_message;
 
-    public:
-    ErrorResponse(Severity severity = Severity::ERROR, const string& error_message = "error message")
-    : severity(severity), error_message(error_message) {
-    }
+   public:
+    ErrorResponse(Severity severity = Severity::ERROR,
+                  const string& error_message = "error message")
+        : severity(severity), error_message(error_message) {}
 
     void encode(vector<char>& buffer) {
         append_char(buffer, 'E');
 
         vector<char> field_severity = encode_severity();
-        vector<char> field_message  = encode_message();
+        vector<char> field_message = encode_message();
 
-        int32_t message_length = 4 + field_severity.size() + field_message.size() + 1;
+        int32_t message_length =
+            4 + field_severity.size() + field_message.size() + 1;
         SPDLOG_DEBUG("message_length: {}", message_length);
         append_int32(buffer, message_length);
         append_vector(buffer, field_severity);
         append_vector(buffer, field_message);
         append_char(buffer, '\x00');
 
+        SPDLOG_DEBUG(
+            "error response: {}",
+            spdlog::to_hex(buffer.data(), buffer.data() + buffer.size()));
         SPDLOG_DEBUG("error response: {}",
-        spdlog::to_hex(buffer.data(), buffer.data() + buffer.size()));
-        SPDLOG_DEBUG("error response: {}", string(buffer.begin(), buffer.end()));
+                     string(buffer.begin(), buffer.end()));
     }
 
     vector<char> encode_severity() {
@@ -243,10 +247,17 @@ class ErrorResponse : public Message {
 
         append_char(buffer, 'S');
         switch (severity) {
-        case Severity::DEBUG: append_cstring(buffer, "DEBUG"); break;
-        case Severity::INFO: append_cstring(buffer, "INFO"); break;
-        case Severity::ERROR: append_cstring(buffer, "ERROR"); break;
-        default: throw std::runtime_error("unsupported severity");
+            case Severity::DEBUG:
+                append_cstring(buffer, "DEBUG");
+                break;
+            case Severity::INFO:
+                append_cstring(buffer, "INFO");
+                break;
+            case Severity::ERROR:
+                append_cstring(buffer, "ERROR");
+                break;
+            default:
+                throw std::runtime_error("unsupported severity");
         }
         return buffer;
     }
@@ -265,10 +276,9 @@ class ParameterStatus : public Message {
     const string key;
     const string value;
 
-    public:
+   public:
     ParameterStatus(const string& key, const string& value)
-    : key(key), value(value) {
-    }
+        : key(key), value(value) {}
 
     // ParameterStatus (B)
     // Byte1('S')
@@ -288,7 +298,7 @@ class ParameterStatus : public Message {
 };
 
 class BackendKeyData : public Message {
-    public:
+   public:
     BackendKeyData() = default;
 
     // BackendKeyData (B)
@@ -314,7 +324,7 @@ class BackendKeyData : public Message {
 };
 
 class ReadyForQuery : public Message {
-    public:
+   public:
     ReadyForQuery() = default;
 
     // ReadyForQuery (B)
@@ -335,15 +345,13 @@ class ReadyForQuery : public Message {
 };
 
 class NetworkPackage {
-    private:
+   private:
     vector<Message*> messages;
 
-    public:
+   public:
     NetworkPackage() = default;
 
-    void add_message(Message* message) {
-        messages.push_back(message);
-    }
+    void add_message(Message* message) { messages.push_back(message); }
 
     void send_all(int sockfd) {
         vector<char> buffer;
@@ -392,19 +400,21 @@ int RunServer(const server::ServerArgs& args) {
     int sock_listen_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (sock_listen_fd < 0) {
         SPDLOG_ERROR("error creating socket: {}", strerror(errno));
-        exit(EXIT_FAILURE); // Exit the program if socket creation fails
+        exit(EXIT_FAILURE);  // Exit the program if socket creation fails
     }
     int opt = 1;
     setsockopt(sock_listen_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
     memset((char*)&server_addr, 0, sizeof(server_addr));
-    server_addr.sin_family      = AF_INET;
-    server_addr.sin_port        = htons(args.port);
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(args.port);
     server_addr.sin_addr.s_addr = INADDR_ANY;
 
     // bind socket and listen for connections
-    if (bind(sock_listen_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
-        string error_msg = fmt::format("error binding socket: {}", strerror(errno));
+    if (bind(sock_listen_fd, (struct sockaddr*)&server_addr,
+             sizeof(server_addr)) < 0) {
+        string error_msg =
+            fmt::format("error binding socket: {}", strerror(errno));
         SPDLOG_ERROR(error_msg);
         throw std::runtime_error(error_msg);
     }
@@ -412,7 +422,8 @@ int RunServer(const server::ServerArgs& args) {
     if (listen(sock_listen_fd, BACKLOG) < 0) {
         SPDLOG_ERROR("error listening: {}", strerror(errno));
     }
-    SPDLOG_INFO("epoll echo server listening for connections on port: {}", args.port);
+    SPDLOG_INFO("epoll echo server listening for connections on port: {}",
+                args.port);
 
     struct epoll_event ev, events[MAX_EVENTS];
     int new_events, sock_conn_fd, epollfd;
@@ -421,7 +432,7 @@ int RunServer(const server::ServerArgs& args) {
     if (epollfd < 0) {
         SPDLOG_ERROR("SPDLOG_ERROR creating epoll..\n");
     }
-    ev.events  = EPOLLIN;
+    ev.events = EPOLLIN;
     ev.data.fd = sock_listen_fd;
 
     if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sock_listen_fd, &ev) == -1) {
@@ -437,18 +448,21 @@ int RunServer(const server::ServerArgs& args) {
 
         for (int i = 0; i < new_events; ++i) {
             int event_fd = events[i].data.fd;
-            SPDLOG_DEBUG("new event, fd: {}, sock_listen_fd: {}", event_fd, sock_listen_fd);
+            SPDLOG_DEBUG("new event, fd: {}, sock_listen_fd: {}", event_fd,
+                         sock_listen_fd);
 
             if (events[i].data.fd == sock_listen_fd) {
-                sock_conn_fd = accept4(sock_listen_fd,
-                (struct sockaddr*)&client_addr, &client_len, SOCK_NONBLOCK);
+                sock_conn_fd =
+                    accept4(sock_listen_fd, (struct sockaddr*)&client_addr,
+                            &client_len, SOCK_NONBLOCK);
                 if (sock_conn_fd == -1) {
                     SPDLOG_ERROR("SPDLOG_ERROR accepting new connection..\n");
                 }
 
-                ev.events  = EPOLLIN | EPOLLET;
+                ev.events = EPOLLIN | EPOLLET;
                 ev.data.fd = sock_conn_fd;
-                if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sock_conn_fd, &ev) == -1) {
+                if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sock_conn_fd, &ev) ==
+                    -1) {
                     SPDLOG_ERROR("SPDLOG_ERROR adding new event to epoll..\n");
                 }
             } else {
@@ -456,150 +470,166 @@ int RunServer(const server::ServerArgs& args) {
 
                 auto state = SocketsManager::get_socket_state(newsockfd);
                 switch (state) {
-                case SocketsManager::SocketState::StartUp: {
-                    SSLRequest::handle_ssl_request(newsockfd);
-                    SocketsManager::set_socket_state(
-                    newsockfd, SocketsManager::SocketState::NoSSLAcknowledged);
-                    break;
-                }
-
-                case SocketsManager::SocketState::NoSSLAcknowledged: {
-                    int bytes_received = recv(newsockfd, buffer, MAX_MESSAGE_LEN, 0);
-
-                    if (bytes_received < 0) {
-                        // TODO:
-                        // - add case "EAGAIN", which is the same as "EWOULDBLOCK"
-                        switch (errno) {
-                        case EWOULDBLOCK:
-                            // Non-blocking socket operation would block
-                            SPDLOG_DEBUG("Would block, try again later");
-                            break;
-                        case ECONNREFUSED:
-                            SPDLOG_DEBUG("Connection refused");
-                            // Handle reconnection logic here
-                            break;
-                        case ETIMEDOUT:
-                            SPDLOG_DEBUG("Connection timed out");
-                            // Handle timeout logic here
-                            break;
-                        case ENOTCONN:
-                            SPDLOG_DEBUG("Socket is not connected");
-                            // Handle disconnection logic here
-                            break;
-                        default:
-                            SPDLOG_DEBUG("recv() failed: {}", strerror(errno));
-                            // Handle other errors
-                            break;
-                        }
-                        continue;
-                    }
-
-                    // log the message in hex format
-                    SPDLOG_DEBUG("received[{} bytes]: {}", bytes_received,
-                    spdlog::to_hex(buffer, buffer + bytes_received));
-
-                    string message = pq_getmessage(buffer);
-
-                    // the first 4 bytes is version
-                    string version(buffer + 4, 4);
-
-                    unordered_map<string, string> recv_params;
-                    // key and value are separated by '\x00'
-                    int pos = 8; // start after the version
-                    while (pos < bytes_received) {
-                        string key;
-                        string value;
-
-                        // Read key
-                        while (pos < bytes_received && buffer[pos] != '\x00') {
-                            key += buffer[pos];
-                            pos++;
-                        }
-                        pos++; // skip the null character
-
-                        // Read value
-                        while (pos < bytes_received && buffer[pos] != '\x00') {
-                            value += buffer[pos];
-                            pos++;
-                        }
-                        pos++; // skip the null character
-
-                        if (!key.empty()) {
-                            recv_params[key] = value;
-                        }
-                    }
-
-                    // Log the extracted key-value pairs
-                    for (const auto& kv : recv_params) {
-                        SPDLOG_DEBUG("Key: {}, Value: {}", kv.first, kv.second);
-                    }
-
-                    NetworkPackage* network_package = new NetworkPackage();
-                    network_package->add_message(new AuthenticationOk());
-                    unordered_map<string, string> params{
-                        { "server_encoding", "UTF8" },
-                        { "client_encoding", "UTF8" },
-                        { "DateStyle", "ISO YMD" },
-                        { "integer_datetimes", "on" },
-                    };
-                    for (const auto& kv : params) {
-                        network_package->add_message(
-                        new ParameterStatus(kv.first, kv.second));
-                    }
-                    network_package->add_message(new BackendKeyData());
-                    network_package->add_message(new ReadyForQuery());
-
-                    network_package->send_all(newsockfd);
-                    SocketsManager::set_socket_state(
-                    newsockfd, SocketsManager::SocketState::ReadyForQuery);
-                    break;
-                }
-                case SocketsManager::SocketState::ReadyForQuery: {
-                    std::vector<char> buffer(MAX_MESSAGE_LEN);
-                    int bytes_received =
-                    recv(newsockfd, buffer.data(), buffer.size(), 0);
-                    if (bytes_received < 0) {
-                        spdlog::error("error receiving data: {}", strerror(errno));
-                        close(newsockfd);
-                        continue;
-                    } else if (bytes_received == 0) {
-                        spdlog::info("connection closed by peer");
-                        close(newsockfd);
-                        continue;
-                    }
-
-                    // Resize the buffer to the actual number of bytes received
-                    // buffer.resize(bytes_received);
-
-                    // Log the message in hex format
-                    SPDLOG_DEBUG("received[{} bytes]: {}", bytes_received,
-                    spdlog::to_hex(buffer.data(), buffer.data() + bytes_received));
-
-                    char message_type = buffer[0];
-                    switch (message_type) {
-                    case 'Q': {
-                        // Query
-
-                        // read length of the query
-                        int32_t query_len = read_int32_chars(buffer.data() + 1);
-
-                        // read the query
-                        string query(buffer.data() + 5, query_len - 4);
-                        handle_query(query, newsockfd);
+                    case SocketsManager::SocketState::StartUp: {
+                        SSLRequest::handle_ssl_request(newsockfd);
+                        SocketsManager::set_socket_state(
+                            newsockfd,
+                            SocketsManager::SocketState::NoSSLAcknowledged);
                         break;
                     }
+
+                    case SocketsManager::SocketState::NoSSLAcknowledged: {
+                        int bytes_received =
+                            recv(newsockfd, buffer, MAX_MESSAGE_LEN, 0);
+
+                        if (bytes_received < 0) {
+                            // TODO:
+                            // - add case "EAGAIN", which is the same as
+                            // "EWOULDBLOCK"
+                            switch (errno) {
+                                case EWOULDBLOCK:
+                                    // Non-blocking socket operation would block
+                                    SPDLOG_DEBUG(
+                                        "Would block, try again later");
+                                    break;
+                                case ECONNREFUSED:
+                                    SPDLOG_DEBUG("Connection refused");
+                                    // Handle reconnection logic here
+                                    break;
+                                case ETIMEDOUT:
+                                    SPDLOG_DEBUG("Connection timed out");
+                                    // Handle timeout logic here
+                                    break;
+                                case ENOTCONN:
+                                    SPDLOG_DEBUG("Socket is not connected");
+                                    // Handle disconnection logic here
+                                    break;
+                                default:
+                                    SPDLOG_DEBUG("recv() failed: {}",
+                                                 strerror(errno));
+                                    // Handle other errors
+                                    break;
+                            }
+                            continue;
+                        }
+
+                        // log the message in hex format
+                        SPDLOG_DEBUG(
+                            "received[{} bytes]: {}", bytes_received,
+                            spdlog::to_hex(buffer, buffer + bytes_received));
+
+                        string message = pq_getmessage(buffer);
+
+                        // the first 4 bytes is version
+                        string version(buffer + 4, 4);
+
+                        unordered_map<string, string> recv_params;
+                        // key and value are separated by '\x00'
+                        int pos = 8;  // start after the version
+                        while (pos < bytes_received) {
+                            string key;
+                            string value;
+
+                            // Read key
+                            while (pos < bytes_received &&
+                                   buffer[pos] != '\x00') {
+                                key += buffer[pos];
+                                pos++;
+                            }
+                            pos++;  // skip the null character
+
+                            // Read value
+                            while (pos < bytes_received &&
+                                   buffer[pos] != '\x00') {
+                                value += buffer[pos];
+                                pos++;
+                            }
+                            pos++;  // skip the null character
+
+                            if (!key.empty()) {
+                                recv_params[key] = value;
+                            }
+                        }
+
+                        // Log the extracted key-value pairs
+                        for (const auto& kv : recv_params) {
+                            SPDLOG_DEBUG("Key: {}, Value: {}", kv.first,
+                                         kv.second);
+                        }
+
+                        NetworkPackage* network_package = new NetworkPackage();
+                        network_package->add_message(new AuthenticationOk());
+                        unordered_map<string, string> params{
+                            {"server_encoding", "UTF8"},
+                            {"client_encoding", "UTF8"},
+                            {"DateStyle", "ISO YMD"},
+                            {"integer_datetimes", "on"},
+                        };
+                        for (const auto& kv : params) {
+                            network_package->add_message(
+                                new ParameterStatus(kv.first, kv.second));
+                        }
+                        network_package->add_message(new BackendKeyData());
+                        network_package->add_message(new ReadyForQuery());
+
+                        network_package->send_all(newsockfd);
+                        SocketsManager::set_socket_state(
+                            newsockfd,
+                            SocketsManager::SocketState::ReadyForQuery);
+                        break;
+                    }
+                    case SocketsManager::SocketState::ReadyForQuery: {
+                        std::vector<char> buffer(MAX_MESSAGE_LEN);
+                        int bytes_received =
+                            recv(newsockfd, buffer.data(), buffer.size(), 0);
+                        if (bytes_received < 0) {
+                            spdlog::error("error receiving data: {}",
+                                          strerror(errno));
+                            close(newsockfd);
+                            continue;
+                        } else if (bytes_received == 0) {
+                            spdlog::info("connection closed by peer");
+                            close(newsockfd);
+                            continue;
+                        }
+
+                        // Resize the buffer to the actual number of bytes
+                        // received buffer.resize(bytes_received);
+
+                        // Log the message in hex format
+                        SPDLOG_DEBUG(
+                            "received[{} bytes]: {}", bytes_received,
+                            spdlog::to_hex(buffer.data(),
+                                           buffer.data() + bytes_received));
+
+                        char message_type = buffer[0];
+                        switch (message_type) {
+                            case 'Q': {
+                                // Query
+
+                                // read length of the query
+                                int32_t query_len =
+                                    read_int32_chars(buffer.data() + 1);
+
+                                // read the query
+                                string query(buffer.data() + 5, query_len - 4);
+                                handle_query(query, newsockfd);
+                                break;
+                            }
+                            default:
+                                SPDLOG_ERROR("unknown message type: {}",
+                                             message_type);
+                                exit(EXIT_FAILURE);
+                                break;
+                        }
+                        break;
+                    }
+
                     default:
-                        SPDLOG_ERROR("unknown message type: {}", message_type);
+                        SPDLOG_ERROR("unknown socket state: {}",
+                                     SocketsManager::format(state));
                         exit(EXIT_FAILURE);
                         break;
-                    }
-                    break;
-                }
-
-                default:
-                    SPDLOG_ERROR("unknown socket state: {}", SocketsManager::format(state));
-                    exit(EXIT_FAILURE);
-                    break;
                 }
             }
         }

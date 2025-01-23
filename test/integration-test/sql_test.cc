@@ -1,16 +1,16 @@
+#include <gtest/gtest.h>
+#include <spdlog/spdlog.h>
+
 #include <array>
 #include <cstdio>
 #include <cstdlib>
-#include <gtest/gtest.h>
 #include <memory>
-#include <spdlog/spdlog.h>
 #include <stdexcept>
 #include <string>
 
-
 // Test fixture for setting up and tearing down the server
 class SQLTest : public ::testing::Test {
-    protected:
+   protected:
     void SetUp() override {
         SPDLOG_INFO("starting the server");
         StartServer();
@@ -30,12 +30,8 @@ class SQLTest : public ::testing::Test {
         }
     }
 
-    void TearDown() override {
-        SPDLOG_INFO("stopping the server");
-    }
+    void TearDown() override { SPDLOG_INFO("stopping the server"); }
 };
 
 // Test case to execute simple SQL commands
-TEST_F(SQLTest, ExecuteSimpleSQL) {
-    SPDLOG_INFO("run test: ExecuteSimpleSQL");
-}
+TEST_F(SQLTest, ExecuteSimpleSQL) { SPDLOG_INFO("run test: ExecuteSimpleSQL"); }

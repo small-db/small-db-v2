@@ -11,9 +11,8 @@
 // ref:
 // https://github.com/fmtlib/fmt/issues/2438
 // #define SPDLOG_USE_STD_FORMAT
-#include <spdlog/fmt/bin_to_hex.h> // spdlog::to_hex
+#include <spdlog/fmt/bin_to_hex.h>  // spdlog::to_hex
 #include <spdlog/spdlog.h>
-
 
 int main() {
     // set level for "spdlog::<level>" functions

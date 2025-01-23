@@ -1,4 +1,4 @@
 class ServerArgs {
-    public:
+   public:
     int port;
 };

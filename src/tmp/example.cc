@@ -20,12 +20,12 @@
 //  COPYING file in the root directory) and Apache 2.0 License
 //  (found in the LICENSE.Apache file in the root directory).
 
-#include <cstdio>
-#include <string>
-
 #include <rocksdb/db.h>
 #include <rocksdb/options.h>
 #include <rocksdb/slice.h>
+
+#include <cstdio>
+#include <string>
 
 using ROCKSDB_NAMESPACE::DB;
 using ROCKSDB_NAMESPACE::Options;
@@ -58,8 +58,9 @@ arrow::Status RunMain() {
     // that in. Data types are important as ever, and there is a Builder for
     // each compatible type; in this case, int8.
     arrow::Int8Builder int8builder;
-    int8_t days_raw[5] = { 1, 12, 17, 23, 28 };
-    // AppendValues, as called, puts 5 values from days_raw into our Builder object.
+    int8_t days_raw[5] = {1, 12, 17, 23, 28};
+    // AppendValues, as called, puts 5 values from days_raw into our Builder
+    // object.
     ARROW_RETURN_NOT_OK(int8builder.AppendValues(days_raw, 5));
     // (Doc section: int8builder 1 Append)
 
@@ -73,36 +74,37 @@ arrow::Status RunMain() {
     // (Doc section: int8builder 2)
     // Builders clear their state every time they fill an Array, so if the type
     // is the same, we can re-use the builder. We do that here for month values.
-    int8_t months_raw[5] = { 1, 3, 5, 7, 1 };
+    int8_t months_raw[5] = {1, 3, 5, 7, 1};
     ARROW_RETURN_NOT_OK(int8builder.AppendValues(months_raw, 5));
     std::shared_ptr<arrow::Array> months;
     ARROW_ASSIGN_OR_RAISE(months, int8builder.Finish());
     // (Doc section: int8builder 2)
 
     // (Doc section: int16builder)
-    // Now that we change to int16, we use the Builder for that data type instead.
+    // Now that we change to int16, we use the Builder for that data type
+    // instead.
     arrow::Int16Builder int16builder;
-    int16_t years_raw[5] = { 1990, 2000, 1995, 2000, 1995 };
+    int16_t years_raw[5] = {1990, 2000, 1995, 2000, 1995};
     ARROW_RETURN_NOT_OK(int16builder.AppendValues(years_raw, 5));
     std::shared_ptr<arrow::Array> years;
     ARROW_ASSIGN_OR_RAISE(years, int16builder.Finish());
     // (Doc section: int16builder)
 
     // (Doc section: Schema)
-    // Now, we want a RecordBatch, which has columns and labels for said columns.
-    // This gets us to the 2d data structures we want in Arrow.
-    // These are defined by schema, which have fields -- here we get both those object types
-    // ready.
+    // Now, we want a RecordBatch, which has columns and labels for said
+    // columns. This gets us to the 2d data structures we want in Arrow. These
+    // are defined by schema, which have fields -- here we get both those object
+    // types ready.
     std::shared_ptr<arrow::Field> field_day, field_month, field_year;
     std::shared_ptr<arrow::Schema> schema;
 
     // Every field needs its name and data type.
-    field_day   = arrow::field("Day", arrow::int8());
+    field_day = arrow::field("Day", arrow::int8());
     field_month = arrow::field("Month", arrow::int8());
-    field_year  = arrow::field("Year", arrow::int16());
+    field_year = arrow::field("Year", arrow::int16());
 
     // The schema can be built from a vector of fields, and we do so here.
-    schema = arrow::schema({ field_day, field_month, field_year });
+    schema = arrow::schema({field_day, field_month, field_year});
     // (Doc section: Schema)
 
     // (Doc section: RBatch)
@@ -112,7 +114,8 @@ arrow::Status RunMain() {
     std::shared_ptr<arrow::RecordBatch> rbatch;
     // The RecordBatch needs the schema, length for columns, which all must
     // match, and the actual data itself.
-    rbatch = arrow::RecordBatch::Make(schema, days->length(), { days, months, years });
+    rbatch =
+        arrow::RecordBatch::Make(schema, days->length(), {days, months, years});
 
     std::cout << rbatch->ToString();
     // (Doc section: RBatch)
@@ -120,17 +123,17 @@ arrow::Status RunMain() {
     // (Doc section: More Arrays)
     // Now, let's get some new arrays! It'll be the same datatypes as above, so
     // we re-use Builders.
-    int8_t days_raw2[5] = { 6, 12, 3, 30, 22 };
+    int8_t days_raw2[5] = {6, 12, 3, 30, 22};
     ARROW_RETURN_NOT_OK(int8builder.AppendValues(days_raw2, 5));
     std::shared_ptr<arrow::Array> days2;
     ARROW_ASSIGN_OR_RAISE(days2, int8builder.Finish());
 
-    int8_t months_raw2[5] = { 5, 4, 11, 3, 2 };
+    int8_t months_raw2[5] = {5, 4, 11, 3, 2};
     ARROW_RETURN_NOT_OK(int8builder.AppendValues(months_raw2, 5));
     std::shared_ptr<arrow::Array> months2;
     ARROW_ASSIGN_OR_RAISE(months2, int8builder.Finish());
 
-    int16_t years_raw2[5] = { 1980, 2001, 1915, 2020, 1996 };
+    int16_t years_raw2[5] = {1980, 2001, 1915, 2020, 1996};
     ARROW_RETURN_NOT_OK(int16builder.AppendValues(years_raw2, 5));
     std::shared_ptr<arrow::Array> years2;
     ARROW_ASSIGN_OR_RAISE(years2, int16builder.Finish());
@@ -139,33 +142,35 @@ arrow::Status RunMain() {
     // (Doc section: ArrayVector)
     // ChunkedArrays let us have a list of arrays, which aren't contiguous
     // with each other. First, we get a vector of arrays.
-    arrow::ArrayVector day_vecs{ days, days2 };
+    arrow::ArrayVector day_vecs{days, days2};
     // (Doc section: ArrayVector)
     // (Doc section: ChunkedArray Day)
     // Then, we use that to initialize a ChunkedArray, which can be used with
     // other functions in Arrow! This is good, since having a normal vector of
     // arrays wouldn't get us far.
     std::shared_ptr<arrow::ChunkedArray> day_chunks =
-    std::make_shared<arrow::ChunkedArray>(day_vecs);
+        std::make_shared<arrow::ChunkedArray>(day_vecs);
     // (Doc section: ChunkedArray Day)
 
     // (Doc section: ChunkedArray Month Year)
     // Repeat for months.
-    arrow::ArrayVector month_vecs{ months, months2 };
+    arrow::ArrayVector month_vecs{months, months2};
     std::shared_ptr<arrow::ChunkedArray> month_chunks =
-    std::make_shared<arrow::ChunkedArray>(month_vecs);
+        std::make_shared<arrow::ChunkedArray>(month_vecs);
 
     // Repeat for years.
-    arrow::ArrayVector year_vecs{ years, years2 };
+    arrow::ArrayVector year_vecs{years, years2};
     std::shared_ptr<arrow::ChunkedArray> year_chunks =
-    std::make_shared<arrow::ChunkedArray>(year_vecs);
+        std::make_shared<arrow::ChunkedArray>(year_vecs);
     // (Doc section: ChunkedArray Month Year)
 
     // (Doc section: Table)
-    // A Table is the structure we need for these non-contiguous columns, and keeps them
-    // all in one place for us so we can use them as if they were normal arrays.
+    // A Table is the structure we need for these non-contiguous columns, and
+    // keeps them all in one place for us so we can use them as if they were
+    // normal arrays.
     std::shared_ptr<arrow::Table> table;
-    table = arrow::Table::Make(schema, { day_chunks, month_chunks, year_chunks }, 10);
+    table =
+        arrow::Table::Make(schema, {day_chunks, month_chunks, year_chunks}, 10);
 
     std::cout << table->ToString();
     // (Doc section: Table)
@@ -213,7 +218,8 @@ int run_rocks() {
 
     {
         PinnableSlice pinnable_val;
-        db->Get(ReadOptions(), db->DefaultColumnFamily(), "key2", &pinnable_val);
+        db->Get(ReadOptions(), db->DefaultColumnFamily(), "key2",
+                &pinnable_val);
         assert(pinnable_val == "value");
     }
 
@@ -222,14 +228,16 @@ int run_rocks() {
         // If it cannot pin the value, it copies the value to its internal
         // buffer. The intenral buffer could be set during construction.
         PinnableSlice pinnable_val(&string_val);
-        db->Get(ReadOptions(), db->DefaultColumnFamily(), "key2", &pinnable_val);
+        db->Get(ReadOptions(), db->DefaultColumnFamily(), "key2",
+                &pinnable_val);
         assert(pinnable_val == "value");
         // If the value is not pinned, the internal buffer must have the value.
         assert(pinnable_val.IsPinned() || string_val == "value");
     }
 
     PinnableSlice pinnable_val;
-    s = db->Get(ReadOptions(), db->DefaultColumnFamily(), "key1", &pinnable_val);
+    s = db->Get(ReadOptions(), db->DefaultColumnFamily(), "key1",
+                &pinnable_val);
     assert(s.IsNotFound());
     // Reset PinnableSlice after each use and before each reuse
     pinnable_val.Reset();

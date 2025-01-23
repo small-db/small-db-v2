@@ -319,7 +319,7 @@ def main():
         "-i",
         "--inplace",
         type=bool,
-        default=False,
+        default=True,
         help="Just fix files (`clang-format -i`) instead of returning a diff",
     )
 
@@ -371,15 +371,13 @@ def main():
         exclude=excludes,
         extensions=args.extensions.split(","),
     )
-    print(files)
-    exit(0)
 
     if not files:
-        print_trouble(parser.prog, "No files found", use_colors=colored_stderr)
+        print_trouble(parser.prog, "no files found", use_colors=colored_stderr)
         return ExitStatus.TROUBLE
 
     if not args.quiet:
-        print("Processing %s files: %s" % (len(files), ", ".join(files)))
+        print("processing %s files: %s" % (len(files), ", ".join(files)))
 
     njobs = args.j
     if njobs == 0:
