@@ -33,6 +33,7 @@ def main() -> int:
 
     for file in files:
         xiaochen_py.run_command(f"clang-format {file}")
+        break
 
 
 if __name__ == "__main__":
