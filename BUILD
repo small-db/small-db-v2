@@ -114,6 +114,14 @@ make(
     visibility = ["//visibility:public"],
 )
 
+cmake(
+    name = "libpqxx",
+    build_args = ["-j"],
+    lib_source = "@libpqxx//:all",
+    out_static_libs = ["libpqxx.a"],
+    visibility = ["//visibility:public"],
+)
+
 config_setting(
     name = "debug",
     values = {"compilation_mode": "dbg"},
@@ -122,3 +130,9 @@ config_setting(
 # ====================================================================================== #
 # top-level targets
 # ====================================================================================== #
+test_suite(
+    name = "integration_test",
+    tests = [
+        "//test/integration-test:sql_test",
+    ],
+)

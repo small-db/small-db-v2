@@ -83,6 +83,13 @@ http_archive(
     integrity = "sha256-6E6WccCYz2mLtA2gj5q8Vq+lMi4OOcmrB1Gc3M1HLQc=",
 )
 
+http_archive(
+    name = "libpqxx",
+    build_file_content = _ALL_CONTENT,
+    strip_prefix = "libpqxx-7.10.0",
+    urls = ["https://github.com/jtv/libpqxx/archive/refs/tags/7.10.0.tar.gz"],
+)
+
 # ====================================================================================== #
 # custom toolchains
 # ====================================================================================== #
