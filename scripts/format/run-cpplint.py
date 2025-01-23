@@ -1,5 +1,6 @@
 import argparse
 import sys
+import xiaochen_py
 
 from scripts import format
 
@@ -10,6 +11,13 @@ def main() -> int:
         "--dir",
         help="directory to run clang-format on (default: current directory)",
         default=".",
+    )
+    parser.add_argument(
+        "--extensions",
+        help="comma separated list of file extensions (default: {})".format(
+            format.DEFAULT_EXTENSIONS
+        ),
+        default=format.DEFAULT_EXTENSIONS,
     )
 
     args = parser.parse_args()
@@ -22,7 +30,9 @@ def main() -> int:
         extensions=args.extensions.split(","),
     )
     print(files)
-    return 0
+
+    for file in files:
+        xiaochen_py.run_command(f"clang-format {file}")
 
 
 if __name__ == "__main__":
