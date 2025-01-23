@@ -23,6 +23,7 @@
 #include <spdlog/spdlog.h>
 
 #include "src/query/query.h"
+#include "src/server/args.h"
 #include "src/store/store.h"
 
 #define BACKLOG 512
@@ -376,26 +377,11 @@ void handle_query(string& query, int sockfd) {
     sendUnimplemented(sockfd);
 }
 
-int RunServer(const ServerArgs& args) {
-
-}
-
-int main(int argc, char* argv[]) {
-    spdlog::set_level(spdlog::level::debug);
-    spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] [%@] %v");
-
-    if (argc < 2) {
-        SPDLOG_INFO("Please give a port number: ./epoll_echo_server [port]\n");
-        exit(0);
-    }
-
+int RunServer(const server::ServerArgs& args) {
     store::init();
 
     query::run();
 
-    exit(0);
-
-    int portno = strtol(argv[1], NULL, 10);
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_len = sizeof(client_addr);
 
@@ -413,7 +399,7 @@ int main(int argc, char* argv[]) {
 
     memset((char*)&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family      = AF_INET;
-    server_addr.sin_port        = htons(portno);
+    server_addr.sin_port        = htons(args.port);
     server_addr.sin_addr.s_addr = INADDR_ANY;
 
     // bind socket and listen for connections
@@ -426,7 +412,7 @@ int main(int argc, char* argv[]) {
     if (listen(sock_listen_fd, BACKLOG) < 0) {
         SPDLOG_ERROR("error listening: {}", strerror(errno));
     }
-    SPDLOG_INFO("epoll echo server listening for connections on port: {}", portno);
+    SPDLOG_INFO("epoll echo server listening for connections on port: {}", args.port);
 
     struct epoll_event ev, events[MAX_EVENTS];
     int new_events, sock_conn_fd, epollfd;

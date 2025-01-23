@@ -25,6 +25,8 @@ class SQLTest : public ::testing::Test {
             // Parent process
         } else {
             // Child process
+            SPDLOG_INFO("child process");
+            exit(EXIT_SUCCESS);
         }
     }
 
@@ -36,9 +38,4 @@ class SQLTest : public ::testing::Test {
 // Test case to execute simple SQL commands
 TEST_F(SQLTest, ExecuteSimpleSQL) {
     SPDLOG_INFO("run test: ExecuteSimpleSQL");
-}
-
-int main(int argc, char** argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }
