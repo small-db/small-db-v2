@@ -21,15 +21,15 @@ git_override(
     # Even better, set up Renovate and let it do the work for you (see "Suggestion: Updates" in the README).
 )
 
-# ================================================================================ #
-# External Dependencies
+# ====================================================================================== #
+# external dependencies
 #
 # Note that the library path is different when using WORKSPACE and MODULE.bazel.
 # When importing the external library "liburing" using WORKSPACE, the library path is:
 #   "bazel-<workspace-name>/external/liburing"
 # With MODULE.bazel (Bazlmod), the path becomes:
 #   "bazel-<workspace-name>/external/_main~_repo_rules~liburing"
-# ================================================================================ #
+# ====================================================================================== #
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 # A generic content for all http_archive rules.
@@ -83,12 +83,19 @@ http_archive(
     integrity = "sha256-6E6WccCYz2mLtA2gj5q8Vq+lMi4OOcmrB1Gc3M1HLQc=",
 )
 
-# ================================================================================ #
-# custom toolchain
-# ================================================================================ #
+# ====================================================================================== #
+# custom toolchains
+# ====================================================================================== #
 bazel_dep(name = "platforms", version = "0.0.10")
 register_toolchains(
     "//toolchain:xc_toolchain_clang20",
     "//toolchain:xc_toolchain_gcc13",
     # "//toolchain:xc_toolchain_default",
 )
+
+# ====================================================================================== #
+# modules from "Bazel Central Registry"
+# ====================================================================================== #
+# Choose the most recent version available at
+# https://registry.bazel.build/modules/googletest
+bazel_dep(name = "googletest", version = "1.15.2")

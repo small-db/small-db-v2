@@ -43,14 +43,14 @@ bazel_features_deps()
 #   "external/_main~_repo_rules~liburing"
 # ================================================================================ #
 
-# A generic content for all http_archive rules.
-_ALL_CONTENT = """\
-filegroup(
-    name = "all",
-    srcs = glob(["**"]),
-    visibility = ["//visibility:public"],
-)
-"""
+# # A generic content for all http_archive rules.
+# _ALL_CONTENT = """\
+# filegroup(
+#     name = "all",
+#     srcs = glob(["**"]),
+#     visibility = ["//visibility:public"],
+# )
+# """
 
 # http_archive(
 #     name = "arrow",
@@ -107,4 +107,3 @@ filegroup(
 #     build_file_content = _ALL_CONTENT,
 #     path = "../libpg_query",
 # )
-

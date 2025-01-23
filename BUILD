@@ -1,4 +1,6 @@
-load("@hedron_compile_commands//:refresh_compile_commands.bzl", "refresh_compile_commands")
+# ====================================================================================== #
+# external dependencies
+# ====================================================================================== #
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake", "configure_make", "make")
 
 cmake(
@@ -116,3 +118,7 @@ config_setting(
     name = "debug",
     values = {"compilation_mode": "dbg"},
 )
+
+# ====================================================================================== #
+# top-level targets
+# ====================================================================================== #

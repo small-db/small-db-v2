@@ -15,3 +15,9 @@
 ```shell
 bazel run //src/server:main -- 5432
 ```
+
+### Run Integration Test
+
+```shell
+bazel test //:integration_test
+```
