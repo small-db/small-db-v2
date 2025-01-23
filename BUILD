@@ -142,5 +142,10 @@ test_suite(
 # ====================================================================================== #
 sh_binary(
     name = "format",
-    srcs = ["scripts/format/run-format.sh"],
+    srcs = [
+        "scripts/format/run-format.sh",
+    ],
+    data = [
+        "scripts/format/run-clang-format.py",
+    ],
 )

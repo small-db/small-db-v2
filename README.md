@@ -35,5 +35,5 @@ bazel test //:integration_test
 ### Format Code & Run Linter
 
 ```shell
-bazel run //:format
+./scripts/format/run-format.sh
 ```
