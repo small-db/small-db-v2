@@ -1,7 +1,6 @@
 cc_binary(
-    name = "main",
+    name = "log",
     srcs = ["log.cc"],
-    visibility = ["//visibility:public"],
     deps = [
         "//:spdlog",
     ],
