@@ -27,3 +27,9 @@ bazel run //src/server:main -- 5432
 ```shell
 bazel test //:integration_test
 ```
+
+### Format Code & Run Linter
+
+```shell
+bazel run //:format
+```

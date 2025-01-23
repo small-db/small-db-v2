@@ -1,2 +1,2 @@
 
-namespac
+// namespac
