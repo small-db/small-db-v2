@@ -8,6 +8,8 @@
 #include <stdexcept>
 #include <string>
 
+#include "src/server/server.h"
+
 // Test fixture for setting up and tearing down the server
 class SQLTest : public ::testing::Test {
    protected:
