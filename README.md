@@ -19,7 +19,11 @@ TODO
 ### Start Server
 
 ```shell
-bazel run //src/server:main -- 5432
+# start server with default port 5432
+bazel run //src/server:main
+
+# start server with custom port
+bazel run //src/server:main -- --port=5432
 ```
 
 ### Run Integration Test
@@ -31,5 +35,5 @@ bazel test //:integration_test
 ### Format Code & Run Linter
 
 ```shell
-./scripts/format.sh
+bazel test //:format
 ```

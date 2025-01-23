@@ -140,7 +140,7 @@ test_suite(
 # ====================================================================================== #
 # helper targets
 # ====================================================================================== #
-sh_binary(
+py_binary(
     name = "format",
-    srcs = ["scripts/format.sh"],
+    srcs = ["scripts/format/run-clang-format.py"],
 )
