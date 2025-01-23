@@ -1,6 +1,6 @@
 # clang-format configuration file
 
-# option manual: http://clang.llvm.org/docs/ClangFormatStyleOptions.html
+# options manual: http://clang.llvm.org/docs/ClangFormatStyleOptions.html
 # tested with: clang-format version 18.1.8
 
 # General
