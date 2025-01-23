@@ -33,36 +33,14 @@ try:
 except ImportError:
     DEVNULL = open(os.devnull, "wb")
 
-from . import list_files
+from scripts import format
 
-
-DEFAULT_EXTENSIONS = "c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx"
-DEFAULT_CLANG_FORMAT_IGNORE = ".clang-format-ignore"
 
 
 class ExitStatus:
     SUCCESS = 0
     DIFF = 1
     TROUBLE = 2
-
-
-def excludes_from_file(ignore_file):
-    excludes = []
-    try:
-        with io.open(ignore_file, "r", encoding="utf-8") as f:
-            for line in f:
-                if line.startswith("#"):
-                    # ignore comments
-                    continue
-                pattern = line.rstrip()
-                if not pattern:
-                    # allow empty lines
-                    continue
-                excludes.append(pattern)
-    except EnvironmentError as e:
-        if e.errno != errno.ENOENT:
-            raise
-    return excludes
 
 
 def make_diff(file, original, reformatted):
@@ -247,9 +225,9 @@ def main():
     parser.add_argument(
         "--extensions",
         help="comma separated list of file extensions (default: {})".format(
-            DEFAULT_EXTENSIONS
+            format.DEFAULT_EXTENSIONS
         ),
-        default=DEFAULT_EXTENSIONS,
+        default=format.DEFAULT_EXTENSIONS,
     )
     parser.add_argument(
         "--dir",
@@ -274,15 +252,6 @@ def main():
         default="auto",
         choices=["auto", "always", "never"],
         help="show colored diff (default: auto)",
-    )
-    parser.add_argument(
-        "-e",
-        "--exclude",
-        metavar="PATTERN",
-        action="append",
-        default=[],
-        help="exclude paths matching the given glob-like pattern(s)"
-        " from recursive search",
     )
     parser.add_argument(
         "--style", help="Formatting style to use (default: file)", default="file"
@@ -335,10 +304,9 @@ def main():
 
     retcode = ExitStatus.SUCCESS
 
-    excludes = excludes_from_file(DEFAULT_CLANG_FORMAT_IGNORE)
-    excludes.extend(split_list_arg(args.exclude))
+    excludes = format.excludes_from_file(format.DEFAULT_CLANG_FORMAT_IGNORE)
 
-    files = list_files(
+    files = format.list_files(
         args.dir,
         exclude=excludes,
         extensions=args.extensions.split(","),

@@ -1,5 +1,29 @@
+import errno
 import fnmatch
+import io
 import os
+
+DEFAULT_EXTENSIONS = "c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx"
+DEFAULT_CLANG_FORMAT_IGNORE = ".clang-format-ignore"
+
+
+def excludes_from_file(ignore_file):
+    excludes = []
+    try:
+        with io.open(ignore_file, "r", encoding="utf-8") as f:
+            for line in f:
+                if line.startswith("#"):
+                    # ignore comments
+                    continue
+                pattern = line.rstrip()
+                if not pattern:
+                    # allow empty lines
+                    continue
+                excludes.append(pattern)
+    except EnvironmentError as e:
+        if e.errno != errno.ENOENT:
+            raise
+    return excludes
 
 
 def list_files(files, extensions=None, exclude=None):
