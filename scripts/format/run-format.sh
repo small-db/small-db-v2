@@ -1,1 +1,1 @@
-./scripts/format/run-clang-format.py
+python3 -m scripts.format.run-clang-format

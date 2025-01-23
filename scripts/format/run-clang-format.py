@@ -33,6 +33,8 @@ try:
 except ImportError:
     DEVNULL = open(os.devnull, "wb")
 
+from . import list_files
+
 
 DEFAULT_EXTENSIONS = "c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx"
 DEFAULT_CLANG_FORMAT_IGNORE = ".clang-format-ignore"
