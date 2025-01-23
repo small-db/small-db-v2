@@ -63,7 +63,7 @@ def excludes_from_file(ignore_file):
     return excludes
 
 
-def list_files(files, recursive=False, extensions=None, exclude=None):
+def list_files(files, extensions=None, exclude=None):
     if extensions is None:
         extensions = []
     if exclude is None:
@@ -71,7 +71,7 @@ def list_files(files, recursive=False, extensions=None, exclude=None):
 
     out = []
     for file in files:
-        if recursive and os.path.isdir(file):
+        if os.path.isdir(file):
             for dirpath, dnames, fnames in os.walk(file):
                 fpaths = [os.path.join(dirpath, fname) for fname in fnames]
                 for pattern in exclude:
@@ -280,12 +280,10 @@ def main():
         default=DEFAULT_EXTENSIONS,
     )
     parser.add_argument(
-        "-r",
-        "--recursive",
-        action="store_true",
-        help="run recursively over directories",
+        "--dir",
+        help="directory to run clang-format on (default: current directory)",
+        default=".",
     )
-    parser.add_argument("files", metavar="file", nargs="+")
     parser.add_argument(
         "-q",
         "--quiet",
@@ -369,11 +367,12 @@ def main():
     excludes.extend(split_list_arg(args.exclude))
 
     files = list_files(
-        split_list_arg(args.files),
-        recursive=args.recursive,
+        args.dir,
         exclude=excludes,
         extensions=args.extensions.split(","),
     )
+    print(files)
+    exit(0)
 
     if not files:
         print_trouble(parser.prog, "No files found", use_colors=colored_stderr)
