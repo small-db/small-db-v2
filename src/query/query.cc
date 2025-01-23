@@ -79,7 +79,7 @@ namespace query {
     const std::string& filename) {
         // Emulate server interaction by parsing hard coded JSON
         const char message[] = {
-            #embed "demo_plan.json"
+#embed "demo_plan.json"
             , '\0' // null terminator
         };
 
