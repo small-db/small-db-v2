@@ -29,11 +29,9 @@ def main() -> int:
         exclude=excludes,
         extensions=args.extensions.split(","),
     )
-    print(files)
 
     for file in files:
-        xiaochen_py.run_command(f"clang-format {file}")
-        break
+        xiaochen_py.run_command(f"cpplint {file}", raise_on_failure=False)
 
 
 if __name__ == "__main__":
