@@ -71,7 +71,7 @@ http_archive(
     urls = ["https://github.com/postgres/postgres/archive/refs/tags/REL_17_1.tar.gz"],
 )
 
-# we use a forked version of libpg_query since the origin's "make install" doesn't work
+# we use a patched version of libpg_query since the origin's "make install" doesn't work
 # with bazel
 http_archive(
     name = "libpg_query",
