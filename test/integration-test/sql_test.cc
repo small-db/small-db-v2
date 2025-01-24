@@ -28,6 +28,7 @@ class SQLTest : public ::testing::Test {
         } else {
             // Child process
             SPDLOG_INFO("child process");
+            server::RunServer(nullptr);
             exit(EXIT_SUCCESS);
         }
     }
