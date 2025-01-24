@@ -91,17 +91,22 @@ http_archive(
 )
 
 # ====================================================================================== #
+# modules from "Bazel Central Registry"
+# ====================================================================================== #
+# https://registry.bazel.build/modules/googletest
+bazel_dep(name = "googletest", version = "1.15.2")
+
+# https://registry.bazel.build/modules/rules_foreign_cc
+bazel_dep(name = "rules_foreign_cc", version = "0.13.0")
+
+# https://registry.bazel.build/modules/platforms
+# Needed for custom toolchains.
+bazel_dep(name = "platforms", version = "0.0.10")
+
+# ====================================================================================== #
 # custom toolchains
 # ====================================================================================== #
-bazel_dep(name = "platforms", version = "0.0.10")
 register_toolchains(
     "//toolchain:xc_toolchain_clang20",
     "//toolchain:xc_toolchain_gcc13",
 )
-
-# ====================================================================================== #
-# modules from "Bazel Central Registry"
-# ====================================================================================== #
-# Choose the most recent version available at
-# https://registry.bazel.build/modules/googletest
-bazel_dep(name = "googletest", version = "1.15.2")

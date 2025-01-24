@@ -14,8 +14,9 @@ cc_library(
     name = "server",
     srcs = [
         "args.cc",
-        "main.cc",
+        "args.h",
         "server.cc",
+        "server.h",
     ],
     visibility = ["//visibility:public"],
     deps = [
