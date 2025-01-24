@@ -75,13 +75,15 @@ class IgnoringConsumer : public ac::SinkNodeConsumer {
 
 arrow::Future<std::shared_ptr<arrow::Buffer>> GetSubstraitFromServer(
     const std::string& filename) {
-    // Emulate server interaction by parsing hard coded JSON
-    const char message[] = {
-#embed "demo_plan.json"
-        , '\0'  // null terminator
-    };
+    //     // Emulate server interaction by parsing hard coded JSON
+    //     const char message[] = {
+    // #embed "demo_plan.json"
+    //         , '\0'  // null terminator
+    //     };
 
-    std::string substrait_json(message);
+    //     std::string substrait_json(message);
+
+    std::string substrait_json = R"(TODO)";
 
     std::string filename_placeholder = "FILENAME_PLACEHOLDER";
 
