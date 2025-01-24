@@ -639,8 +639,6 @@ int RunServer(const server::ServerArgs& args) {
     }
 }
 
-void Foo() {
-    SPDLOG_INFO("foo");
-}
+void Foo() { SPDLOG_INFO("foo"); }
 
 }  // namespace server
