@@ -1,3 +1,7 @@
+# reference:
+# - http://clang.llvm.org/docs/ClangFormatStyleOptions.html
+# - https://gist.github.com/idelsink/c25049d8c987890935f4
+
 ---
 Language: Cpp
 # BasedOnStyle:  Google
