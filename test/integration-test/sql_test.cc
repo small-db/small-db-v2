@@ -1,3 +1,17 @@
+// Copyright 2025 Xiaochen Cui
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include <gtest/gtest.h>
 #include <spdlog/spdlog.h>
 
@@ -5,6 +19,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <memory>
+#include <pqxx/pqxx>
 #include <stdexcept>
 #include <string>
 
@@ -16,6 +31,7 @@ class SQLTest : public ::testing::Test {
     void SetUp() override {
         SPDLOG_INFO("starting the server");
         StartServer();
+        WaitServer();
     }
 
     void StartServer() {
@@ -28,9 +44,18 @@ class SQLTest : public ::testing::Test {
         } else {
             // Child process
             SPDLOG_INFO("child process");
-            server::RunServer(nullptr);
+            server::RunServer(server::DefaultArgs);
             exit(EXIT_SUCCESS);
         }
+    }
+
+    // wait for the server to ready
+    void WaitServer() {
+        pqxx::connection cx{
+            "dbname=postgres user=postgres password=postgres "
+            "hostaddr=localhost port=5432"};
+        auto version = cx.server_version();
+        SPDLOG_INFO("server version: {}", version);
     }
 
     void TearDown() override { SPDLOG_INFO("stopping the server"); }

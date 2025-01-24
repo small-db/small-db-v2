@@ -4,7 +4,7 @@ cc_test(
     srcs = ["sql_test.cc"],
     deps = [
         # internal dependencies
-        "//src/server",
+        "//src/server:server",
         # external dependencies
         "//:spdlog",
         "//:libpqxx",

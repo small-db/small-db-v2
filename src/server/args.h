@@ -17,4 +17,7 @@ class ServerArgs {
    public:
     int port;
 };
+
+ServerArgs DefaultArgs = {5432};
+
 }  // namespace server

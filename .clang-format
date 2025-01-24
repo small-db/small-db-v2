@@ -145,6 +145,8 @@ IndentRequiresClause: true
 
 # IndentWidth (unsigned)
 # The number of columns to use for indentation.
+#
+# original value (google): 2
 IndentWidth: 4
 
 IndentWrappedFunctionNames: false
