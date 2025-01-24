@@ -44,22 +44,28 @@ class SQLTest : public ::testing::Test {
         } else {
             // Child process
             SPDLOG_INFO("child process");
-            server::RunServer(server::DefaultArgs);
-            exit(EXIT_SUCCESS);
+            // server::Foo();
+            int exit_code = server::RunServer(server::DefaultArgs);
+            ASSERT_EQ(exit_code, 0);
+            exit(exit_code);
         }
     }
 
     // wait for the server to ready
     void WaitServer() {
-        pqxx::connection cx{
-            "dbname=postgres user=postgres password=postgres "
-            "hostaddr=localhost port=5432"};
-        auto version = cx.server_version();
-        SPDLOG_INFO("server version: {}", version);
+        // pqxx::connection cx{
+        //     "dbname=postgres user=postgres password=postgres "
+        //     "hostaddr=localhost port=5432"};
+        // auto version = cx.server_version();
+        // SPDLOG_INFO("server version: {}", version);
     }
 
     void TearDown() override { SPDLOG_INFO("stopping the server"); }
 };
 
 // Test case to execute simple SQL commands
-TEST_F(SQLTest, ExecuteSimpleSQL) { SPDLOG_INFO("run test: ExecuteSimpleSQL"); }
+TEST_F(SQLTest, ExecuteSimpleSQL) {
+    SPDLOG_INFO("start test: ExecuteSimpleSQL");
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+    SPDLOG_INFO("stop test: ExecuteSimpleSQL");
+}

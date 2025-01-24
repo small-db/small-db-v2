@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#pragma once
+
 namespace server {
 class ServerArgs {
    public:
     int port;
 };
 
-ServerArgs DefaultArgs = {5432};
+extern ServerArgs DefaultArgs;
 
 }  // namespace server

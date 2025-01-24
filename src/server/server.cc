@@ -28,7 +28,7 @@
 #define MAX_EVENTS 128
 #define MAX_MESSAGE_LEN 2048
 
-using namespace std;
+namespace server {
 
 class ReaderWriter {
    protected:
@@ -123,9 +123,9 @@ SocketsManager* SocketsManager::instancePtr = nullptr;
 std::mutex SocketsManager::mtx;
 
 // get a message with length word from connection
-string pq_getmessage(char* buffer) {
+std::string pq_getmessage(char* buffer) {
     int len = read_int32_chars(buffer);
-    string message(buffer + 4, len);
+    std::string message(buffer + 4, len);
     return message;
 }
 
@@ -158,33 +158,34 @@ class SSLRequest : ReaderWriter {
 
 class Message {
    protected:
-    void append_char(vector<char>& buffer, char value) {
+    void append_char(std::vector<char>& buffer, char value) {
         buffer.push_back(value);
     }
 
-    void append_int32(vector<char>& buffer, int32_t value) {
+    void append_int32(std::vector<char>& buffer, int32_t value) {
         int32_t network_value = htonl(value);
         const char* data = reinterpret_cast<const char*>(&network_value);
         buffer.insert(buffer.end(), data, data + sizeof(network_value));
     }
 
-    void append_cstring(vector<char>& buffer, const string& value) {
+    void append_cstring(std::vector<char>& buffer, const std::string& value) {
         buffer.insert(buffer.end(), value.begin(), value.end());
         buffer.push_back('\x00');
     }
 
-    void append_vector(vector<char>& buffer, const vector<char>& value) {
+    void append_vector(std::vector<char>& buffer,
+                       const std::vector<char>& value) {
         buffer.insert(buffer.end(), value.begin(), value.end());
     }
 
    public:
-    virtual void encode(vector<char>& buffer) = 0;
+    virtual void encode(std::vector<char>& buffer) = 0;
 };
 
 class AuthenticationOk : public Message {
    public:
     AuthenticationOk() = default;
-    void encode(vector<char>& buffer) {
+    void encode(std::vector<char>& buffer) {
         append_char(buffer, 'R');
         append_int32(buffer, 8);
         append_int32(buffer, 0);
@@ -194,7 +195,7 @@ class AuthenticationOk : public Message {
 class EmptyQueryResponse : public Message {
    public:
     EmptyQueryResponse() = default;
-    void encode(vector<char>& buffer) {
+    void encode(std::vector<char>& buffer) {
         append_char(buffer, 'I');
         append_int32(buffer, 4);
     }
@@ -214,18 +215,18 @@ class ErrorResponse : public Message {
 
    private:
     const Severity severity;
-    const string error_message;
+    const std::string error_message;
 
    public:
     ErrorResponse(Severity severity = Severity::ERROR,
-                  const string& error_message = "error message")
+                  const std::string& error_message = "error message")
         : severity(severity), error_message(error_message) {}
 
-    void encode(vector<char>& buffer) {
+    void encode(std::vector<char>& buffer) {
         append_char(buffer, 'E');
 
-        vector<char> field_severity = encode_severity();
-        vector<char> field_message = encode_message();
+        std::vector<char> field_severity = encode_severity();
+        std::vector<char> field_message = encode_message();
 
         int32_t message_length =
             4 + field_severity.size() + field_message.size() + 1;
@@ -239,11 +240,11 @@ class ErrorResponse : public Message {
             "error response: {}",
             spdlog::to_hex(buffer.data(), buffer.data() + buffer.size()));
         SPDLOG_DEBUG("error response: {}",
-                     string(buffer.begin(), buffer.end()));
+                     std::string(buffer.begin(), buffer.end()));
     }
 
-    vector<char> encode_severity() {
-        vector<char> buffer;
+    std::vector<char> encode_severity() {
+        std::vector<char> buffer;
 
         append_char(buffer, 'S');
         switch (severity) {
@@ -262,8 +263,8 @@ class ErrorResponse : public Message {
         return buffer;
     }
 
-    vector<char> encode_message() {
-        vector<char> buffer;
+    std::vector<char> encode_message() {
+        std::vector<char> buffer;
 
         append_char(buffer, 'M');
         append_cstring(buffer, error_message);
@@ -273,11 +274,11 @@ class ErrorResponse : public Message {
 };
 
 class ParameterStatus : public Message {
-    const string key;
-    const string value;
+    const std::string key;
+    const std::string value;
 
    public:
-    ParameterStatus(const string& key, const string& value)
+    ParameterStatus(const std::string& key, const std::string& value)
         : key(key), value(value) {}
 
     // ParameterStatus (B)
@@ -289,7 +290,7 @@ class ParameterStatus : public Message {
     // The name of the run-time parameter being reported.
     // String
     // The current value of the parameter.
-    void encode(vector<char>& buffer) {
+    void encode(std::vector<char>& buffer) {
         append_char(buffer, 'S');
         append_int32(buffer, 4 + key.size() + 1 + value.size() + 1);
         append_cstring(buffer, key);
@@ -310,7 +311,7 @@ class BackendKeyData : public Message {
     // The process ID of this backend.
     // Int32
     // The secret key of this backend.
-    void encode(vector<char>& buffer) {
+    void encode(std::vector<char>& buffer) {
         append_char(buffer, 'K');
         append_int32(buffer, 12);
 
@@ -337,7 +338,7 @@ class ReadyForQuery : public Message {
     // idle (not in a transaction block); 'T' if in a transaction block; or 'E'
     // if in a failed transaction block (queries will be rejected until block is
     // ended).
-    void encode(vector<char>& buffer) {
+    void encode(std::vector<char>& buffer) {
         append_char(buffer, 'Z');
         append_int32(buffer, 5);
         append_char(buffer, 'I');
@@ -346,7 +347,7 @@ class ReadyForQuery : public Message {
 
 class NetworkPackage {
    private:
-    vector<Message*> messages;
+    std::vector<Message*> messages;
 
    public:
     NetworkPackage() = default;
@@ -354,7 +355,7 @@ class NetworkPackage {
     void add_message(Message* message) { messages.push_back(message); }
 
     void send_all(int sockfd) {
-        vector<char> buffer;
+        std::vector<char> buffer;
         for (auto message : messages) {
             message->encode(buffer);
         }
@@ -371,7 +372,7 @@ void sendUnimplemented(int sockfd) {
     network_package->send_all(sockfd);
 }
 
-void handle_query(string& query, int sockfd) {
+void handle_query(std::string& query, int sockfd) {
     SPDLOG_INFO("query: {}", query);
 
     PgQueryParseResult result;
@@ -413,10 +414,10 @@ int RunServer(const server::ServerArgs& args) {
     // bind socket and listen for connections
     if (bind(sock_listen_fd, (struct sockaddr*)&server_addr,
              sizeof(server_addr)) < 0) {
-        string error_msg =
+        std::string error_msg =
             fmt::format("error binding socket: {}", strerror(errno));
         SPDLOG_ERROR(error_msg);
-        throw std::runtime_error(error_msg);
+        return EXIT_FAILURE;
     }
 
     if (listen(sock_listen_fd, BACKLOG) < 0) {
@@ -518,17 +519,18 @@ int RunServer(const server::ServerArgs& args) {
                             "received[{} bytes]: {}", bytes_received,
                             spdlog::to_hex(buffer, buffer + bytes_received));
 
-                        string message = pq_getmessage(buffer);
+                        std::string message = pq_getmessage(buffer);
 
                         // the first 4 bytes is version
-                        string version(buffer + 4, 4);
+                        std::string version(buffer + 4, 4);
 
-                        unordered_map<string, string> recv_params;
+                        std::unordered_map<std::string, std::string>
+                            recv_params;
                         // key and value are separated by '\x00'
                         int pos = 8;  // start after the version
                         while (pos < bytes_received) {
-                            string key;
-                            string value;
+                            std::string key;
+                            std::string value;
 
                             // Read key
                             while (pos < bytes_received &&
@@ -559,7 +561,7 @@ int RunServer(const server::ServerArgs& args) {
 
                         NetworkPackage* network_package = new NetworkPackage();
                         network_package->add_message(new AuthenticationOk());
-                        unordered_map<string, string> params{
+                        std::unordered_map<std::string, std::string> params{
                             {"server_encoding", "UTF8"},
                             {"client_encoding", "UTF8"},
                             {"DateStyle", "ISO YMD"},
@@ -612,7 +614,8 @@ int RunServer(const server::ServerArgs& args) {
                                     read_int32_chars(buffer.data() + 1);
 
                                 // read the query
-                                string query(buffer.data() + 5, query_len - 4);
+                                std::string query(buffer.data() + 5,
+                                                  query_len - 4);
                                 handle_query(query, newsockfd);
                                 break;
                             }
@@ -635,3 +638,9 @@ int RunServer(const server::ServerArgs& args) {
         }
     }
 }
+
+void Foo() {
+    SPDLOG_INFO("foo");
+}
+
+}  // namespace server

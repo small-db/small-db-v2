@@ -19,4 +19,7 @@
 namespace server {
 int RunServer(const server::ServerArgs& args);
 
+
+void Foo();
+
 }  // namespace server
