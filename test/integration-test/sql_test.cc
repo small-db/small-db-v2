@@ -59,7 +59,7 @@ class SQLTest : public ::testing::Test {
         // auto version = this->cx.server_version();
         // SPDLOG_INFO("server version: {}", version);
 
-        // pqxx::connection conn;
+        pqxx::connection conn;
     }
 
     void TearDown() override { SPDLOG_INFO("stopping the server"); }
