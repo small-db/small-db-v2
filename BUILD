@@ -118,8 +118,15 @@ cmake(
     name = "libpqxx",
     build_args = ["-j"],
     lib_source = "@libpqxx//:all",
+    generate_args = [
+        "-DBUILD_SHARED_LIBS=off",
+    ],
     out_static_libs = ["libpqxx.a"],
     visibility = ["//visibility:public"],
+    deps = [
+        # libpqxx depends on libpq which is built from postgres
+        ":postgres",
+    ],
 )
 
 config_setting(
