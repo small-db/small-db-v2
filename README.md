@@ -37,3 +37,7 @@ bazel test //:integration_test
 ```shell
 ./scripts/format/run-format.sh
 ```
+
+## (book) Building a Geo-Distributed Database: A Step-by-Step Guide
+
+

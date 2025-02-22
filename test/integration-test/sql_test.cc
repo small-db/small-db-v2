@@ -28,6 +28,8 @@
 // Test fixture for setting up and tearing down the server
 class SQLTest : public ::testing::Test {
    protected:
+    pqxx::connection cx;
+
     void SetUp() override {
         SPDLOG_INFO("starting the server");
         StartServer();
@@ -53,11 +55,11 @@ class SQLTest : public ::testing::Test {
 
     // wait for the server to ready
     void WaitServer() {
-        // pqxx::connection cx{
-        //     "dbname=postgres user=postgres password=postgres "
-        //     "hostaddr=localhost port=5432"};
-        // auto version = cx.server_version();
-        // SPDLOG_INFO("server version: {}", version);
+        this->cx = pqxx::connection{
+            "dbname=postgres user=postgres password=postgres "
+            "hostaddr=localhost port=5432"};
+        auto version = this->cx.server_version();
+        SPDLOG_INFO("server version: {}", version);
     }
 
     void TearDown() override { SPDLOG_INFO("stopping the server"); }
@@ -66,6 +68,10 @@ class SQLTest : public ::testing::Test {
 // Test case to execute simple SQL commands
 TEST_F(SQLTest, ExecuteSimpleSQL) {
     SPDLOG_INFO("start test: ExecuteSimpleSQL");
+
+    pqxx::work tx(this->cx);
+    tx.exec("CREATE TABLE test_table (id INT PRIMARY KEY, name TEXT);");
+
     std::this_thread::sleep_for(std::chrono::seconds(5));
     SPDLOG_INFO("stop test: ExecuteSimpleSQL");
 }
