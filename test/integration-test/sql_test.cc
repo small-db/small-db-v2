@@ -28,8 +28,6 @@
 // Test fixture for setting up and tearing down the server
 class SQLTest : public ::testing::Test {
    protected:
-    pqxx::connection conn;
-
     void SetUp() override {
         SPDLOG_INFO("starting the server");
         StartServer();
@@ -46,7 +44,6 @@ class SQLTest : public ::testing::Test {
         } else {
             // Child process
             SPDLOG_INFO("child process");
-            // server::Foo();
             int exit_code = server::RunServer(server::DefaultArgs);
             ASSERT_EQ(exit_code, 0);
             exit(exit_code);
@@ -55,10 +52,10 @@ class SQLTest : public ::testing::Test {
 
     // wait for the server to ready
     void WaitServer() {
-        this->conn = pqxx::connection{
+        pqxx::connection conn = pqxx::connection{
             "dbname=postgres user=postgres password=postgres "
             "hostaddr=localhost port=5432"};
-        auto version = this->conn.server_version();
+        auto version = conn.server_version();
         SPDLOG_INFO("server version: {}", version);
     }
 
