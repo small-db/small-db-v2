@@ -2,4 +2,5 @@
 
 int main() {
     pqxx::connection conn;
+    return 0;
 }

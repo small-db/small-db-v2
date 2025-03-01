@@ -94,12 +94,24 @@ configure_make(
     ],
     includes = ["server"],
     lib_source = "@postgres//:all",
-    out_static_libs = [
-        "libpq.a",
-        "libpgcommon.a",
-        "libpgport.a",
-        "libpgport_shlib.a",
+    out_shared_libs = [
+        "libpq.so",
     ],
+    # out_static_libs = [
+    #     # not found for some reason
+    #     # "libpgport_srv.a",
+    #     "libpgport_shlib.a",
+    #     "libpgport.a",
+    #     "libpgcommon.a",
+    #     "libpgcommon_shlib.a",
+    #     # not found for some reason
+    #     # "libpgcommon_srv.a",
+    #     "libpgtypes.a",
+    #     "libpq.a",
+    #     "libecpg.a",
+    #     "libpgfeutils.a",
+    #     "libecpg_compat.a",
+    # ],
     visibility = ["//visibility:public"],
 )
 
@@ -141,18 +153,5 @@ test_suite(
     name = "integration_test",
     tests = [
         "//test/integration-test:sql_test",
-    ],
-)
-
-# ====================================================================================== #
-# helper targets
-# ====================================================================================== #
-sh_binary(
-    name = "format",
-    srcs = [
-        "scripts/format/run-format.sh",
-    ],
-    data = [
-        "scripts/format/run-clang-format.py",
     ],
 )
