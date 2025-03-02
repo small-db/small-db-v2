@@ -9,6 +9,15 @@
                 "kind": "build",
                 "isDefault": true
             },
-        }
+        },
+        {
+            "label": "build hello_world (debug)",
+            "type": "shell",
+            "command": "bazel build //src/tmp:hello_world -c dbg",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+        },
     ]
 }

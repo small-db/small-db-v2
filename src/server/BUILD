@@ -3,10 +3,15 @@ cc_binary(
     srcs = ["main.cc"],
     visibility = ["//visibility:public"],
     deps = [
-        "//:libpg_query",
-        "//:spdlog",
+        ":server",
+
+        # internal dependencies
         "//src/query",
         "//src/store",
+
+        # external dependencies
+        "//:libpg_query",
+        "//:spdlog",
     ],
 )
 
