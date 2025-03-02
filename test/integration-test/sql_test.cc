@@ -20,12 +20,9 @@
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 #include <spdlog/spdlog.h>
 
-#include <array>
 #include <cstdio>
 #include <cstdlib>
-#include <memory>
 #include <pqxx/pqxx>
-#include <stdexcept>
 #include <string>
 
 #include "src/server/server.h"
