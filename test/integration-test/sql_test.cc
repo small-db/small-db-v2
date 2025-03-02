@@ -13,6 +13,11 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
+
+// set level for "SPDLOG_<LEVEL>" macros
+// NB: must define SPDLOG_ACTIVE_LEVEL before `#include "spdlog/spdlog.h"`
+// to make it works
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 #include <spdlog/spdlog.h>
 
 #include <array>
@@ -29,6 +34,12 @@
 class SQLTest : public ::testing::Test {
    protected:
     void SetUp() override {
+        SPDLOG_DEBUG("1");
+        SPDLOG_INFO("2");
+
+        spdlog::debug("3");
+        spdlog::info("4");
+
         SPDLOG_INFO("starting the server");
         StartServer();
         WaitServer();
@@ -52,9 +63,12 @@ class SQLTest : public ::testing::Test {
 
     // wait for the server to ready
     void WaitServer() {
+        // sleep for 5 seconds
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+
         pqxx::connection conn = pqxx::connection{
             "dbname=postgres user=postgres password=postgres "
-            "hostaddr=localhost port=5432"};
+            "hostaddr=127.0.0.1 port=5432"};
         auto version = conn.server_version();
         SPDLOG_INFO("server version: {}", version);
     }

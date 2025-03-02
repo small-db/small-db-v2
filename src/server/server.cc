@@ -597,7 +597,7 @@ int RunServer(const server::ServerArgs& args) {
                         // received buffer.resize(bytes_received);
 
                         // Log the message in hex format
-                        SPDLOG_DEBUG(
+                        SPDLOG_INFO(
                             "received[{} bytes]: {}", bytes_received,
                             spdlog::to_hex(buffer.data(),
                                            buffer.data() + bytes_received));
@@ -617,6 +617,14 @@ int RunServer(const server::ServerArgs& args) {
                                 handle_query(query, newsockfd);
                                 break;
                             }
+
+                            case 'X': {
+                                // Terminate
+                                SPDLOG_INFO("terminate connection");
+                                close(newsockfd);
+                                break;
+                            }
+
                             default:
                                 SPDLOG_ERROR("unknown message type: {}",
                                              message_type);
