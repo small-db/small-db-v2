@@ -34,11 +34,8 @@
 class SQLTest : public ::testing::Test {
    protected:
     void SetUp() override {
-        SPDLOG_DEBUG("1");
-        SPDLOG_INFO("2");
-
-        spdlog::debug("3");
-        spdlog::info("4");
+        spdlog::set_level(spdlog::level::debug);
+        spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] [%@] %v");
 
         SPDLOG_INFO("starting the server");
         StartServer();

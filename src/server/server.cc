@@ -482,7 +482,7 @@ int RunServer(const server::ServerArgs& args) {
                             recv(newsockfd, buffer, MAX_MESSAGE_LEN, 0);
 
                         if (bytes_received < 0) {
-                            // TODO:
+                            // TODO(xiaochen):
                             // - add case "EAGAIN", which is the same as
                             // "EWOULDBLOCK"
                             switch (errno) {
@@ -618,12 +618,12 @@ int RunServer(const server::ServerArgs& args) {
                                 break;
                             }
 
-                            case 'X': {
-                                // Terminate
-                                SPDLOG_INFO("terminate connection");
-                                close(newsockfd);
-                                break;
-                            }
+                            // case 'X': {
+                            //     // Terminate
+                            //     SPDLOG_INFO("terminate connection");
+                            //     close(newsockfd);
+                            //     break;
+                            // }
 
                             default:
                                 SPDLOG_ERROR("unknown message type: {}",
