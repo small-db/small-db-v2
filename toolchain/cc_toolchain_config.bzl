@@ -74,6 +74,7 @@ def impl_clang20(ctx):
                             flag_group(
                                 flags=[
                                     "-Wno-c23-extensions",
+                                    "-g",
                                 ]
                             ),
                         ]

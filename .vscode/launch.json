@@ -10,6 +10,9 @@
             "name": "sql_test",
             "program": "${workspaceFolder}/bazel-bin/test/integration_test/sql_test",
             "cwd": "${workspaceFolder}",
+            "sourceMap": {
+                "/proc/self/cwd/": "${workspaceFolder}/"
+            },
         },
         {
             "name": "server",
