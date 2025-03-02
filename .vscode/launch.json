@@ -8,7 +8,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "sql_test",
-            "program": "${workspaceFolder}/bazel-bin/test/integration-test/sql_test",
+            "program": "${workspaceFolder}/bazel-bin/test/integration_test/sql_test",
             "cwd": "${workspaceFolder}",
         },
         {

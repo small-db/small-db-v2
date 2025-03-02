@@ -152,6 +152,6 @@ config_setting(
 test_suite(
     name = "integration_test",
     tests = [
-        "//test/integration-test:sql_test",
+        "//test/integration_test:sql_test",
     ],
 )
