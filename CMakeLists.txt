@@ -11,14 +11,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # ============================================================================== #
-# build settings
-# ============================================================================== #
-set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
-set(CMAKE_C_COMPILER /usr/bin/clang)
-set(CMAKE_CXX_COMPILER /usr/bin/g++)
-
-# ============================================================================== #
 # external dependencies
 # ============================================================================== #
 include(FetchContent)
