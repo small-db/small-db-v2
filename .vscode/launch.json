@@ -11,7 +11,8 @@
             "program": "${workspaceFolder}/bazel-bin/test/integration_test/sql_test",
             "cwd": "${workspaceFolder}",
             "sourceMap": {
-                "/proc/self/cwd/": "${workspaceFolder}/"
+                "/proc/self/cwd/": "${workspaceFolder}/",
+                "/home/xiaochen/.cache/bazel/_bazel_xiaochen/def8392de60694faa9c9ea704dc32257/sandbox/processwrapper-sandbox/31/execroot/_main/": "${workspaceFolder}/",
             },
         },
         {
