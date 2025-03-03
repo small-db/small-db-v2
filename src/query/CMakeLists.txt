@@ -6,8 +6,10 @@ add_library(query_lib
     query.h
 )
 
+find_package(Arrow REQUIRED)
+
 target_link_libraries(query_lib
     PRIVATE
-    arrow
+    Arrow::arrow_shared
     spdlog
 )
