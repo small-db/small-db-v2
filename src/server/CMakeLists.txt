@@ -5,6 +5,12 @@ add_library(server_lib
     # Add other source files and headers here
 )
 
+target_link_libraries(server_lib
+    PRIVATE
+    query_lib
+    spdlog
+)
+
 # Define the executable target "server"
 add_executable(server
     main.cc
@@ -27,3 +33,15 @@ target_include_directories(server
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+add_dependencies(server_lib libpg_query)
+
+target_include_directories(server_lib PRIVATE
+    ${CMAKE_BINARY_DIR}/install/usr/local/include # Adjust if necessary
+)
+
+target_link_directories(server_lib PRIVATE
+    ${CMAKE_BINARY_DIR}/install/usr/local/lib  # Adjust based on install location
+)
+
+# target_link_libraries(server PRIVATE libpg_query)  # Replace 'mylib' with actual library name

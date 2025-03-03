@@ -26,13 +26,19 @@ FetchContent_Declare(
     GIT_TAG 7.7.4
 )
 
-# FetchContent_Declare(
-#     libpq_query
-#     GIT_REPOSITORY https://github.com/pganalyze/libpg_query.git
-#     GIT_TAG 17-6.0.0
-# )
+FetchContent_Declare(
+    spdlog 
+    GIT_REPOSITORY https://github.com/gabime/spdlog.git
+    GIT_TAG v1.15.1
+)
 
-FetchContent_MakeAvailable(googletest libpqxx)
+FetchContent_Declare(
+    arrow
+    GIT_REPOSITORY https://github.com/apache/arrow.git
+    GIT_TAG apache-arrow-19.0.1
+)
+
+FetchContent_MakeAvailable(googletest libpqxx spdlog arrow)
 
 include(ExternalProject)
 
@@ -40,11 +46,11 @@ include(ExternalProject)
 
 ExternalProject_Add(
     libpg_query
-    GIT_REPOSITORY https://github.com/pganalyze/libpg_query.git
-    GIT_TAG 17-6.0.0
+    GIT_REPOSITORY https://github.com/small-db/libpg_query.git
+    GIT_TAG 7018e9e
     CONFIGURE_COMMAND ""
-    BUILD_COMMAND make
-    INSTALL_COMMAND ""
+    BUILD_COMMAND make libpg_query.a libpg_query.so
+    INSTALL_COMMAND make install PREFIX=${CMAKE_BINARY_DIR}/install
     BUILD_IN_SOURCE 1
 )
 
