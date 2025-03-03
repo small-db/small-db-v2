@@ -9,13 +9,19 @@
         {
             "name": "base",
             "hidden": true,
-            "generator": "Ninja"
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "/usr/bin/clang",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++"
+            }
         },
         {
             "name": "debug",
             "description": "debug build",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
+                "CMAKE_BUILD_TYPE": "DEBUG",
+                "CMAKE_C_FLAGS_DEBUG": "-g",
+                "CMAKE_CXX_FLAGS_DEBUG": "-g"
             }
         }
     ]

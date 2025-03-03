@@ -26,12 +26,37 @@ FetchContent_Declare(
     GIT_TAG 7.7.4
 )
 
+# FetchContent_Declare(
+#     libpq_query
+#     GIT_REPOSITORY https://github.com/pganalyze/libpg_query.git
+#     GIT_TAG 17-6.0.0
+# )
+
 FetchContent_MakeAvailable(googletest libpqxx)
+
+include(ExternalProject)
+
+# https://stackoverflow.com/questions/63667653/how-to-build-an-external-library-downloaded-with-cmake-fetchcontent
+
+ExternalProject_Add(
+    libpg_query
+    GIT_REPOSITORY https://github.com/pganalyze/libpg_query.git
+    GIT_TAG 17-6.0.0
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND make
+    INSTALL_COMMAND ""
+    BUILD_IN_SOURCE 1
+)
+
+# ============================================================================== #
+# subdirectories
+# ============================================================================== #
+
+add_subdirectory(src)
 
 # ============================================================================== #
 # clutter
 # ============================================================================== #
-
 
 enable_testing()
 
