@@ -116,6 +116,11 @@ class SocketsManager {
         auto instance = getInstance();
         instance->socket_states[sockfd] = state;
     }
+
+    static void remove_socket_state(int sockfd) {
+        auto instance = getInstance();
+        instance->socket_states.erase(sockfd);
+    }
 };
 
 // Define the static members
@@ -623,6 +628,7 @@ int RunServer(const server::ServerArgs& args) {
                                 // Terminate
                                 SPDLOG_INFO("terminate connection");
                                 close(newsockfd);
+                                SocketsManager::remove_socket_state(newsockfd);
                                 break;
                             }
 

@@ -76,10 +76,12 @@ class SQLTest : public ::testing::Test {
 TEST_F(SQLTest, ExecuteSimpleSQL) {
     SPDLOG_INFO("start test: ExecuteSimpleSQL");
 
-    // pqxx::work tx(this->cx);
-    // tx.exec(
-    //     "CREATE TABLE users (id INT PRIMARY KEY, name STRING, balance INT)");
-    // tx.commit();
+    pqxx::connection conn = pqxx::connection{CONNECTION_STRING};
+
+    pqxx::work tx(conn);
+    tx.exec(
+        "CREATE TABLE users (id INT PRIMARY KEY, name STRING, balance INT)");
+    tx.commit();
 
     std::this_thread::sleep_for(std::chrono::seconds(5));
     SPDLOG_INFO("stop test: ExecuteSimpleSQL");
