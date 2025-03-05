@@ -19,10 +19,10 @@
             "name": "debug",
             "description": "debug build",
             "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_C_FLAGS_DEBUG": "-g",
                 "CMAKE_CXX_FLAGS_DEBUG": "-g",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "CMAKE_BUILD_TYPE": "DEBUG"
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
             }
         }
     ]

@@ -3,4 +3,4 @@
 # ============================================================================== #
 
 add_subdirectory(query)
-add_subdirectory(server)
+# add_subdirectory(server)
