@@ -27,6 +27,10 @@
 
 #include "src/server/server.h"
 
+const std::string CONNECTION_STRING =
+    "dbname=postgres user=postgres password=postgres hostaddr=127.0.0.1 "
+    "port=5432";
+
 // Test fixture for setting up and tearing down the server
 class SQLTest : public ::testing::Test {
    protected:
@@ -60,9 +64,7 @@ class SQLTest : public ::testing::Test {
         // sleep for 5 seconds
         std::this_thread::sleep_for(std::chrono::seconds(5));
 
-        pqxx::connection conn = pqxx::connection{
-            "dbname=postgres user=postgres password=postgres "
-            "hostaddr=127.0.0.1 port=5432"};
+        pqxx::connection conn = pqxx::connection{CONNECTION_STRING};
         auto version = conn.server_version();
         SPDLOG_INFO("server version: {}", version);
     }

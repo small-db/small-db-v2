@@ -560,14 +560,12 @@ int RunServer(const server::ServerArgs& args) {
                         NetworkPackage* network_package = new NetworkPackage();
                         network_package->add_message(new AuthenticationOk());
 
-                        
                         std::unordered_map<std::string, std::string> params{
                             {"server_encoding", "UTF8"},
                             {"client_encoding", "UTF8"},
                             {"DateStyle", "ISO YMD"},
                             {"integer_datetimes", "on"},
-                            {"server_version", "17.0"}
-                        };
+                            {"server_version", "17.0"}};
                         for (const auto& kv : params) {
                             network_package->add_message(
                                 new ParameterStatus(kv.first, kv.second));
@@ -621,12 +619,12 @@ int RunServer(const server::ServerArgs& args) {
                                 break;
                             }
 
-                            // case 'X': {
-                            //     // Terminate
-                            //     SPDLOG_INFO("terminate connection");
-                            //     close(newsockfd);
-                            //     break;
-                            // }
+                            case 'X': {
+                                // Terminate
+                                SPDLOG_INFO("terminate connection");
+                                close(newsockfd);
+                                break;
+                            }
 
                             default:
                                 SPDLOG_ERROR("unknown message type: {}",
