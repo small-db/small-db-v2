@@ -19,37 +19,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # set(CMAKE_BUILD_TYPE Debug)
 
-# set(ARROW_BUILD_SHARED True)
-# # set(ARROW_DEPENDENCY_SOURCE "SYSTEM")
-# set(ARROW_DEPENDENCY_SOURCE "BUNDLED")
-# set(ARROW_SIMD_LEVEL NONE) # macOS-specific workaround
-
-# # Turn on Arrow features here (and add them to target_link_libraries when
-# # appropriate)
-# set(ARROW_ACERO ON)
-# set(ARROW_PARQUET ON)
-# set(ARROW_IPC ON)
-# set(ARROW_DATASET ON)
-# set(ARROW_FILESYSTEM ON)
-# set(ARROW_COMPUTE ON)
-
-# set(ARROW_BUILD_TESTS OFF)
-
-# # Get Arrow
-# include(FetchContent)
-
-# FetchContent_Declare(Arrow
-#   GIT_REPOSITORY https://github.com/apache/arrow.git
-#     GIT_TAG apache-arrow-19.0.1
-#   GIT_SHALLOW TRUE SOURCE_SUBDIR cpp
-#   OVERRIDE_FIND_PACKAGE
-# )
-
-# FetchContent_MakeAvailable(Arrow)
 
 # ============================================================================== #
 # third-party dependencies
 # ============================================================================== #
+
+add_subdirectory("third_party")
 
 # include(FetchContent)
 # FetchContent_Declare(
