@@ -10,6 +10,9 @@ project(small-db-v2)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# https://discourse.cmake.org/t/cmake-3-28-cmake-cxx-compiler-clang-scan-deps-notfound-not-found/9244/4
+set(CMAKE_CXX_SCAN_FOR_MODULES 0)
+
 # # ============================================================================== #
 # # external dependencies: arrow
 # # ============================================================================== #
