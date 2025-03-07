@@ -2,7 +2,7 @@
 # library: query_lib
 # ============================================================================== #
 
-# message(STATUS "arrow_BINARY_DIR: ${arrow_BINARY_DIR}")
+message(STATUS "Arrow_INCLUDE_DIRS: ${Arrow_INCLUDE_DIRS}")
 # message(STATUS "arrow_SOURCE_DIR (2): ${arrow_SOURCE_DIR}")
 
 add_library(query_lib
@@ -30,6 +30,11 @@ add_library(query_lib
 target_link_libraries(query_lib
     PRIVATE
     ${Arrow_LIBRARIES}
+)
+
+target_include_directories(query_lib
+    PRIVATE
+    ${Arrow_INCLUDE_DIRS}
 )
 
 # message(STATUS "Arrow_INCLUDE_DIRS: ${Arrow_INCLUDE_DIRS}")

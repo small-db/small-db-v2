@@ -27,8 +27,12 @@ set(CMAKE_CXX_SCAN_FOR_MODULES 0)
 # third-party dependencies
 # ============================================================================== #
 
-add_subdirectory("third_party")
-message(STATUS "arrow_SOURCE_DIR (2): ${arrow_SOURCE_DIR}")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/third_party/")
+
+find_package(Arrow REQUIRED)
+
+# add_subdirectory("third_party")
+message(STATUS "arrow_SOURCE_DIR (3): ${arrow_SOURCE_DIR}")
 
 # include(FetchContent)
 # FetchContent_Declare(
