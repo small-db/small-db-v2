@@ -35,6 +35,7 @@ target_link_libraries(query_lib
 target_include_directories(query_lib
     PRIVATE
     ${Arrow_INCLUDE_DIRS}
+    ${Spdlog_INCLUDE_DIRS}
 )
 
 # message(STATUS "Arrow_INCLUDE_DIRS: ${Arrow_INCLUDE_DIRS}")

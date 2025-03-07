@@ -31,6 +31,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/third_part
 
 find_package(Arrow REQUIRED)
 
+find_package(Spdlog REQUIRED)
+
 # add_subdirectory("third_party")
 message(STATUS "arrow_SOURCE_DIR (3): ${arrow_SOURCE_DIR}")
 
@@ -58,6 +60,8 @@ message(STATUS "arrow_SOURCE_DIR (3): ${arrow_SOURCE_DIR}")
 # #     GIT_REPOSITORY https://github.com/apache/arrow.git
 # #     GIT_TAG apache-arrow-19.0.1
 # # )
+
+FetchContent_MakeAvailable(spdlog)
 
 # FetchContent_MakeAvailable(googletest libpqxx spdlog)
 

@@ -51,7 +51,8 @@ FetchContent_MakeAvailable(Arrow)
 #   message(STATUS "${_var}=${${_var}}")
 # endforeach()
 
-set(Arrow_INCLUDE_DIRS ${arrow_SOURCE_DIR}/cpp/src)
+list(APPEND Arrow_INCLUDE_DIRS ${arrow_SOURCE_DIR}/cpp/src)
+list(APPEND Arrow_INCLUDE_DIRS ${arrow_BINARY_DIR}/src)
 
 # message(STATUS "Arrow_LIBRARIES: ${Arrow_LIBRARIES}")
 # message(STATUS "Arrow_LIBRARY_DIRS: ${Arrow_LIBRARY_DIRS}")
