@@ -1,6 +1,10 @@
 # ============================================================================== #
 # library: query_lib
 # ============================================================================== #
+
+# message(STATUS "arrow_BINARY_DIR: ${arrow_BINARY_DIR}")
+# message(STATUS "arrow_SOURCE_DIR (2): ${arrow_SOURCE_DIR}")
+
 add_library(query_lib
     query.cc
     query.h
@@ -25,13 +29,14 @@ add_library(query_lib
 
 target_link_libraries(query_lib
     PRIVATE
-    # Arrow::arrow_static
-    arrow_static
+    ${Arrow_LIBRARIES}
 )
 
-message(STATUS "arrow_BINARY_DIR: ${arrow_BINARY_DIR}")
-message(STATUS "arrow_SOURCE_DIR: ${arrow_SOURCE_DIR}")
+# message(STATUS "Arrow_INCLUDE_DIRS: ${Arrow_INCLUDE_DIRS}")
 
-target_include_directories(query_lib
-    ${arrow_BINARY_DIR}/src
-    ${arrow_SOURCE_DIR}/cpp/src)
+# message(STATUS "arrow_BINARY_DIR: ${arrow_BINARY_DIR}")
+# message(STATUS "arrow_SOURCE_DIR (2): ${arrow_SOURCE_DIR}")
+
+# target_include_directories(query_lib
+#     ${arrow_BINARY_DIR}/src
+#     ${arrow_SOURCE_DIR}/cpp/src)

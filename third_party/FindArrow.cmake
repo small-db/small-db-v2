@@ -1,3 +1,28 @@
+# # Summary
+# 
+# This module fetches arrow from remote and builds it.
+# 
+# # Control Variables
+#
+# - Arrow_USE_STATIC_LIBS  - Set to ON to force use of static libraries.
+# 
+# # Set Variables
+#
+# The following are set after the configuration is done:
+#
+# - Arrow_LIBRARIES        - path to the Arrow libraries
+# - Arrow_LIBRARY_DIRS     - compile time link directories
+# - Arrow_INCLUDE_DIRS     - compile time include directories
+#
+# # Sample Usage
+#
+# ```cmake
+# find_package(Arrow)
+# if(Arrow_FOUND)
+#   target_link_libraries(<YourTarget> ${Arrow_LIBRARIES})
+# endif()
+# ```
+
 set(ARROW_BUILD_SHARED True)
 set(ARROW_DEPENDENCY_SOURCE "BUNDLED")
 set(ARROW_SIMD_LEVEL NONE)
@@ -17,20 +42,28 @@ FetchContent_Declare(Arrow
   GIT_REPOSITORY https://github.com/apache/arrow.git
   GIT_TAG apache-arrow-19.0.1
   GIT_SHALLOW TRUE
-  SOURCE_SUBDIR cpp
-  OVERRIDE_FIND_PACKAGE
 )
 
 FetchContent_MakeAvailable(Arrow)
 
-message(STATUS "arrow_BINARY_DIR: ${arrow_BINARY_DIR}")
-message(STATUS "arrow_SOURCE_DIR: ${arrow_SOURCE_DIR}")
+# get_cmake_property(_vars VARIABLES)
+# foreach(_var ${_vars})
+#   message(STATUS "${_var}=${${_var}}")
+# endforeach()
 
-add_library(Arrow::arrow_static INTERFACE IMPORTED)
-target_link_libraries(Arrow::arrow_static INTERFACE arrow_static)
-target_include_directories(Arrow::arrow_static
-  INTERFACE ${arrow_BINARY_DIR}/src
-  ${arrow_SOURCE_DIR}/cpp/src)
+set(Arrow_INCLUDE_DIRS ${arrow_SOURCE_DIR}/cpp/src/arrow)
+
+# message(STATUS "Arrow_LIBRARIES: ${Arrow_LIBRARIES}")
+# message(STATUS "Arrow_LIBRARY_DIRS: ${Arrow_LIBRARY_DIRS}")
+# message(STATUS "Arrow_INCLUDE_DIRS: ${Arrow_INCLUDE_DIRS}")
+# message(STATUS "arrow_BINARY_DIR: ${arrow_BINARY_DIR}")
+# message(STATUS "arrow_SOURCE_DIR (1): ${arrow_SOURCE_DIR}")
+
+# add_library(Arrow::arrow_static INTERFACE IMPORTED)
+# target_link_libraries(Arrow::arrow_static INTERFACE arrow_static)
+# target_include_directories(Arrow::arrow_static
+#   INTERFACE ${arrow_BINARY_DIR}/src
+#   ${arrow_SOURCE_DIR}/cpp/src)
 
 # message(STATUS "INCLUDE_DIRECTORIES: ${INCLUDE_DIRECTORIES}")
 # message(STATUS "Arrow_INCLUDE_DIRS: ${Arrow_INCLUDE_DIRS}")
