@@ -384,6 +384,7 @@ void handle_query(std::string& query, int sockfd) {
 
     result = pg_query_parse(query.c_str());
 
+
     SPDLOG_INFO("parse_tree: {}", result.parse_tree);
 
     pg_query_free_parse_result(result);
