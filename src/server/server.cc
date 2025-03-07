@@ -1,7 +1,22 @@
+// Copyright 2025 Xiaochen Cui
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include <arpa/inet.h>
 #include <errno.h>
 #include <netinet/in.h>
 #include <pg_query.h>
+#include <pg_query.pb-c.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -383,6 +398,11 @@ void handle_query(std::string& query, int sockfd) {
     PgQueryParseResult result;
 
     result = pg_query_parse(query.c_str());
+
+    PgQueryProtobufParseResult pgquery_pbparse_result = pg_query_parse_protobuf_opts(query.c_str(), PG_QUERY_PARSE_DEFAULT);
+    // pb_result.parse_tree
+
+    auto unpacked = pg_query__parse_result__unpack(NULL, pgquery_pbparse_result.parse_tree.len, pgquery_pbparse_result.parse_tree.data)
 
 
     SPDLOG_INFO("parse_tree: {}", result.parse_tree);
