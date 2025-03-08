@@ -1,27 +1,6 @@
-# # Summary
-# 
-# This module fetches arrow from remote and builds it.
-# 
-# # Control Variables
-#
-# - Arrow_USE_STATIC_LIBS  - Set to ON to force use of static libraries.
-# 
-# # Set Variables
-#
-# The following are set after the configuration is done:
-#
-# - Arrow_LIBRARIES        - path to the Arrow libraries
-# - Arrow_LIBRARY_DIRS     - compile time link directories
-# - Arrow_INCLUDE_DIRS     - compile time include directories
-#
-# # Sample Usage
-#
-# ```cmake
-# find_package(Arrow)
-# if(Arrow_FOUND)
-#   target_link_libraries(<YourTarget> ${Arrow_LIBRARIES})
-# endif()
-# ```
+# ref:
+# - https://github.com/heavyai/heavydb/blob/a5dc49c757739d87f12baf8038ccfe4d1ece88ea/cmake/Modules/FindArrow.cmake
+# - https://github.com/amoeba/arrow-cmake-fetchcontent/blob/main/CMakeLists.txt
 
 set(ARROW_BUILD_SHARED True)
 set(ARROW_DEPENDENCY_SOURCE "BUNDLED")
