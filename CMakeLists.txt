@@ -31,18 +31,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/third_part
 
 find_package(Arrow REQUIRED)
 
-if(TARGET Arrow::arrow_shared)
-  message(STATUS "Arrow::arrow_shared exists")
-else()
-  message(STATUS "Arrow::arrow_shared does not exist")
-endif()
-
-if(TARGET arrow_shared)
-  message(STATUS "arrow_shared exists")
-else()
-  message(STATUS "arrow_shared does not exist")
-endif()
-
 find_package(Spdlog REQUIRED)
 
 find_package(PgQuery REQUIRED)
@@ -57,11 +45,13 @@ FetchContent_Declare(
     GIT_TAG v1.16.0
 )
 
-# FetchContent_Declare(
-#     libpqxx
-#     GIT_REPOSITORY https://github.com/jtv/libpqxx.git
-#     GIT_TAG 7.7.4
-# )
+FetchContent_Declare(
+    libpqxx
+    GIT_REPOSITORY https://github.com/jtv/libpqxx.git
+    GIT_TAG 7.7.4
+)
+
+FetchContent_MakeAvailable(libpqxx)
 
 # FetchContent_Declare(
 #     spdlog 
@@ -79,14 +69,6 @@ FetchContent_Declare(
 # FetchContent_MakeAvailable(Arrow)
 
 FetchContent_MakeAvailable(googletest)
-
-get_property(targets DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
-foreach(target IN LISTS targets)
-    message(STATUS "Target: ${target}")
-endforeach()
-
-get_property(TARGETS DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
-message(STATUS "Targets: ${TARGETS}")
 
 # FetchContent_MakeAvailable(googletest libpqxx spdlog)
 
@@ -126,21 +108,21 @@ include_directories(
 
 add_subdirectory(src)
 
-# # ============================================================================== #
-# # clutter
-# # ============================================================================== #
+# ============================================================================== #
+# clutter
+# ============================================================================== #
 
-# enable_testing()
+enable_testing()
 
-# add_executable(
-#     hello_test
-#     test/integration_test/hello_test.cc
-# )
-# target_link_libraries(
-#     hello_test
-#     GTest::gtest_main
-#     pqxx
-# )
+add_executable(
+    hello_test
+    test/integration_test/hello_test.cc
+)
+target_link_libraries(
+    hello_test
+    GTest::gtest_main
+    pqxx
+)
 
-# include(GoogleTest)
-# gtest_discover_tests(hello_test)
+include(GoogleTest)
+gtest_discover_tests(hello_test)
