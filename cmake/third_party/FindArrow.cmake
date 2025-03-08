@@ -103,9 +103,13 @@ target_link_libraries(
   parquet
 )
 
-target_include_directories(arrow
-  INTERFACE ${arrow_BINARY_DIR}/src
-  ${arrow_SOURCE_DIR}/cpp/src)
+target_include_directories(
+  arrow
+  INTERFACE
+  ${arrow_BINARY_DIR}/src
+  ${arrow_SOURCE_DIR}/cpp/src
+)
+
 target_link_directories(
   arrow
   INTERFACE
@@ -113,11 +117,11 @@ target_link_directories(
 )
 
 
-get_property(TARGETS DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
-foreach(TGT ${TARGETS})
-  get_target_property(TYPE ${TGT} TYPE)
-  if(TYPE STREQUAL "STATIC_LIBRARY" OR TYPE STREQUAL "SHARED_LIBRARY" OR TYPE STREQUAL "MODULE_LIBRARY")
-    message(STATUS "Library target: ${TGT}")
-  endif()
-  message(STATUS "Library target: ${TGT}")
-endforeach()
+# get_property(TARGETS DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+# foreach(TGT ${TARGETS})
+#   get_target_property(TYPE ${TGT} TYPE)
+#   if(TYPE STREQUAL "STATIC_LIBRARY" OR TYPE STREQUAL "SHARED_LIBRARY" OR TYPE STREQUAL "MODULE_LIBRARY")
+#     message(STATUS "Library target: ${TGT}")
+#   endif()
+#   message(STATUS "Library target: ${TGT}")
+# endforeach()
