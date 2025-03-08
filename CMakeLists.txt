@@ -13,16 +13,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # https://discourse.cmake.org/t/cmake-3-28-cmake-cxx-compiler-clang-scan-deps-notfound-not-found/9244/4
 set(CMAKE_CXX_SCAN_FOR_MODULES 0)
 
-# # ============================================================================== #
-# # external dependencies: arrow
-# # ============================================================================== #
-# cmake_minimum_required(VERSION 3.14)
-
-# project(example LANGUAGES CXX)
-
-# set(CMAKE_BUILD_TYPE Debug)
-
-
 # ============================================================================== #
 # third-party dependencies
 # ============================================================================== #
