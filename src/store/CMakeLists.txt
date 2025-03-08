@@ -1,9 +1,14 @@
 # ============================================================================== #
-# subdirectories
+# library: store_lib
 # ============================================================================== #
 
-message(STATUS "arrow_SOURCE_DIR (2): ${arrow_SOURCE_DIR}")
+add_library(store_lib
+    store.cc
+    store.h
+)
 
-add_subdirectory(query)
-add_subdirectory(store)
-add_subdirectory(server)
+target_link_libraries(store_lib
+    PUBLIC
+    arrow
+    spdlog
+)

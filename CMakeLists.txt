@@ -31,7 +31,21 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/third_part
 
 find_package(Arrow REQUIRED)
 
+if(TARGET Arrow::arrow_shared)
+  message(STATUS "Arrow::arrow_shared exists")
+else()
+  message(STATUS "Arrow::arrow_shared does not exist")
+endif()
+
+if(TARGET arrow_shared)
+  message(STATUS "Arrow::arrow_shared exists")
+else()
+  message(STATUS "Arrow::arrow_shared does not exist")
+endif()
+
 find_package(Spdlog REQUIRED)
+
+find_package(PgQuery REQUIRED)
 
 # add_subdirectory("third_party")
 message(STATUS "arrow_SOURCE_DIR (3): ${arrow_SOURCE_DIR}")
@@ -61,7 +75,11 @@ message(STATUS "arrow_SOURCE_DIR (3): ${arrow_SOURCE_DIR}")
 # #     GIT_TAG apache-arrow-19.0.1
 # # )
 
-FetchContent_MakeAvailable(spdlog)
+# FetchContent_MakeAvailable(spdlog)
+# FetchContent_MakeAvailable(Arrow)
+
+get_property(TARGETS DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+message(STATUS "Targets: ${TARGETS}")
 
 # FetchContent_MakeAvailable(googletest libpqxx spdlog)
 
@@ -94,6 +112,10 @@ FetchContent_MakeAvailable(spdlog)
 # ============================================================================== #
 # subdirectories
 # ============================================================================== #
+
+include_directories(
+    ${CMAKE_SOURCE_DIR}
+)
 
 add_subdirectory(src)
 

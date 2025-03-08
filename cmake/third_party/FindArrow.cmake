@@ -74,3 +74,50 @@ list(APPEND Arrow_INCLUDE_DIRS ${arrow_BINARY_DIR}/src)
 
 # message(STATUS "INCLUDE_DIRECTORIES: ${INCLUDE_DIRECTORIES}")
 # message(STATUS "Arrow_INCLUDE_DIRS: ${Arrow_INCLUDE_DIRS}")
+
+# get_cmake_property(_vars VARIABLES)
+# foreach(_var ${_vars})
+#     message(STATUS "${_var}=${${_var}}")
+# endforeach()
+
+if(TARGET Arrow::arrow_shared)
+  message(STATUS "Arrow::arrow_shared exists")
+else()
+  message(STATUS "Arrow::arrow_shared does not exist")
+endif()
+
+if(TARGET arrow_shared)
+  message(STATUS "Arrow::arrow_shared exists")
+else()
+  message(STATUS "Arrow::arrow_shared does not exist")
+endif()
+
+add_library(arrow INTERFACE IMPORTED)
+# target_link_libraries(arrow INTERFACE arrow_static)
+target_link_libraries(
+  arrow
+  INTERFACE
+  arrow
+  arrow_dataset
+  arrow_acero
+  parquet
+)
+
+target_include_directories(arrow
+  INTERFACE ${arrow_BINARY_DIR}/src
+  ${arrow_SOURCE_DIR}/cpp/src)
+target_link_directories(
+  arrow
+  INTERFACE
+  ${arrow_BINARY_DIR}/debug
+)
+
+
+get_property(TARGETS DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+foreach(TGT ${TARGETS})
+  get_target_property(TYPE ${TGT} TYPE)
+  if(TYPE STREQUAL "STATIC_LIBRARY" OR TYPE STREQUAL "SHARED_LIBRARY" OR TYPE STREQUAL "MODULE_LIBRARY")
+    message(STATUS "Library target: ${TGT}")
+  endif()
+  message(STATUS "Library target: ${TGT}")
+endforeach()

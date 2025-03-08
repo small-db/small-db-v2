@@ -27,16 +27,27 @@ add_library(query_lib
 #   arrow_acero_shared
 #   parquet_shared)
 
+# message(STATUS "Arrow_LIBRARIES (2): ${Arrow_LIBRARIES}")
+
 target_link_libraries(query_lib
     PRIVATE
-    ${Arrow_LIBRARIES}
+    # ArrowKing
+    # Arrow
+    arrow
+    spdlog
+    # SpdlogKing
 )
 
-target_include_directories(query_lib
-    PRIVATE
-    ${Arrow_INCLUDE_DIRS}
-    ${Spdlog_INCLUDE_DIRS}
-)
+# add_dependencies(server_lib libpg_query)
+
+get_property(TARGETS DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+message(STATUS "Targets: ${TARGETS}")
+
+# target_include_directories(query_lib
+#     PRIVATE
+#     ${Arrow_INCLUDE_DIRS}
+#     ${Spdlog_INCLUDE_DIRS}
+# )
 
 # message(STATUS "Arrow_INCLUDE_DIRS: ${Arrow_INCLUDE_DIRS}")
 
