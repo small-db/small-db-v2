@@ -33,7 +33,9 @@ target_link_libraries(query_lib
     PRIVATE
     # ArrowKing
     # Arrow
-    arrow
+    # arrow_shared
+    # arrow
+    arrow_lib
     spdlog
     # SpdlogKing
 )

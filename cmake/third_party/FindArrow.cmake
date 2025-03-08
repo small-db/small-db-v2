@@ -42,6 +42,8 @@ FetchContent_Declare(Arrow
   GIT_REPOSITORY https://github.com/apache/arrow.git
   GIT_TAG apache-arrow-19.0.1
   GIT_SHALLOW TRUE
+  SOURCE_SUBDIR cpp
+  OVERRIDE_FIND_PACKAGE
 )
 
 FetchContent_MakeAvailable(Arrow)
@@ -87,15 +89,24 @@ else()
 endif()
 
 if(TARGET arrow_shared)
-  message(STATUS "Arrow::arrow_shared exists")
+  message(STATUS "arrow_shared exists")
 else()
-  message(STATUS "Arrow::arrow_shared does not exist")
+  message(STATUS "arrow_shared does not exist")
 endif()
 
-add_library(arrow INTERFACE IMPORTED)
-# target_link_libraries(arrow INTERFACE arrow_static)
+if(TARGET arrow)
+  message(STATUS "arrow exists")
+else()
+  message(STATUS "arrow does not exist")
+endif()
+
+execute_process(COMMAND pwd)
+
+add_library(arrow_lib INTERFACE IMPORTED)
+# # target_link_libraries(arrow INTERFACE arrow_static)
+
 target_link_libraries(
-  arrow
+  arrow_lib
   INTERFACE
   arrow
   arrow_dataset
@@ -104,14 +115,14 @@ target_link_libraries(
 )
 
 target_include_directories(
-  arrow
+  arrow_lib
   INTERFACE
   ${arrow_BINARY_DIR}/src
   ${arrow_SOURCE_DIR}/cpp/src
 )
 
 target_link_directories(
-  arrow
+  arrow_lib
   INTERFACE
   ${arrow_BINARY_DIR}/debug
 )

@@ -38,9 +38,9 @@ else()
 endif()
 
 if(TARGET arrow_shared)
-  message(STATUS "Arrow::arrow_shared exists")
+  message(STATUS "arrow_shared exists")
 else()
-  message(STATUS "Arrow::arrow_shared does not exist")
+  message(STATUS "arrow_shared does not exist")
 endif()
 
 find_package(Spdlog REQUIRED)
@@ -50,12 +50,12 @@ find_package(PgQuery REQUIRED)
 # add_subdirectory("third_party")
 message(STATUS "arrow_SOURCE_DIR (3): ${arrow_SOURCE_DIR}")
 
-# include(FetchContent)
-# FetchContent_Declare(
-#     googletest
-#     GIT_REPOSITORY https://github.com/google/googletest.git
-#     GIT_TAG v1.16.0
-# )
+include(FetchContent)
+FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG v1.16.0
+)
 
 # FetchContent_Declare(
 #     libpqxx
@@ -77,6 +77,13 @@ message(STATUS "arrow_SOURCE_DIR (3): ${arrow_SOURCE_DIR}")
 
 # FetchContent_MakeAvailable(spdlog)
 # FetchContent_MakeAvailable(Arrow)
+
+FetchContent_MakeAvailable(googletest)
+
+get_property(targets DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+foreach(target IN LISTS targets)
+    message(STATUS "Target: ${target}")
+endforeach()
 
 get_property(TARGETS DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
 message(STATUS "Targets: ${TARGETS}")

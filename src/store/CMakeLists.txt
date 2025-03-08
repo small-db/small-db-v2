@@ -9,6 +9,6 @@ add_library(store_lib
 
 target_link_libraries(store_lib
     PUBLIC
-    arrow
+    arrow_lib
     spdlog
 )
