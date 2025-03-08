@@ -35,9 +35,6 @@ find_package(Spdlog REQUIRED)
 
 find_package(PgQuery REQUIRED)
 
-# add_subdirectory("third_party")
-message(STATUS "arrow_SOURCE_DIR (3): ${arrow_SOURCE_DIR}")
-
 include(FetchContent)
 FetchContent_Declare(
     googletest
@@ -53,50 +50,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(libpqxx)
 
-# FetchContent_Declare(
-#     spdlog 
-#     GIT_REPOSITORY https://github.com/gabime/spdlog.git
-#     GIT_TAG v1.15.1
-# )
-
-# # FetchContent_Declare(
-# #     arrow
-# #     GIT_REPOSITORY https://github.com/apache/arrow.git
-# #     GIT_TAG apache-arrow-19.0.1
-# # )
-
-# FetchContent_MakeAvailable(spdlog)
-# FetchContent_MakeAvailable(Arrow)
-
 FetchContent_MakeAvailable(googletest)
-
-# FetchContent_MakeAvailable(googletest libpqxx spdlog)
-
-# # Add Arrow include and library directories
-# FetchContent_GetProperties(arrow)
-# if(NOT arrow_POPULATED)
-#   FetchContent_Populate(arrow)
-#   add_subdirectory(${arrow_SOURCE_DIR} ${arrow_BINARY_DIR} EXCLUDE_FROM_ALL)
-# endif()
-
-# # Set Arrow_DIR to the build directory of Arrow
-# set(Arrow_DIR ${arrow_BINARY_DIR}/arrow/cmake_modules)
-
-# find_package(Arrow REQUIRED)
-
-# include(ExternalProject)
-
-# # https://stackoverflow.com/questions/63667653/how-to-build-an-external-library-downloaded-with-cmake-fetchcontent
-
-# ExternalProject_Add(
-#     libpg_query
-#     GIT_REPOSITORY https://github.com/small-db/libpg_query.git
-#     GIT_TAG 7018e9e
-#     CONFIGURE_COMMAND ""
-#     BUILD_COMMAND make libpg_query.a libpg_query.so
-#     INSTALL_COMMAND make install PREFIX=${CMAKE_BINARY_DIR}/install
-#     BUILD_IN_SOURCE 1
-# )
 
 # ============================================================================== #
 # subdirectories
