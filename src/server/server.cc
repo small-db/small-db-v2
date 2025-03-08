@@ -405,7 +405,9 @@ void handle_query(std::string& query, int sockfd) {
 
     auto unpacked = pg_query__parse_result__unpack(
         NULL, pgquery_pbparse_result.parse_tree.len,
-        (const uint8_t *) pgquery_pbparse_result.parse_tree.data);
+        (const uint8_t*)pgquery_pbparse_result.parse_tree.data);
+
+    SPDLOG_INFO("unpacked.stmts[0].stmt_len: {}", unpacked->stmts[0]->stmt_len);
 
     // auto unpacked = pg_query__parse_result__unpack(
     //     NULL, pgquery_pbparse_result.parse_tree.len, NULL);
