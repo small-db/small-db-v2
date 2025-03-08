@@ -403,11 +403,12 @@ void handle_query(std::string& query, int sockfd) {
         pg_query_parse_protobuf_opts(query.c_str(), PG_QUERY_PARSE_DEFAULT);
     // pb_result.parse_tree
 
-    // auto unpacked = pg_query__parse_result__unpack(NULL,
-    // pgquery_pbparse_result.parse_tree.len,
-    // pgquery_pbparse_result.parse_tree.data)
     auto unpacked = pg_query__parse_result__unpack(
-        NULL, pgquery_pbparse_result.parse_tree.len, NULL);
+        NULL, pgquery_pbparse_result.parse_tree.len,
+        (const uint8_t *) pgquery_pbparse_result.parse_tree.data);
+
+    // auto unpacked = pg_query__parse_result__unpack(
+    //     NULL, pgquery_pbparse_result.parse_tree.len, NULL);
 
     SPDLOG_INFO("parse_tree: {}", result.parse_tree);
 
