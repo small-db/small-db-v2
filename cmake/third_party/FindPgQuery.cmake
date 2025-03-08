@@ -13,24 +13,13 @@ if(NOT libpg_query_POPULATED)
     execute_process(COMMAND make -j libpg_query.a libpg_query.so
         WORKING_DIRECTORY ${libpg_query_SOURCE_DIR}
     )
-
-    # # Optionally install the library
-    # execute_process(COMMAND make install
-    #     WORKING_DIRECTORY ${libpg_query_SOURCE_DIR}
-    # )
 endif()
 
-# FetchContent_MakeAvailable(libpg_query)
 
 message(STATUS "libpg_query_POPULATED: ${libpg_query_POPULATED}")
 
-# get_cmake_property(_vars VARIABLES)
-# foreach(_var ${_vars})
-#     message(STATUS "${_var}=${${_var}}")
-# endforeach()
-
 add_library(libpg_query_lib INTERFACE IMPORTED)
-# target_link_libraries(ArrowKing INTERFACE arrow_static)
+
 target_include_directories(
     libpg_query_lib
     INTERFACE
