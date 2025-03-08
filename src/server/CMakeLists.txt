@@ -2,7 +2,8 @@
 add_library(server_lib
     server.cc
     server.h
-    # Add other source files and headers here
+    args.cc
+    args.h
 )
 
 target_link_libraries(server_lib

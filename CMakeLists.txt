@@ -115,14 +115,16 @@ add_subdirectory(src)
 enable_testing()
 
 add_executable(
-    hello_test
-    test/integration_test/hello_test.cc
+    sql_test
+    test/integration_test/sql_test.cc
 )
 target_link_libraries(
-    hello_test
+    sql_test
     GTest::gtest_main
     pqxx
+    spdlog
+    server_lib
 )
 
 include(GoogleTest)
-gtest_discover_tests(hello_test)
+gtest_discover_tests(sql_test)
