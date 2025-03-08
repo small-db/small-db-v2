@@ -10,7 +10,7 @@ target_link_libraries(server_lib
     query_lib
     store_lib
     spdlog
-    libpg_query
+    libpg_query_lib
 )
 
 # # Define the executable target "server"

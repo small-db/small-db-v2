@@ -29,10 +29,10 @@ message(STATUS "libpg_query_POPULATED: ${libpg_query_POPULATED}")
 #     message(STATUS "${_var}=${${_var}}")
 # endforeach()
 
-add_library(libpg_query INTERFACE IMPORTED)
+add_library(libpg_query_lib INTERFACE IMPORTED)
 # target_link_libraries(ArrowKing INTERFACE arrow_static)
 target_include_directories(
-    libpg_query
+    libpg_query_lib
     INTERFACE
     ${libpg_query_SOURCE_DIR}
     ${libpg_query_SOURCE_DIR}/protobuf
@@ -40,8 +40,18 @@ target_include_directories(
 )
 
 target_link_libraries(
-    libpg_query
+    libpg_query_lib
     INTERFACE
     ${libpg_query_SOURCE_DIR}/libpg_query.a
-    ${libpg_query_SOURCE_DIR}/libpg_query.so
+
+    # this doesn't work, it will leave "libpg_query.so.1705.1 => not found" in the binary
+    # ${libpg_query_SOURCE_DIR}/libpg_query.so
 )
+
+target_link_directories(
+    libpg_query_lib
+    INTERFACE
+    ${libpg_query_SOURCE_DIR}
+)
+
+message(STATUS "libpg_query_SOURCE_DIR: ${libpg_query_SOURCE_DIR}")
