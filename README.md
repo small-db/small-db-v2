@@ -41,5 +41,6 @@ ctest --test-dir build
 ### Format Code & Run Linter
 
 ```shell
+# TODO: this is broken
 ./scripts/format/run-format.sh
 ```
