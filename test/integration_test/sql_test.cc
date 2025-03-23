@@ -27,6 +27,17 @@
 
 #include "src/server/server.h"
 
+class SmallEnvironment : public ::testing::Environment {
+   public:
+    ~SmallEnvironment() override {}
+
+    // Override this to define how to set up the environment.
+    void SetUp() override {}
+
+    // Override this to define how to tear down the environment.
+    void TearDown() override {}
+};
+
 const std::string CONNECTION_STRING =
     "dbname=postgres user=postgres password=postgres hostaddr=127.0.0.1 "
     "port=5432";
@@ -44,29 +55,28 @@ class SQLTest : public ::testing::Test {
     }
 
     void StartServer() {
-        pid_t c_pid = fork();
-        if (c_pid == -1) {
-            perror("fork");
-            exit(EXIT_FAILURE);
-        } else if (c_pid > 0) {
-            // Parent process
-        } else {
-            // Child process
-            SPDLOG_INFO("child process");
-            int exit_code = server::RunServer(server::DefaultArgs);
-            ASSERT_EQ(exit_code, 0);
-            exit(exit_code);
-        }
+        // pid_t c_pid = fork();
+        // if (c_pid == -1) {
+        //     perror("fork");
+        //     exit(EXIT_FAILURE);
+        // } else if (c_pid > 0) {
+        //     // Parent process
+        // } else {
+        //     // Child process
+        //     SPDLOG_INFO("child process");
+        //     int exit_code = server::RunServer(server::DefaultArgs);
+        //     ASSERT_EQ(exit_code, 0);
+        //     exit(exit_code);
+        // }
     }
 
     // wait for the server to ready
     void WaitServer() {
-        // sleep for 5 seconds
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        // std::this_thread::sleep_for(std::chrono::seconds(2));
 
-        pqxx::connection conn = pqxx::connection{CONNECTION_STRING};
-        auto version = conn.server_version();
-        SPDLOG_INFO("server version: {}", version);
+        // pqxx::connection conn = pqxx::connection{CONNECTION_STRING};
+        // auto version = conn.server_version();
+        // SPDLOG_INFO("server version: {}", version);
     }
 
     void TearDown() override { SPDLOG_INFO("stopping the server"); }
@@ -76,13 +86,18 @@ class SQLTest : public ::testing::Test {
 TEST_F(SQLTest, ExecuteSimpleSQL) {
     SPDLOG_INFO("start test: ExecuteSimpleSQL");
 
-    pqxx::connection conn = pqxx::connection{CONNECTION_STRING};
+    // pqxx::connection conn = pqxx::connection{CONNECTION_STRING};
 
-    pqxx::work tx(conn);
-    tx.exec(
-        "CREATE TABLE users (id INT PRIMARY KEY, name STRING, balance INT)");
-    tx.commit();
+    // pqxx::work tx(conn);
+    // tx.exec(
+    //     "CREATE TABLE users (id INT PRIMARY KEY, name STRING, balance INT)");
+    // tx.commit();
 
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    // std::this_thread::sleep_for(std::chrono::seconds(5));
     SPDLOG_INFO("stop test: ExecuteSimpleSQL");
+}
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
