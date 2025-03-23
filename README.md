@@ -19,24 +19,23 @@ TODO
 ### CMake Configuration & Build
 
 ```shell
+# configure with "debug" preset
 cmake -S . -B build --preset=debug
+# build all targets
 cmake --build build
 ```
 
 ### Start Server
 
 ```shell
-# start server with default port 5432
-bazel run //src/server:main
-
 # start server with custom port
-bazel run //src/server:main -- --port=5432
+./build/src/server/server --port=5432
 ```
 
 ### Run Integration Test
 
 ```shell
-bazel test //:integration_test
+ctest --test-dir build
 ```
 
 ### Format Code & Run Linter
