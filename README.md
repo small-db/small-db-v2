@@ -6,23 +6,22 @@
 
 TODO
 
-## Development - General
+## Development
 
 ### Style Guide
 
 - [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html)
 
-## Development - CMake
-
 ### Build System
 
 - [CMake 3.21.3](https://cmake.org/)
 
-## Development - Bazel
+### CMake Configuration & Build
 
-### Build System
-
-- [bazel 8.0.1](https://bazel.build/)
+```shell
+cmake -S . -B build --preset=debug
+cmake --build build
+```
 
 ### Start Server
 
