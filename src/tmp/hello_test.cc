@@ -8,9 +8,7 @@ TEST(HelloTest, BasicAssertions) {
     EXPECT_EQ(7 * 6, 42);
 }
 
-
 // #include <iostream>
-
 
 // int main() {
 //     std::cout << "Hello, World!" << std::endl;
