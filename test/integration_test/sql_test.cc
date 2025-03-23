@@ -62,7 +62,7 @@ class SQLTest : public ::testing::Test {
     // wait for the server to ready
     void WaitServer() {
         // sleep for 5 seconds
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        std::this_thread::sleep_for(std::chrono::seconds(2));
 
         pqxx::connection conn = pqxx::connection{CONNECTION_STRING};
         auto version = conn.server_version();
