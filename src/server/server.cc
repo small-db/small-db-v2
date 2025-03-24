@@ -47,6 +47,8 @@
 
 namespace server {
 
+std::atomic<bool> stopSignal = false;
+
 class ReaderWriter {
    protected:
     static int32_t read_int32(int sockfd) {
@@ -682,6 +684,11 @@ int RunServer(const server::ServerArgs& args) {
             }
         }
     }
+}
+
+void StopServer() {
+    SPDLOG_INFO("stopping the server");
+    stopSignal = true;
 }
 
 }  // namespace server

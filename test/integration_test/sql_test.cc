@@ -57,12 +57,10 @@ class SQLTest : public ::testing::Test {
     }
 
     static std::thread server_thread;
-    static int server_id;
 
     static void StartServerThread() {
         SPDLOG_INFO("starting the server thread");
-        server_id = rand() % 1000;
-        server::ServerArgs args = server::ServerArgs(5432, server_id);
+        server::ServerArgs args = server::ServerArgs(5432);
         server_thread = std::thread(server::RunServer, args);
     }
 
@@ -73,10 +71,6 @@ class SQLTest : public ::testing::Test {
         pqxx::connection conn = pqxx::connection{CONNECTION_STRING};
         auto version = conn.server_version();
         SPDLOG_INFO("server version: {}", version);
-
-        auto got_id = conn.get_var("server_id");
-        SPDLOG_INFO("server id: {}", got_id);
-        ASSERT_EQ(std::stoi(got_id), server_id);
     }
 
     static void TearDownTestSuite() {
@@ -86,7 +80,6 @@ class SQLTest : public ::testing::Test {
 };
 
 std::thread SQLTest::server_thread;
-int SQLTest::server_id;
 
 // Test case to execute simple SQL commands
 TEST_F(SQLTest, ExecuteSimpleSQL) {

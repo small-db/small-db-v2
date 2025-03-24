@@ -14,9 +14,14 @@
 
 #pragma once
 
+#include <chrono>
+
 #include "src/server/args.h"
 
 namespace server {
+
 int RunServer(const server::ServerArgs& args);
+
+void StopServer();
 
 }  // namespace server
