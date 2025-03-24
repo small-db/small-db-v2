@@ -92,8 +92,9 @@ class SQLTest : public ::testing::Test {
         auto version = conn.server_version();
         SPDLOG_INFO("server version: {}", version);
 
-        auto server_id = conn.get_var("server_id");
-        SPDLOG_INFO("server id: {}", server_id);
+        auto got_id = conn.get_var("server_id");
+        SPDLOG_INFO("server id: {}", got_id);
+        ASSERT_EQ(std::stoi(got_id), server_id);
     }
 
     static void TearDownTestSuite() {
