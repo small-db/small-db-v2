@@ -91,6 +91,9 @@ class SQLTest : public ::testing::Test {
         pqxx::connection conn = pqxx::connection{CONNECTION_STRING};
         auto version = conn.server_version();
         SPDLOG_INFO("server version: {}", version);
+
+        auto server_id = conn.get_variable("server_id");
+        SPDLOG_INFO("server id: {}", server_id);
     }
 
     static void TearDownTestSuite() {

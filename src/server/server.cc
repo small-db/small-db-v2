@@ -35,10 +35,11 @@
 #include <spdlog/fmt/bin_to_hex.h>  // spdlog::to_hex (doesn't work in C++20 and later version)
 #include <spdlog/spdlog.h>
 
+#include <iostream>
+
 #include "src/query/query.h"
 #include "src/server/args.h"
 #include "src/store/store.h"
-#include <iostream>
 
 #define BACKLOG 512
 #define MAX_EVENTS 128
@@ -599,7 +600,9 @@ int RunServer(const server::ServerArgs& args) {
                             {"client_encoding", "UTF8"},
                             {"DateStyle", "ISO YMD"},
                             {"integer_datetimes", "on"},
-                            {"server_version", "17.0"}};
+                            {"server_version", "17.0"},
+                            {"server_id", std::to_string(args.id)},
+                        };
                         for (const auto& kv : params) {
                             network_package->add_message(
                                 new ParameterStatus(kv.first, kv.second));
