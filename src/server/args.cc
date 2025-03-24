@@ -12,13 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <src/server/args.h>
+
 namespace server {
 
-class ServerArgs {
-   public:
-    int port;
-};
+ServerArgs::ServerArgs(int port) : port(port) {}
+ServerArgs::ServerArgs(int port, int id) : port(port), id(id) {}
 
-ServerArgs DefaultArgs = {5432};
+// class ServerArgs {
+//    public:
+//     int port;
+//     int id;
+
+//     ServerArgs(int port) : port(port) {}
+//     ServerArgs(int port, int id) : port(port), id(id) {}
+// };
+
+// ServerArgs* DefaultArgs = new ServerArgs(5432);
 
 }  // namespace server

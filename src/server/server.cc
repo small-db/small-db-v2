@@ -38,6 +38,7 @@
 #include "src/query/query.h"
 #include "src/server/args.h"
 #include "src/store/store.h"
+#include <iostream>
 
 #define BACKLOG 512
 #define MAX_EVENTS 128

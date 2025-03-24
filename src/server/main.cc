@@ -42,6 +42,6 @@ int main(int argc, char* argv[]) {
     }
 
     int portno = strtol(argv[1], NULL, 10);
-    server::ServerArgs args = {portno};
+    server::ServerArgs args = server::ServerArgs(portno);
     return server::RunServer(args);
 }

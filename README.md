@@ -36,6 +36,7 @@ cmake --build build
 
 ```shell
 ctest --test-dir build
+./build/sql_test
 ```
 
 ### Format Code & Run Linter
