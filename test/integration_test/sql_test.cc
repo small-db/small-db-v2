@@ -52,26 +52,8 @@ class SQLTest : public ::testing::Test {
    protected:
     static void SetUpTestSuite() {
         SPDLOG_INFO("starting the server");
-        // StartServer();
         StartServerThread();
         WaitServer();
-    }
-
-    static void StartServer() {
-        // pid_t c_pid = fork();
-        // if (c_pid == -1) {
-        //     perror("fork");
-        //     exit(EXIT_FAILURE);
-        // } else if (c_pid > 0) {
-        //     // Parent process
-        // } else {
-        //     // Child process
-        //     SPDLOG_INFO("child process");
-        //     exit(0);
-        //     int exit_code = server::RunServer(server::DefaultArgs);
-        //     ASSERT_EQ(exit_code, 0);
-        //     exit(exit_code);
-        // }
     }
 
     static std::thread server_thread;
