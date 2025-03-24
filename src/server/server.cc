@@ -403,6 +403,27 @@ void handle_stmt(PgQuery__Node* stmt) {
             auto create_stmt = stmt->create_stmt;
             SPDLOG_INFO("create_stmt->relation->relname: {}",
                         create_stmt->relation->relname);
+            for (int i = 0; i < create_stmt->n_table_elts; i++) {
+                auto node_case = create_stmt->table_elts[i]->node_case;
+                switch (node_case) {
+                    case PG_QUERY__NODE__NODE_COLUMN_DEF: {
+                        SPDLOG_INFO("column definition");
+                        auto column_def =
+                            create_stmt->table_elts[i]->column_def;
+                        SPDLOG_INFO("column_def->colname: {}",
+                                    column_def->colname);
+                        break;
+                    }
+                    case PG_QUERY__NODE__NODE_CONSTRAINT: {
+                        SPDLOG_INFO("constraint");
+                        break;
+                    }
+                    default:
+                        SPDLOG_INFO("unknown table element, node_case: {}",
+                                    static_cast<int>(node_case));
+                        break;
+                }
+            }
             break;
         }
         case PG_QUERY__NODE__NODE_TRANSACTION_STMT: {
