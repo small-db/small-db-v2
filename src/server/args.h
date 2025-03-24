@@ -18,10 +18,8 @@ namespace server {
 class ServerArgs {
    public:
     int port;
-    int id;
 
     ServerArgs(int port);
-    ServerArgs(int port, int id);
 };
 
 // extern ServerArgs DefaultArgs;

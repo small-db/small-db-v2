@@ -17,17 +17,5 @@
 namespace server {
 
 ServerArgs::ServerArgs(int port) : port(port) {}
-ServerArgs::ServerArgs(int port, int id) : port(port), id(id) {}
-
-// class ServerArgs {
-//    public:
-//     int port;
-//     int id;
-
-//     ServerArgs(int port) : port(port) {}
-//     ServerArgs(int port, int id) : port(port), id(id) {}
-// };
-
-// ServerArgs* DefaultArgs = new ServerArgs(5432);
 
 }  // namespace server

@@ -609,7 +609,6 @@ int RunServer(const server::ServerArgs& args) {
                             {"DateStyle", "ISO YMD"},
                             {"integer_datetimes", "on"},
                             {"server_version", "17.0"},
-                            {"server_id", std::to_string(args.id)},
                         };
                         for (const auto& kv : params) {
                             network_package->add_message(
