@@ -396,30 +396,13 @@ void sendUnimplemented(int sockfd) {
     network_package->send_all(sockfd);
 }
 
-void handle_query(std::string& query, int sockfd) {
-    SPDLOG_INFO("query: {}", query);
-
-    PgQueryParseResult result;
-
-    result = pg_query_parse(query.c_str());
-
-    PgQueryProtobufParseResult pgquery_pbparse_result =
-        pg_query_parse_protobuf_opts(query.c_str(), PG_QUERY_PARSE_DEFAULT);
-    // pb_result.parse_tree
-
-    auto unpacked = pg_query__parse_result__unpack(
-        NULL, pgquery_pbparse_result.parse_tree.len,
-        (const uint8_t*)pgquery_pbparse_result.parse_tree.data);
-
-    SPDLOG_INFO("debug start --------------");
-    SPDLOG_INFO(unpacked->n_stmts);
-    auto node_case = unpacked->stmts[0]->stmt->node_case;
-    SPDLOG_INFO(static_cast<int>(node_case));
-    SPDLOG_INFO("debug end --------------");
-
-    switch (node_case) {
+void handle_stmt(PgQuery__Node* stmt) {
+    switch (stmt->node_case) {
         case PG_QUERY__NODE__NODE_CREATE_STMT: {
             SPDLOG_INFO("create statement");
+            auto create_stmt = stmt->create_stmt;
+            SPDLOG_INFO("create_stmt->relation->relname: {}",
+                        create_stmt->relation->relname);
             break;
         }
         case PG_QUERY__NODE__NODE_TRANSACTION_STMT: {
@@ -427,16 +410,35 @@ void handle_query(std::string& query, int sockfd) {
             break;
         }
         default:
-            SPDLOG_INFO("unknown statement");
+            SPDLOG_INFO("unknown statement, node_case: {}",
+                        static_cast<int>(stmt->node_case));
             break;
     }
+}
 
-    // auto unpacked = pg_query__parse_result__unpack(
-    //     NULL, pgquery_pbparse_result.parse_tree.len, NULL);
+void handle_query(std::string& query, int sockfd) {
+    SPDLOG_INFO("query: {}", query);
 
+    PgQueryParseResult result;
+
+    result = pg_query_parse(query.c_str());
     SPDLOG_INFO("parse_tree: {}", result.parse_tree);
-
     pg_query_free_parse_result(result);
+
+    PgQueryProtobufParseResult pgquery_pbparse_result =
+        pg_query_parse_protobuf_opts(query.c_str(), PG_QUERY_PARSE_DEFAULT);
+
+    auto unpacked = pg_query__parse_result__unpack(
+        NULL, pgquery_pbparse_result.parse_tree.len,
+        (const uint8_t*)pgquery_pbparse_result.parse_tree.data);
+
+    SPDLOG_INFO(unpacked->n_stmts);
+
+    auto node_case = unpacked->stmts[0]->stmt->node_case;
+
+    for (int i = 0; i < unpacked->n_stmts; i++) {
+        handle_stmt(unpacked->stmts[i]->stmt);
+    }
 
     sendUnimplemented(sockfd);
 }
