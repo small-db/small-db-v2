@@ -411,7 +411,25 @@ void handle_query(std::string& query, int sockfd) {
         NULL, pgquery_pbparse_result.parse_tree.len,
         (const uint8_t*)pgquery_pbparse_result.parse_tree.data);
 
-    SPDLOG_INFO("unpacked.stmts[0].stmt_len: {}", unpacked->stmts[0]->stmt_len);
+    SPDLOG_INFO("debug start --------------");
+    SPDLOG_INFO(unpacked->n_stmts);
+    auto node_case = unpacked->stmts[0]->stmt->node_case;
+    SPDLOG_INFO(static_cast<int>(node_case));
+    SPDLOG_INFO("debug end --------------");
+
+    switch (node_case) {
+        case PG_QUERY__NODE__NODE_CREATE_STMT: {
+            SPDLOG_INFO("create statement");
+            break;
+        }
+        case PG_QUERY__NODE__NODE_TRANSACTION_STMT: {
+            SPDLOG_INFO("transaction statement");
+            break;
+        }
+        default:
+            SPDLOG_INFO("unknown statement");
+            break;
+    }
 
     // auto unpacked = pg_query__parse_result__unpack(
     //     NULL, pgquery_pbparse_result.parse_tree.len, NULL);
