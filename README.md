@@ -20,9 +20,9 @@ TODO
 
 ```shell
 # configure with "debug" preset
-cmake -S . -B build --preset=debug
+cmake --preset=debug
 # build all targets
-cmake --build build
+cmake --build ./build/debug
 ```
 
 ### Start Server
