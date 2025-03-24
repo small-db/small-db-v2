@@ -75,6 +75,7 @@ class SQLTest : public ::testing::Test {
 
     static void TearDownTestSuite() {
         SPDLOG_INFO("stopping the server");
+        server::StopServer();
         server_thread.join();
     }
 };
