@@ -476,7 +476,13 @@ int RunServer(const server::ServerArgs& args) {
     }
 
     while (1) {
-        new_events = epoll_wait(epollfd, events, MAX_EVENTS, -1);
+        if (stopSignal.load()) {
+            SPDLOG_INFO("stop signal received, stopping the server");
+            break;
+        }
+
+        // timeout: 1000ms
+        new_events = epoll_wait(epollfd, events, MAX_EVENTS, 1000);
 
         if (new_events == -1) {
             SPDLOG_ERROR("SPDLOG_ERROR in epoll_wait..\n");
@@ -684,6 +690,9 @@ int RunServer(const server::ServerArgs& args) {
             }
         }
     }
+
+    close(sock_listen_fd);
+    return 0;
 }
 
 void StopServer() {
