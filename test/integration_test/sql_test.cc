@@ -92,7 +92,7 @@ class SQLTest : public ::testing::Test {
         auto version = conn.server_version();
         SPDLOG_INFO("server version: {}", version);
 
-        auto server_id = conn.get_variable("server_id");
+        auto server_id = conn.get_var("server_id");
         SPDLOG_INFO("server id: {}", server_id);
     }
 
