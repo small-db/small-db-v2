@@ -20,10 +20,9 @@ set(CMAKE_CXX_SCAN_FOR_MODULES 0)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/third_party/")
 
 find_package(Arrow REQUIRED)
-
 find_package(Spdlog REQUIRED)
-
 find_package(PgQuery REQUIRED)
+find_package(Abseil REQUIRED)
 
 include(FetchContent)
 FetchContent_Declare(
