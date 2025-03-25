@@ -34,33 +34,31 @@
 #include <parquet/arrow/writer.h>
 #include <parquet/exception.h>
 
-using namespace std;
-
 namespace store {
 
-const string DATA_DIR = "data/";
-const string TABLE_SCHEMAS = "schemas";
-const string TABLE_TABLES = "tables";
+const std::string DATA_DIR = "data/";
+const std::string TABLE_SCHEMAS = "schemas";
+const std::string TABLE_TABLES = "tables";
 
 const uint8_t TYPE_STRING = 20;
 
 // "schemas" -> "schemas-2021-09-01-12-00-00.parquet"
-string gen_datafile_path(const string& tablename) {
+std::string gen_datafile_path(const std::string& tablename) {
     // Get the current time
-    auto now = chrono::system_clock::now();
-    auto now_time_t = chrono::system_clock::to_time_t(now);
+    auto now = std::chrono::system_clock::now();
+    auto now_time_t = std::chrono::system_clock::to_time_t(now);
     auto now_ns =
-        chrono::duration_cast<chrono::nanoseconds>(now.time_since_epoch())
+        std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch())
             .count() %
         1000000000;
 
-    // Format the time into a string
-    stringstream ss;
-    ss << put_time(localtime(&now_time_t), "%Y-%m-%d-%H-%M-%S") << "-"
-       << setw(9) << setfill('0') << now_ns;
+    // Format the time into a std::string
+    std::stringstream ss;
+    ss << std::put_time(localtime(&now_time_t), "%Y-%m-%d-%H-%M-%S") << "-"
+       << std::setw(9) << std::setfill('0') << now_ns;
 
     // Generate the file path
-    string filepath = tablename + "-" + ss.str() + ".parquet";
+    std::string filepath = tablename + "-" + ss.str() + ".parquet";
     SPDLOG_INFO("generated file path: {}", filepath);
     return filepath;
 }
@@ -76,7 +74,7 @@ arrow::Status execute_plan_and_collect_as_table(
     return arrow::Status::OK();
 }
 
-arrow::Status scan_sink_example(shared_ptr<arrow::Table> table) {
+arrow::Status scan_sink_example(std::shared_ptr<arrow::Table> table) {
     // ensure arrow::dataset node factories are in the registry
     arrow::dataset::internal::Initialize();
 
@@ -143,7 +141,7 @@ void init_tables() {
     // names
     auto table_name_builder = arrow::StringBuilder();
     PARQUET_THROW_NOT_OK(table_name_builder.Append("pg_database"));
-    shared_ptr<arrow::Array> table_names;
+    std::shared_ptr<arrow::Array> table_names;
     PARQUET_THROW_NOT_OK(table_name_builder.Finish(&table_names));
 
     // columns
@@ -209,7 +207,7 @@ void init_demo() {
     PARQUET_THROW_NOT_OK(i_builder.Append(102));
     PARQUET_THROW_NOT_OK(i_builder.Append(103));
     PARQUET_THROW_NOT_OK(i_builder.Append(104));
-    shared_ptr<arrow::Array> i_list;
+    std::shared_ptr<arrow::Array> i_list;
     PARQUET_THROW_NOT_OK(i_builder.Finish(&i_list));
 
     // b
@@ -218,7 +216,7 @@ void init_demo() {
     PARQUET_THROW_NOT_OK(b_builder.Append(false));
     PARQUET_THROW_NOT_OK(b_builder.Append(true));
     PARQUET_THROW_NOT_OK(b_builder.Append(false));
-    shared_ptr<arrow::Array> b_list;
+    std::shared_ptr<arrow::Array> b_list;
     PARQUET_THROW_NOT_OK(b_builder.Finish(&b_list));
 
     // create the table
@@ -242,10 +240,10 @@ void init_demo() {
 }
 
 // search for data files with prefix "tablename-"
-bool table_exists(const string& tablename) {
-    for (const auto& entry : filesystem::directory_iterator(".")) {
+bool table_exists(const std::string& tablename) {
+    for (const auto& entry : std::filesystem::directory_iterator(".")) {
         auto entry_name = entry.path().filename().string();
-        string prefix = tablename + "-";
+        std::string prefix = tablename + "-";
         if (strncmp(entry_name.c_str(), prefix.c_str(), prefix.size()) == 0) {
             return true;
         }
