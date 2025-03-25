@@ -425,12 +425,12 @@ void handle_stmt(PgQuery__Node* stmt) {
                 }
             }
 
-            auto status = schema::create_table(
-                create_stmt->relation->relname,
-                std::vector<schema::Column>{{"id", "int"}, {"name", "text"}});
-            if (!status.ok()) {
-                SPDLOG_ERROR("error creating table: {}", status.message());
-            }
+            // auto status = schema::create_table(
+            //     create_stmt->relation->relname,
+            //     std::vector<schema::Column>{{"id", "int"}, {"name", "text"}});
+            // if (!status.ok()) {
+            //     SPDLOG_ERROR("error creating table: {}", status.message());
+            // }
 
             break;
         }
