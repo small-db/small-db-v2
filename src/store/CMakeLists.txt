@@ -4,7 +4,6 @@
 
 add_library(store_lib
     store.cc
-    # store_1.cc
     store.h
 )
 
