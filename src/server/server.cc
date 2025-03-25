@@ -32,15 +32,17 @@
 // NB: must define SPDLOG_ACTIVE_LEVEL before `#include "spdlog/spdlog.h"`
 // to make it works
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+#include <absl/base/options.h>
 #include <spdlog/fmt/bin_to_hex.h>  // spdlog::to_hex (doesn't work in C++20 and later version)
 #include <spdlog/spdlog.h>
 
 #include <iostream>
 
 #include "src/query/query.h"
+#include "src/schema/schema.h"
+#include "src/semantics/check.h"
 #include "src/server/args.h"
 #include "src/store/store.h"
-#include <src/schema/schema.h>
 
 #define BACKLOG 512
 #define MAX_EVENTS 128
@@ -396,6 +398,8 @@ void sendUnimplemented(int sockfd) {
     network_package->send_all(sockfd);
 }
 
+// absl::op
+
 void handle_stmt(PgQuery__Node* stmt) {
     switch (stmt->node_case) {
         case PG_QUERY__NODE__NODE_CREATE_STMT: {
@@ -403,6 +407,10 @@ void handle_stmt(PgQuery__Node* stmt) {
             auto create_stmt = stmt->create_stmt;
             SPDLOG_INFO("create_stmt->relation->relname: {}",
                         create_stmt->relation->relname);
+
+            std::string table_name = create_stmt->relation->relname;
+            std::vector<schema::Column> columns;
+
             for (int i = 0; i < create_stmt->n_table_elts; i++) {
                 auto node_case = create_stmt->table_elts[i]->node_case;
                 switch (node_case) {
@@ -412,6 +420,19 @@ void handle_stmt(PgQuery__Node* stmt) {
                             create_stmt->table_elts[i]->column_def;
                         SPDLOG_INFO("column_def->colname: {}",
                                     column_def->colname);
+
+                        auto type_name =
+                            semantics::is_string(column_def->type_name);
+                        // auto type_name = column_def->type_name->names[0];
+                        SPDLOG_INFO("type_name: {}", type_name.value());
+
+                        for (int j = 0; j < column_def->n_constraints; j++) {
+                            auto constraint =
+                                column_def->constraints[j]->constraint;
+                            SPDLOG_INFO("constraint->contype: {}",
+                                        static_cast<int>(constraint->contype));
+                        }
+
                         break;
                     }
                     case PG_QUERY__NODE__NODE_CONSTRAINT: {
@@ -425,12 +446,10 @@ void handle_stmt(PgQuery__Node* stmt) {
                 }
             }
 
-            // auto status = schema::create_table(
-            //     create_stmt->relation->relname,
-            //     std::vector<schema::Column>{{"id", "int"}, {"name", "text"}});
-            // if (!status.ok()) {
-            //     SPDLOG_ERROR("error creating table: {}", status.message());
-            // }
+            auto status = schema::create_table(table_name, columns);
+            if (!status.ok()) {
+                SPDLOG_ERROR("error creating table: {}", status.message());
+            }
 
             break;
         }
