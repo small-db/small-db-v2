@@ -90,7 +90,7 @@ TEST_F(SQLTest, ExecuteSimpleSQL) {
 
     pqxx::work tx(conn);
     tx.exec(
-        "CREATE TABLE users (id INT PRIMARY KEY, name STRING, balance INT)");
+        "CREATE TABLE users (id INT PRIMARY KEY, name STRING, balance FLOAT)");
     tx.commit();
 
     // std::this_thread::sleep_for(std::chrono::seconds(5));

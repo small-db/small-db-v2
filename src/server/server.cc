@@ -421,10 +421,23 @@ void handle_stmt(PgQuery__Node* stmt) {
                         SPDLOG_INFO("column_def->colname: {}",
                                     column_def->colname);
 
+                        SPDLOG_INFO("column_def->type_name->n_names: {}",
+                                    column_def->type_name->n_names);
+
+                        // choose the last name as the type name
+                        // Q: why?
+                        // A:
+                        // int -> [pg_catalog, int4]
+                        // double -> [pg_catalog, float8]
+                        // string -> [string]
+                        int name_id = column_def->type_name->n_names - 1;
+
                         auto type_name = semantics::is_string(
-                            column_def->type_name->names[0]);
+                            column_def->type_name->names[name_id]);
                         if (!type_name.has_value()) {
                             SPDLOG_ERROR("type_name: unknown");
+                        } else {
+                            SPDLOG_INFO("type_name: {}", type_name.value());
                         }
 
                         bool primary_key = false;
