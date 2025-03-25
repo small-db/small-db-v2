@@ -27,11 +27,18 @@
 #include <parquet/arrow/reader.h>
 #include <parquet/arrow/writer.h>
 #include <parquet/exception.h>
+#include <spdlog/spdlog.h>
 
 #include "src/schema/const.h"
 #include "src/schema/schema.h"
 
 namespace schema {
+
+// "schemas" -> "<data_dir>/schemas.parquet"
+std::string gen_datafile_path(const std::string& tablename) {
+    return DATA_DIR + tablename + ".parquet";
+}
+
 absl::Status create_table(const std::string& table_name,
                           const std::vector<Column>& columns) {
     auto pool = arrow::default_memory_pool();
@@ -79,8 +86,8 @@ absl::Status create_table(const std::string& table_name,
 
     // write to disk
     std::shared_ptr<arrow::io::FileOutputStream> outfile;
-    PARQUET_ASSIGN_OR_THROW(outfile,
-                            arrow::io::FileOutputStream::Open(TABLE_TABLES));
+    PARQUET_ASSIGN_OR_THROW(outfile, arrow::io::FileOutputStream::Open(
+                                         gen_datafile_path(TABLE_TABLES)));
     PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(
         *table, arrow::default_memory_pool(), outfile, 300));
 
