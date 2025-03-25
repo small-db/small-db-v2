@@ -15,14 +15,12 @@ set(ARROW_COMPUTE ON)
 
 set(ARROW_BUILD_TESTS OFF)
 
-include(FetchContent)
 
 FetchContent_Declare(Arrow
   GIT_REPOSITORY https://github.com/apache/arrow.git
   GIT_TAG apache-arrow-19.0.1
   GIT_SHALLOW TRUE
   SOURCE_SUBDIR cpp
-  OVERRIDE_FIND_PACKAGE
 )
 
 FetchContent_MakeAvailable(Arrow)

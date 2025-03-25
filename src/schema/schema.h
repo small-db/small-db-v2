@@ -1,6 +1,6 @@
 #pragma once
 
-// #include "absl/status/status.h"
+#include "absl/status/status.h"
 
 namespace schema {
 
@@ -9,7 +9,7 @@ struct Column {
     std::string type;
 };
 
-// absl::Status create_table(const std::string& table_name,
-//                           const std::vector<Column>& columns);
+absl::Status create_table(const std::string& table_name,
+                          const std::vector<Column>& columns);
 
 }  // namespace schema

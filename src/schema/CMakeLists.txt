@@ -11,4 +11,5 @@ target_link_libraries(schema_lib
     PUBLIC
     arrow_lib
     spdlog
+    absl_status
 )
