@@ -90,16 +90,10 @@ TEST_F(SQLTest, ExecuteSimpleSQL) {
 
     pqxx::work tx(conn);
     tx.exec(
-        "CREATE TABLE users (id INT PRIMARY KEY, name STRING, balance FLOAT)");
+        "CREATE TABLE users (id INT PRIMARY KEY, name STRING, balance INT)");
     tx.commit();
 
-    // std::this_thread::sleep_for(std::chrono::seconds(5));
     SPDLOG_INFO("stop test: ExecuteSimpleSQL");
-}
-
-TEST_F(SQLTest, Foo) {
-    SPDLOG_INFO("start test: Foo");
-    SPDLOG_INFO("stop test: Foo");
 }
 
 int main(int argc, char** argv) {
