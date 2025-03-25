@@ -40,6 +40,7 @@
 #include "src/query/query.h"
 #include "src/server/args.h"
 #include "src/store/store.h"
+#include <src/schema/schema.h>
 
 #define BACKLOG 512
 #define MAX_EVENTS 128
@@ -423,6 +424,14 @@ void handle_stmt(PgQuery__Node* stmt) {
                         break;
                 }
             }
+
+            auto status = schema::create_table(
+                create_stmt->relation->relname,
+                std::vector<schema::Column>{{"id", "int"}, {"name", "text"}});
+            if (!status.ok()) {
+                SPDLOG_ERROR("error creating table: {}", status.message());
+            }
+
             break;
         }
         case PG_QUERY__NODE__NODE_TRANSACTION_STMT: {
