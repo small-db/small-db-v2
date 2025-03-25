@@ -4,9 +4,11 @@
 
 #include <absl/base/options.h>
 
+#include <optional>
+#include <string>
+
 namespace semantics {
 
-absl::Option<string> is_string(PgQuery__Node* node);
-
+std::optional<std::string> is_string(PgQuery__Node* node);
 
 }  // namespace semantics

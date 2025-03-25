@@ -421,8 +421,8 @@ void handle_stmt(PgQuery__Node* stmt) {
                         SPDLOG_INFO("column_def->colname: {}",
                                     column_def->colname);
 
-                        auto type_name =
-                            semantics::is_string(column_def->type_name);
+                        auto type_name = semantics::is_string(
+                            column_def->type_name->names[0]);
                         // auto type_name = column_def->type_name->names[0];
                         SPDLOG_INFO("type_name: {}", type_name.value());
 
