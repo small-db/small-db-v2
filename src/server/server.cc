@@ -444,7 +444,9 @@ void handle_stmt(PgQuery__Node* stmt) {
                             }
                         }
 
-                        schema::Column column(column_def->colname, type_name.value());
+                        schema::Column column(column_def->colname,
+                                              type_name.value(), primary_key);
+                        columns.push_back(column);
 
                         break;
                     }

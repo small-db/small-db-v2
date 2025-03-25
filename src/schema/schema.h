@@ -12,6 +12,9 @@ class Column {
 
     Column(const std::string& name, const std::string& type)
         : name(name), type(type) {}
+
+    Column(const std::string& name, const std::string& type, bool primary_key)
+        : name(name), type(type), primary_key(primary_key) {}
 };
 
 absl::Status create_table(const std::string& table_name,
