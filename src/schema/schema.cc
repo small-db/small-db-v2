@@ -1,5 +1,3 @@
-#include "src/schema/schema.h"
-
 #include <absl/status/status.h>
 
 // arrow core
@@ -30,7 +28,8 @@
 #include <parquet/arrow/writer.h>
 #include <parquet/exception.h>
 
-const uint8_t TYPE_STRING = 20;
+#include "src/schema/const.h"
+#include "src/schema/schema.h"
 
 namespace schema {
 absl::Status create_table(const std::string& table_name,
@@ -39,20 +38,20 @@ absl::Status create_table(const std::string& table_name,
 
     // declare custom types
     auto type_column_name = arrow::utf8();
-    auto type_column_type = arrow::uint8();
+    auto type_column_type = arrow::utf8();
     auto type_column = arrow::struct_({arrow::field("name", type_column_name),
                                        arrow::field("type", type_column_type)});
     auto type_columns = arrow::list(type_column);
 
     // names
     auto table_name_builder = arrow::StringBuilder();
-    PARQUET_THROW_NOT_OK(table_name_builder.Append("pg_database"));
+    PARQUET_THROW_NOT_OK(table_name_builder.Append(table_name));
     std::shared_ptr<arrow::Array> table_names;
     PARQUET_THROW_NOT_OK(table_name_builder.Finish(&table_names));
 
     // columns
     auto column_names_builder = std::make_shared<arrow::StringBuilder>();
-    auto column_types_builder = std::make_shared<arrow::UInt8Builder>();
+    auto column_types_builder = std::make_shared<arrow::StringBuilder>();
     std::vector<std::shared_ptr<arrow::ArrayBuilder>> field_builders = {
         column_names_builder, column_types_builder};
     auto column_builder =
@@ -63,25 +62,11 @@ absl::Status create_table(const std::string& table_name,
     // columns for "pg_database"
     PARQUET_THROW_NOT_OK(columns_builder->Append());
 
-    // column "datname"
-    PARQUET_THROW_NOT_OK(column_builder->Append());
-    PARQUET_THROW_NOT_OK(column_names_builder->Append("datname"));
-    PARQUET_THROW_NOT_OK(column_types_builder->Append(TYPE_STRING));
-
-    // column "datcollate"
-    PARQUET_THROW_NOT_OK(column_builder->Append());
-    PARQUET_THROW_NOT_OK(column_names_builder->Append("datcollate"));
-    PARQUET_THROW_NOT_OK(column_types_builder->Append(TYPE_STRING));
-
-    // column "datctype"
-    PARQUET_THROW_NOT_OK(column_builder->Append());
-    PARQUET_THROW_NOT_OK(column_names_builder->Append("datctype"));
-    PARQUET_THROW_NOT_OK(column_types_builder->Append(TYPE_STRING));
-
-    // column "datacl"
-    PARQUET_THROW_NOT_OK(column_builder->Append());
-    PARQUET_THROW_NOT_OK(column_names_builder->Append("datacl"));
-    PARQUET_THROW_NOT_OK(column_types_builder->Append(TYPE_STRING));
+    for (const auto& column : columns) {
+        PARQUET_THROW_NOT_OK(column_builder->Append());
+        PARQUET_THROW_NOT_OK(column_names_builder->Append(column.name));
+        PARQUET_THROW_NOT_OK(column_types_builder->Append(column.type));
+    }
 
     std::shared_ptr<arrow::Array> columns_list;
     PARQUET_THROW_NOT_OK(columns_builder->Finish(&columns_list));
@@ -94,16 +79,10 @@ absl::Status create_table(const std::string& table_name,
 
     // write to disk
     std::shared_ptr<arrow::io::FileOutputStream> outfile;
-    PARQUET_ASSIGN_OR_THROW(outfile, arrow::io::FileOutputStream::Open(
-                                         gen_datafile_path(TABLE_TABLES)));
+    PARQUET_ASSIGN_OR_THROW(outfile,
+                            arrow::io::FileOutputStream::Open(TABLE_TABLES));
     PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(
         *table, arrow::default_memory_pool(), outfile, 300));
-
-    arrow::Status status = scan_sink_example(table);
-
-    if (!status.ok()) {
-        SPDLOG_ERROR("error occurred: {}", status.message());
-    }
 
     return absl::OkStatus();
 }

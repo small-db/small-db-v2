@@ -34,23 +34,19 @@
 #include <parquet/arrow/writer.h>
 #include <parquet/exception.h>
 
+#include "src/schema/const.h"
+
 namespace store {
-
-const std::string DATA_DIR = "data/";
-const std::string TABLE_SCHEMAS = "schemas";
-const std::string TABLE_TABLES = "tables";
-
-const uint8_t TYPE_STRING = 20;
 
 // "schemas" -> "schemas-2021-09-01-12-00-00.parquet"
 std::string gen_datafile_path(const std::string& tablename) {
     // Get the current time
     auto now = std::chrono::system_clock::now();
     auto now_time_t = std::chrono::system_clock::to_time_t(now);
-    auto now_ns =
-        std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch())
-            .count() %
-        1000000000;
+    auto now_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                      now.time_since_epoch())
+                      .count() %
+                  1000000000;
 
     // Format the time into a std::string
     std::stringstream ss;
@@ -122,8 +118,9 @@ void init_schemas() {
 
     // write to disk
     std::shared_ptr<arrow::io::FileOutputStream> outfile;
-    PARQUET_ASSIGN_OR_THROW(outfile, arrow::io::FileOutputStream::Open(
-                                         gen_datafile_path(TABLE_SCHEMAS)));
+    PARQUET_ASSIGN_OR_THROW(outfile,
+                            arrow::io::FileOutputStream::Open(
+                                gen_datafile_path(schema::TABLE_SCHEMAS)));
     PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(
         *table, arrow::default_memory_pool(), outfile, 300));
 }
@@ -160,22 +157,22 @@ void init_tables() {
     // column "datname"
     PARQUET_THROW_NOT_OK(column_builder->Append());
     PARQUET_THROW_NOT_OK(column_names_builder->Append("datname"));
-    PARQUET_THROW_NOT_OK(column_types_builder->Append(TYPE_STRING));
+    PARQUET_THROW_NOT_OK(column_types_builder->Append(schema::TYPE_STRING));
 
     // column "datcollate"
     PARQUET_THROW_NOT_OK(column_builder->Append());
     PARQUET_THROW_NOT_OK(column_names_builder->Append("datcollate"));
-    PARQUET_THROW_NOT_OK(column_types_builder->Append(TYPE_STRING));
+    PARQUET_THROW_NOT_OK(column_types_builder->Append(schema::TYPE_STRING));
 
     // column "datctype"
     PARQUET_THROW_NOT_OK(column_builder->Append());
     PARQUET_THROW_NOT_OK(column_names_builder->Append("datctype"));
-    PARQUET_THROW_NOT_OK(column_types_builder->Append(TYPE_STRING));
+    PARQUET_THROW_NOT_OK(column_types_builder->Append(schema::TYPE_STRING));
 
     // column "datacl"
     PARQUET_THROW_NOT_OK(column_builder->Append());
     PARQUET_THROW_NOT_OK(column_names_builder->Append("datacl"));
-    PARQUET_THROW_NOT_OK(column_types_builder->Append(TYPE_STRING));
+    PARQUET_THROW_NOT_OK(column_types_builder->Append(schema::TYPE_STRING));
 
     std::shared_ptr<arrow::Array> columns_list;
     PARQUET_THROW_NOT_OK(columns_builder->Finish(&columns_list));
@@ -188,8 +185,9 @@ void init_tables() {
 
     // write to disk
     std::shared_ptr<arrow::io::FileOutputStream> outfile;
-    PARQUET_ASSIGN_OR_THROW(outfile, arrow::io::FileOutputStream::Open(
-                                         gen_datafile_path(TABLE_TABLES)));
+    PARQUET_ASSIGN_OR_THROW(outfile,
+                            arrow::io::FileOutputStream::Open(
+                                gen_datafile_path(schema::TABLE_TABLES)));
     PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(
         *table, arrow::default_memory_pool(), outfile, 300));
 
@@ -253,27 +251,27 @@ bool table_exists(const std::string& tablename) {
 
 void init() {
     // create the data directory if it does not exist
-    if (access(DATA_DIR.c_str(), F_OK) != 0) {
-        if (mkdir(DATA_DIR.c_str(), 0777) != 0) {
-            SPDLOG_ERROR("error creating directory {}", DATA_DIR);
+    if (access(schema::DATA_DIR.c_str(), F_OK) != 0) {
+        if (mkdir(schema::DATA_DIR.c_str(), 0777) != 0) {
+            SPDLOG_ERROR("error creating directory {}", schema::DATA_DIR);
             exit(EXIT_FAILURE);
         }
     }
 
     return;
 
-    int ret = chdir(DATA_DIR.c_str());
+    int ret = chdir(schema::DATA_DIR.c_str());
     if (ret != 0) {
-        SPDLOG_ERROR("error changing to directory {}, error: {}", DATA_DIR,
-                     ret);
+        SPDLOG_ERROR("error changing to directory {}, error: {}",
+                     schema::DATA_DIR, ret);
         exit(EXIT_FAILURE);
     }
 
-    if (!table_exists(TABLE_SCHEMAS)) {
+    if (!table_exists(schema::TABLE_SCHEMAS)) {
         init_schemas();
     }
 
-    if (!table_exists(TABLE_TABLES)) {
+    if (!table_exists(schema::TABLE_TABLES)) {
         init_tables();
     }
 
