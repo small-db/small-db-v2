@@ -14,16 +14,18 @@
 
 #include <gtest/gtest.h>
 
+#include <cstdio>
+#include <cstdlib>
+#include <fstream>
+#include <string>
+
 // set level for "SPDLOG_<LEVEL>" macros
 // NB: must define SPDLOG_ACTIVE_LEVEL before `#include "spdlog/spdlog.h"`
 // to make it works
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 #include <spdlog/spdlog.h>
 
-#include <cstdio>
-#include <cstdlib>
 #include <pqxx/pqxx>
-#include <string>
 
 #include "src/server/server.h"
 
@@ -82,6 +84,47 @@ class SQLTest : public ::testing::Test {
 
 std::thread SQLTest::server_thread;
 
+class SQLTestCase {
+   public:
+    std::string sql;
+    std::string expected_output;
+};
+
+std::vector<SQLTestCase> read_cases(const std::string& file_path) {
+    std::vector<SQLTestCase> cases;
+
+    std::ifstream file(file_path);
+    if (!file.is_open()) {
+        SPDLOG_ERROR("failed to open file: {}", file_path);
+        return cases;
+    }
+
+    std::ostringstream currentSQL;
+    std::string line;
+    bool emptyBlock = true;
+
+    while (std::getline(file, line)) {
+        if (line.empty()) {
+            if (!emptyBlock && !currentSQL.str().empty()) {
+                cases.push_back({currentSQL.str(), ""});
+                currentSQL.str("");
+                currentSQL.clear();
+                emptyBlock = true;
+            }
+        } else {
+            currentSQL << line << '\n';
+            emptyBlock = false;
+        }
+    }
+
+    // Add the last SQL if there's no trailing empty line
+    if (!currentSQL.str().empty()) {
+        cases.push_back({currentSQL.str(), ""});
+    }
+
+    return cases;
+}
+
 // Test case to execute simple SQL commands
 TEST_F(SQLTest, ExecuteSimpleSQL) {
     SPDLOG_INFO("start test: ExecuteSimpleSQL");
@@ -89,8 +132,22 @@ TEST_F(SQLTest, ExecuteSimpleSQL) {
     pqxx::connection conn = pqxx::connection{CONNECTION_STRING};
 
     pqxx::work tx(conn);
-    tx.exec(
-        "CREATE TABLE users (id INT PRIMARY KEY, name STRING, balance INT)");
+
+    std::string sql_file_path = "test/integration_test/test.sql";
+
+    auto cases = read_cases(sql_file_path);
+    for (auto& c : cases) {
+        SPDLOG_INFO("executing SQL: {}", c.sql);
+
+        pqxx::result r = tx.exec(c.sql);
+
+        for (auto row : r) {
+            for (auto field : row) {
+                SPDLOG_INFO("field: {}", field.c_str());
+            }
+        }
+    }
+
     tx.commit();
 
     SPDLOG_INFO("stop test: ExecuteSimpleSQL");

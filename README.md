@@ -45,3 +45,9 @@ ctest --test-dir build
 # TODO: this is broken
 ./scripts/format/run-format.sh
 ```
+
+## Partitioning
+
+- https://www.cockroachlabs.com/docs/stable/partitioning
+- https://www.postgresql.org/docs/current/ddl-partitioning.html
+- https://rasiksuhail.medium.com/guide-to-postgresql-table-partitioning-c0814b0fbd9b
