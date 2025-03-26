@@ -4,17 +4,26 @@
 
 namespace schema {
 
+enum PartitioningType {
+    NONE,
+    LIST,
+    RANGE,
+    HASH,
+};
+
 class Column {
    public:
     std::string name;
     std::string type;
-    bool primary_key = false;
+    bool is_primary_key = false;
+    PartitioningType partitioning = PartitioningType::NONE;
 
     Column(const std::string& name, const std::string& type)
         : name(name), type(type) {}
 
-    Column(const std::string& name, const std::string& type, bool primary_key)
-        : name(name), type(type), primary_key(primary_key) {}
+    void set_primary_key(bool set) { is_primary_key = set; }
+
+    void set_partitioning(PartitioningType type) { partitioning = type; }
 };
 
 absl::Status create_table(const std::string& table_name,

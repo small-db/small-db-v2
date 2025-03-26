@@ -43,6 +43,10 @@ absl::Status create_table(const std::string& table_name,
                           const std::vector<Column>& columns) {
     auto pool = arrow::default_memory_pool();
 
+    if (columns.empty()) {
+        return absl::OkStatus();
+    }
+
     // declare custom types
     auto type_column_name = arrow::utf8();
     auto type_column_type = arrow::utf8();
@@ -66,7 +70,6 @@ absl::Status create_table(const std::string& table_name,
     auto columns_builder =
         make_shared<arrow::ListBuilder>(pool, column_builder);
 
-    // columns for "pg_database"
     PARQUET_THROW_NOT_OK(columns_builder->Append());
 
     for (const auto& column : columns) {
