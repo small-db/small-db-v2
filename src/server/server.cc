@@ -458,7 +458,10 @@ void handle_stmt(PgQuery__Node* stmt) {
                         }
 
                         schema::Column column(column_def->colname,
-                                              type_name.value(), primary_key);
+                                              type_name.value());
+                        if (primary_key) {
+                            column.set_primary_key(true);
+                        }
                         columns.push_back(column);
 
                         break;
