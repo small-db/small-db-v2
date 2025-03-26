@@ -411,6 +411,28 @@ void handle_stmt(PgQuery__Node* stmt) {
             std::string table_name = create_stmt->relation->relname;
             std::vector<schema::Column> columns;
 
+            std::string partition_column = "";
+            PgQuery__PartitionStrategy strategy =
+                PG_QUERY__PARTITION_STRATEGY__PARTITION_STRATEGY_UNDEFINED;
+            if (create_stmt->partspec != NULL) {
+                strategy = create_stmt->partspec->strategy;
+                if (create_stmt->partspec->n_part_params != 1) {
+                    SPDLOG_ERROR("number of part params: {}",
+                                 create_stmt->partspec->n_part_params);
+                    return;
+                }
+
+                auto v =
+                    semantics::is_string(create_stmt->partspec->part_params[0]);
+                if (!v.has_value()) {
+                    SPDLOG_ERROR("type_name: unknown");
+                    return;
+                } else {
+                    SPDLOG_INFO("type_name: {}", v.value());
+                    partition_column = v.value();
+                }
+            }
+
             for (int i = 0; i < create_stmt->n_table_elts; i++) {
                 auto node_case = create_stmt->table_elts[i]->node_case;
                 switch (node_case) {
@@ -461,6 +483,9 @@ void handle_stmt(PgQuery__Node* stmt) {
                                               type_name.value());
                         if (primary_key) {
                             column.set_primary_key(true);
+                        }
+                        if (column_def->colname == partition_column) {
+                            column.set_partitioning(strategy);
                         }
                         columns.push_back(column);
 

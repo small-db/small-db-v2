@@ -13,4 +13,5 @@ target_link_libraries(schema_lib
     arrow_lib
     spdlog
     absl_status
+    libpg_query_lib
 )

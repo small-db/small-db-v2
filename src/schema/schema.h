@@ -1,22 +1,18 @@
 #pragma once
 
 #include <absl/status/status.h>
+#include <pg_query.h>
+#include <pg_query.pb-c.h>
 
 namespace schema {
-
-enum PartitioningType {
-    NONE,
-    LIST,
-    RANGE,
-    HASH,
-};
 
 class Column {
    public:
     std::string name;
     std::string type;
     bool is_primary_key = false;
-    PartitioningType partitioning = PartitioningType::NONE;
+    PgQuery__PartitionStrategy partitioning =
+        PG_QUERY__PARTITION_STRATEGY__PARTITION_STRATEGY_UNDEFINED;
 
     Column(const std::string& name, const std::string& type)
         : name(name), type(type) {}
