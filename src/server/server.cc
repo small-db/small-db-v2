@@ -477,6 +477,8 @@ void handle_stmt(PgQuery__Node* stmt) {
             auto status = schema::create_table(table_name, columns);
             if (!status.ok()) {
                 SPDLOG_ERROR("error creating table: {}", status.message());
+            } else {
+                SPDLOG_INFO("table created successfully");
             }
 
             break;
