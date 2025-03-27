@@ -34,6 +34,15 @@
 
 namespace schema {
 
+Column::Column(const std::string& name, const std::string& type)
+    : name(name), type(type) {}
+
+void Column::set_primary_key(bool set) { is_primary_key = set; }
+
+void Column::set_partitioning(PgQuery__PartitionStrategy strategy) {
+    partitioning = strategy;
+}
+
 // "schemas" -> "<data_dir>/schemas.parquet"
 std::string gen_datafile_path(const std::string& tablename) {
     return DATA_DIR + tablename + ".parquet";
@@ -81,11 +90,60 @@ absl::Status create_table(const std::string& table_name,
     std::shared_ptr<arrow::Array> columns_list;
     PARQUET_THROW_NOT_OK(columns_builder->Finish(&columns_list));
 
+    // primary key
+    std::string pk_name;
+    for (const auto& column : columns) {
+        if (column.is_primary_key) {
+            pk_name = column.name;
+            break;
+        }
+    }
+    if (pk_name.empty()) {
+        return absl::InvalidArgumentError("No primary key found");
+    }
+    auto pk_builder = arrow::StringBuilder();
+    PARQUET_THROW_NOT_OK(pk_builder.Append(pk_name));
+    std::shared_ptr<arrow::Array> pk_names;
+    PARQUET_THROW_NOT_OK(pk_builder.Finish(&pk_names));
+
+    // partition key
+    auto type_partition_key =
+        arrow::struct_({arrow::field("name", arrow::utf8()),
+                        arrow::field("strategy", arrow::int8())});
+    auto partition_name_builder = std::make_shared<arrow::StringBuilder>();
+    auto partition_strategy_builder = std::make_shared<arrow::Int8Builder>();
+    std::vector<std::shared_ptr<arrow::ArrayBuilder>> partition_field_builders =
+        {partition_name_builder, partition_strategy_builder};
+    auto partition_key_builder = make_shared<arrow::StructBuilder>(
+        type_partition_key, pool, partition_field_builders);
+
+    std::string partition_name;
+    PgQuery__PartitionStrategy partition_strategy;
+    for (const auto& column : columns) {
+        if (column.partitioning !=
+            PG_QUERY__PARTITION_STRATEGY__PARTITION_STRATEGY_UNDEFINED) {
+            partition_name = column.name;
+            partition_strategy = column.partitioning;
+            break;
+        }
+    }
+
+    PARQUET_THROW_NOT_OK(partition_key_builder->Append());
+    PARQUET_THROW_NOT_OK(partition_name_builder->Append(partition_name));
+    PARQUET_THROW_NOT_OK(
+        partition_strategy_builder->Append(partition_strategy));
+
+    std::shared_ptr<arrow::Array> pk_names;
+
+
     // create the table
     std::shared_ptr<arrow::Schema> schema =
         arrow::schema({arrow::field("name", arrow::utf8()),
-                       arrow::field("columns", type_columns)});
-    auto table = arrow::Table::Make(schema, {table_names, columns_list});
+                       arrow::field("columns", type_columns),
+                       arrow::field("primary_key", arrow::utf8()),
+                       arrow::field("partition_key", type_partition_key)});
+    auto table =
+        arrow::Table::Make(schema, {table_names, columns_list, pk_names});
 
     // write to disk
     std::shared_ptr<arrow::io::FileOutputStream> outfile;
