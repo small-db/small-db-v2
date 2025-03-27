@@ -133,8 +133,6 @@ absl::Status create_table(const std::string& table_name,
     PARQUET_THROW_NOT_OK(
         partition_strategy_builder->Append(partition_strategy));
 
-    std::shared_ptr<arrow::Array> pk_names;
-
 
     // create the table
     std::shared_ptr<arrow::Schema> schema =
