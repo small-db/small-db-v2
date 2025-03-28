@@ -36,6 +36,7 @@ find_package(PgQuery REQUIRED)
 find_package(Libpqxx REQUIRED)
 find_package(GoogleTest REQUIRED)
 find_package(Abseil REQUIRED)
+find_package(RocksDB REQUIRED)
 
 # ============================================================================== #
 # subdirectories

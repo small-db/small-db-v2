@@ -16,3 +16,5 @@ VALUES
 CREATE TABLE users_asia PARTITION OF users FOR
 VALUES
     IN ('China', 'Japan', 'Korea');
+
+SELECT * FROM pg_catalog.pg_tables;
