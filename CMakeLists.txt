@@ -14,6 +14,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_SCAN_FOR_MODULES 0)
 
 # ======================================================================== #
+# helper functions
+# ======================================================================== #
+
+add_subdirectory(cmake/helper)
+
+# ======================================================================== #
 # third-party packages
 # ======================================================================== #
 
@@ -30,9 +36,6 @@ find_package(PgQuery REQUIRED)
 find_package(Libpqxx REQUIRED)
 find_package(GoogleTest REQUIRED)
 find_package(Abseil REQUIRED)
-
-
-
 
 # ============================================================================== #
 # subdirectories

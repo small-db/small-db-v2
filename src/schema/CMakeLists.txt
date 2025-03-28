@@ -10,8 +10,9 @@ add_library(schema_lib
 
 target_link_libraries(schema_lib
     PUBLIC
-    # arrow_lib
-    Arrow
+    arrow_lib
+    # Arrow
+    # arrow_static
     spdlog
     absl_status
     libpg_query_lib
