@@ -29,6 +29,11 @@
 #include <parquet/exception.h>
 #include <spdlog/spdlog.h>
 
+// rocksdb
+#include <rocksdb/db.h>
+#include <rocksdb/options.h>
+#include <rocksdb/slice.h>
+
 #include "src/schema/const.h"
 #include "src/schema/schema.h"
 
@@ -50,6 +55,14 @@ std::string gen_datafile_path(const std::string& tablename) {
 
 absl::Status create_table(const std::string& table_name,
                           const std::vector<Column>& columns) {
+    rocksdb::DB* db;
+    rocksdb::Options options;
+    // Optimize RocksDB. This is the easiest way to get RocksDB to perform well
+    options.IncreaseParallelism();
+    options.OptimizeLevelStyleCompaction();
+    // create the DB if it's not already present
+    options.create_if_missing = true;
+
     auto pool = arrow::default_memory_pool();
 
     if (columns.empty()) {
@@ -132,7 +145,6 @@ absl::Status create_table(const std::string& table_name,
     PARQUET_THROW_NOT_OK(partition_name_builder->Append(partition_name));
     PARQUET_THROW_NOT_OK(
         partition_strategy_builder->Append(partition_strategy));
-
 
     // create the table
     std::shared_ptr<arrow::Schema> schema =

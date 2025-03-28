@@ -9,9 +9,9 @@ FetchContent_Declare(RocksDB
   GIT_SHALLOW TRUE
 )
 
-# get_all_targets(. BEFORE_TARGETS)
+get_all_targets(. BEFORE_TARGETS)
 
 FetchContent_MakeAvailable(RocksDB)
 
-# get_all_targets(. AFTER_TARGETS)
-# print_added_target(BEFORE_TARGETS AFTER_TARGETS)
+get_all_targets(. AFTER_TARGETS)
+print_added_target(BEFORE_TARGETS AFTER_TARGETS)
