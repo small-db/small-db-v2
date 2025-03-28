@@ -63,6 +63,17 @@ absl::Status create_table(const std::string& table_name,
     // create the DB if it's not already present
     options.create_if_missing = true;
 
+    // open DB
+    std::string DBPath = DATA_DIR + TABLE_TABLES;
+    rocksdb::Status s = rocksdb::DB::Open(options, DBPath, &db);
+    if (!s.ok()) {
+        return absl::InternalError("Failed to open RocksDB");
+    }
+
+    // Put key-value
+    s = db->Put(rocksdb::WriteOptions(), "key1", "value");
+    return absl::OkStatus();
+
     auto pool = arrow::default_memory_pool();
 
     if (columns.empty()) {
