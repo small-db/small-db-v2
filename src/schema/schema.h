@@ -32,6 +32,12 @@
 
 namespace schema {
 
+class Table {
+   private:
+    std::string name;
+    std::vector<Column> columns;
+};
+
 class Column {
    public:
     std::string name;

@@ -12,10 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <atomic>
 #include <cstdint>
 
 namespace id {
 
-uint64_t generate_id();
+// Atomic counter to ensure thread-safe ID generation
+std::atomic<uint64_t> id_counter{0};
+
+uint64_t generate_id() {
+    // Atomically increment and return the next ID
+    return id_counter.fetch_add(1, std::memory_order_relaxed);
+}
 
 }  // namespace id

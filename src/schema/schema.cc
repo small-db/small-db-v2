@@ -65,6 +65,81 @@ void from_json(const nlohmann::json& j, Column& c) {
     j.at("partitioning").get_to(c.partitioning);
 }
 
+rocksdb::DB* open_rocksdb(std::string_view db_path) {
+    rocksdb::DB* db;
+    rocksdb::Options options;
+
+    // Optimize RocksDB. This is the easiest way to get RocksDB to perform well.
+    options.IncreaseParallelism();
+    options.OptimizeLevelStyleCompaction();
+
+    // Create the DB if it's not already present.
+    options.create_if_missing = true;
+
+    std::vector<rocksdb::ColumnFamilyDescriptor> column_families = {
+        rocksdb::ColumnFamilyDescriptor(
+            "default", rocksdb::ColumnFamilyOptions()),  // Always required
+        rocksdb::ColumnFamilyDescriptor("TablesCF",
+                                        rocksdb::ColumnFamilyOptions()),
+        rocksdb::ColumnFamilyDescriptor("ColumnsCF",
+                                        rocksdb::ColumnFamilyOptions()),
+        rocksdb::ColumnFamilyDescriptor("PartitionsCF",
+                                        rocksdb::ColumnFamilyOptions())};
+
+    std::vector<rocksdb::ColumnFamilyHandle*> handles;
+
+    std::string DBPath = DATA_DIR + db_path.data();
+    rocksdb::Status s =
+        rocksdb::DB::Open(options, DBPath, column_families, &handles, &db);
+    if (!s.ok()) {
+        return nullptr;
+    }
+
+    return db;
+}
+
+std::optional<Table> get_table(const std::string& table_name) {
+    rocksdb::DB* db;
+    rocksdb::Options options;
+
+    // Optimize RocksDB. This is the easiest way to get RocksDB to perform well.
+    options.IncreaseParallelism();
+    options.OptimizeLevelStyleCompaction();
+
+    // Create the DB if it's not already present.
+    options.create_if_missing = true;
+
+    std::vector<rocksdb::ColumnFamilyDescriptor> column_families = {
+        rocksdb::ColumnFamilyDescriptor(
+            "default", rocksdb::ColumnFamilyOptions()),  // Always required
+        rocksdb::ColumnFamilyDescriptor("TablesCF",
+                                        rocksdb::ColumnFamilyOptions()),
+        rocksdb::ColumnFamilyDescriptor("ColumnsCF",
+                                        rocksdb::ColumnFamilyOptions()),
+        rocksdb::ColumnFamilyDescriptor("PartitionsCF",
+                                        rocksdb::ColumnFamilyOptions())};
+
+    std::vector<rocksdb::ColumnFamilyHandle*> handles;
+
+    std::string DBPath = DATA_DIR + TABLE_TABLES;
+    rocksdb::Status s =
+        rocksdb::DB::Open(options, DBPath, column_families, &handles, &db);
+    if (!s.ok()) {
+        return std::nullopt;
+    }
+
+    // nlohmann::json j;
+    s = db->Get(rocksdb::ReadOptions(), table_name);
+    if (!s.ok()) {
+        return std::nullopt;
+    }
+
+    Table table;
+    j.get_to(table);
+
+    return table;
+}
+
 // "schemas" -> "<data_dir>/schemas.parquet"
 std::string gen_datafile_path(const std::string& tablename) {
     return DATA_DIR + tablename + ".parquet";
