@@ -422,6 +422,8 @@ void handle_stmt(PgQuery__Node* stmt) {
                     return;
                 }
 
+                SPDLOG_INFO("node type: {}", semantics::node_type_str(create_stmt->partspec->part_params[0]));
+
                 auto v =
                     semantics::is_string(create_stmt->partspec->part_params[0]);
                 if (!v.has_value()) {

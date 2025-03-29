@@ -23,7 +23,7 @@ std::optional<std::string> is_string(PgQuery__Node* node) {
 std::string node_type_str(PgQuery__Node* node) {
     auto v = magic_enum::enum_name(node->node_case);
     SPDLOG_INFO("node_case: {}", v);
-    return "";
+    return std::string(v);
 }
 
 }  // namespace semantics
