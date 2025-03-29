@@ -57,13 +57,14 @@ absl::Status create_table(const std::string& table_name,
                           const std::vector<Column>& columns) {
     rocksdb::DB* db;
     rocksdb::Options options;
-    // Optimize RocksDB. This is the easiest way to get RocksDB to perform well
+
+    // Optimize RocksDB. This is the easiest way to get RocksDB to perform well.
     options.IncreaseParallelism();
     options.OptimizeLevelStyleCompaction();
-    // create the DB if it's not already present
+
+    // Create the DB if it's not already present.
     options.create_if_missing = true;
 
-    // open DB
     std::string DBPath = DATA_DIR + TABLE_TABLES;
     rocksdb::Status s = rocksdb::DB::Open(options, DBPath, &db);
     if (!s.ok()) {

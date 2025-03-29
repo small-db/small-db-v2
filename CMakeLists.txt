@@ -37,6 +37,7 @@ find_package(Libpqxx REQUIRED)
 find_package(GoogleTest REQUIRED)
 find_package(Abseil REQUIRED)
 find_package(RocksDB REQUIRED)
+find_package(Json REQUIRED)
 
 # ============================================================================== #
 # subdirectories
