@@ -414,6 +414,7 @@ void handle_stmt(PgQuery__Node* stmt) {
             std::string partition_column = "";
             PgQuery__PartitionStrategy strategy =
                 PG_QUERY__PARTITION_STRATEGY__PARTITION_STRATEGY_UNDEFINED;
+
             if (create_stmt->partspec != NULL) {
                 strategy = create_stmt->partspec->strategy;
                 if (create_stmt->partspec->n_part_params != 1) {
@@ -422,7 +423,12 @@ void handle_stmt(PgQuery__Node* stmt) {
                     return;
                 }
 
-                SPDLOG_INFO("node type: {}", semantics::node_type_str(create_stmt->partspec->part_params[0]));
+                SPDLOG_INFO("node type: {}",
+                            semantics::node_type_str(
+                                create_stmt->partspec->part_params[0]));
+                SPDLOG_INFO("node internal name: {}",
+                            create_stmt->partspec->part_params[0]
+                                ->partition_elem->name);
 
                 auto v =
                     semantics::is_string(create_stmt->partspec->part_params[0]);
