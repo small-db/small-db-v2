@@ -71,7 +71,13 @@ absl::Status create_table(const std::string& table_name,
     }
 
     // Put key-value
-    s = db->Put(rocksdb::WriteOptions(), "key1", "value");
+    // s = db->Put(rocksdb::WriteOptions(), "key1", "value");
+
+    // get value
+    std::string value;
+    s = db->Get(rocksdb::ReadOptions(), "key1", &value);
+    SPDLOG_INFO("value: {}", value);
+
     return absl::OkStatus();
 
     auto pool = arrow::default_memory_pool();
