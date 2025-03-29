@@ -131,6 +131,25 @@ std::optional<Table> get_table(const std::string& table_name) {
     return std::nullopt;
 }
 
+void scan_all_kv(rocksdb::DB* db) {
+    if (db == nullptr) {
+        SPDLOG_ERROR("RocksDB instance is null");
+        return;
+    }
+
+    std::unique_ptr<rocksdb::Iterator> it(
+        db->NewIterator(rocksdb::ReadOptions()));
+    for (it->SeekToFirst(); it->Valid(); it->Next()) {
+        std::string key = it->key().ToString();
+        std::string value = it->value().ToString();
+        SPDLOG_INFO("Key: {}, Value: {}", key, value);
+    }
+
+    if (!it->status().ok()) {
+        SPDLOG_ERROR("Error during iteration: {}", it->status().ToString());
+    }
+}
+
 absl::Status create_table(const std::string& table_name,
                           const std::vector<Column>& columns) {
     auto table = get_table(table_name);
@@ -142,6 +161,8 @@ absl::Status create_table(const std::string& table_name,
     if (db == nullptr) {
         return absl::InternalError("Failed to open RocksDB");
     }
+
+    scan_all_kv(db);
 
     nlohmann::json j(columns);
     SPDLOG_INFO("json: {}", j.dump());
