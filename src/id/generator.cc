@@ -12,16 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#pragma once
 #include <cstdint>
-#include <string>
 
-namespace schema {
+namespace id {
 
-constexpr uint8_t TYPE_STRING = 20;
+uint64_t generate_id();
 
-constexpr std::string DATA_DIR = "data/";
-constexpr std::string TABLE_SCHEMAS = "schemas";
-constexpr std::string TABLE_TABLES = "tables";
-
-}  // namespace schema
+}  // namespace id

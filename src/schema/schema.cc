@@ -82,19 +82,28 @@ absl::Status create_table(const std::string& table_name,
     // Create the DB if it's not already present.
     options.create_if_missing = true;
 
+    std::vector<rocksdb::ColumnFamilyDescriptor> column_families = {
+        rocksdb::ColumnFamilyDescriptor(
+            "default", rocksdb::ColumnFamilyOptions()),  // Always required
+        rocksdb::ColumnFamilyDescriptor("TablesCF",
+                                        rocksdb::ColumnFamilyOptions()),
+        rocksdb::ColumnFamilyDescriptor("ColumnsCF",
+                                        rocksdb::ColumnFamilyOptions()),
+        rocksdb::ColumnFamilyDescriptor("PartitionsCF",
+                                        rocksdb::ColumnFamilyOptions())};
+
+    std::vector<rocksdb::ColumnFamilyHandle*> handles;
+
     std::string DBPath = DATA_DIR + TABLE_TABLES;
-    rocksdb::Status s = rocksdb::DB::Open(options, DBPath, &db);
+    rocksdb::Status s =
+        rocksdb::DB::Open(options, DBPath, column_families, &handles, &db);
     if (!s.ok()) {
         return absl::InternalError("Failed to open RocksDB");
     }
 
-    // Put key-value
-    // s = db->Put(rocksdb::WriteOptions(), "key1", "value");
-
-    // nlohmann::json j = columns;
     nlohmann::json j(columns);
-    // SPDLOG_INFO("json: {}", j);
     SPDLOG_INFO("json: {}", j.dump());
+    s = db->Put(rocksdb::WriteOptions(), table_name, j.dump());
 
     // get value
     std::string value;
