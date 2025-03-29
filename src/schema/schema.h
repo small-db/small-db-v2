@@ -32,12 +32,6 @@
 
 namespace schema {
 
-class Table {
-   private:
-    std::string name;
-    std::vector<Column> columns;
-};
-
 class Column {
    public:
     std::string name;
@@ -53,6 +47,12 @@ class Column {
     void set_primary_key(bool set);
 
     void set_partitioning(PgQuery__PartitionStrategy strategy);
+};
+
+class Table {
+   private:
+    std::string name;
+    std::vector<Column> columns;
 };
 
 absl::Status create_table(const std::string& table_name,
