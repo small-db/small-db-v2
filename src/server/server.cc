@@ -423,22 +423,16 @@ void handle_stmt(PgQuery__Node* stmt) {
                     return;
                 }
 
-                SPDLOG_INFO("node type: {}",
-                            semantics::node_type_str(
-                                create_stmt->partspec->part_params[0]));
-                SPDLOG_INFO("node internal name: {}",
-                            create_stmt->partspec->part_params[0]
-                                ->partition_elem->name);
+                // SPDLOG_INFO("node type: {}",
+                //             semantics::node_type_str(
+                //                 create_stmt->partspec->part_params[0]));
+                // SPDLOG_INFO("node internal name: {}",
+                //             create_stmt->partspec->part_params[0]
+                //                 ->partition_elem->name);
 
-                auto v =
-                    semantics::is_string(create_stmt->partspec->part_params[0]);
-                if (!v.has_value()) {
-                    SPDLOG_ERROR("type_name: unknown");
-                    return;
-                } else {
-                    SPDLOG_INFO("type_name: {}", v.value());
-                    partition_column = v.value();
-                }
+                partition_column = std::string(
+                    create_stmt->partspec->part_params[0]
+                        ->partition_elem->name);
             }
 
             for (int i = 0; i < create_stmt->n_table_elts; i++) {
