@@ -6,6 +6,10 @@
 #include <optional>
 #include <string>
 
+#include <spdlog/spdlog.h>
+
+#include <magic_enum/magic_enum.hpp>
+
 namespace semantics {
 
 std::optional<std::string> is_string(PgQuery__Node* node) {
@@ -14,6 +18,12 @@ std::optional<std::string> is_string(PgQuery__Node* node) {
     } else {
         return std::nullopt;
     }
+}
+
+std::string node_type_str(PgQuery__Node* node) {
+    auto v = magic_enum::enum_name(node->node_case);
+    SPDLOG_INFO("node_case: {}", v);
+    return "";
 }
 
 }  // namespace semantics

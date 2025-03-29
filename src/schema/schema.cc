@@ -34,6 +34,9 @@
 #include <rocksdb/options.h>
 #include <rocksdb/slice.h>
 
+// json
+#include <nlohmann/json.hpp>
+
 #include "src/schema/const.h"
 #include "src/schema/schema.h"
 
@@ -46,6 +49,20 @@ void Column::set_primary_key(bool set) { is_primary_key = set; }
 
 void Column::set_partitioning(PgQuery__PartitionStrategy strategy) {
     partitioning = strategy;
+}
+
+void to_json(nlohmann::json& j, const Column& c) {
+    j = nlohmann::json{{"name", c.name},
+                       {"type", c.type},
+                       {"is_primary_key", c.is_primary_key},
+                       {"partitioning", c.partitioning}};
+}
+
+void from_json(const nlohmann::json& j, Column& c) {
+    j.at("name").get_to(c.name);
+    j.at("type").get_to(c.type);
+    j.at("is_primary_key").get_to(c.is_primary_key);
+    j.at("partitioning").get_to(c.partitioning);
 }
 
 // "schemas" -> "<data_dir>/schemas.parquet"
@@ -73,6 +90,11 @@ absl::Status create_table(const std::string& table_name,
 
     // Put key-value
     // s = db->Put(rocksdb::WriteOptions(), "key1", "value");
+
+    // nlohmann::json j = columns;
+    nlohmann::json j(columns);
+    // SPDLOG_INFO("json: {}", j);
+    SPDLOG_INFO("json: {}", j.dump());
 
     // get value
     std::string value;
