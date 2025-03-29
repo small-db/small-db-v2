@@ -149,9 +149,12 @@ absl::Status create_table(const std::string& table_name,
     s = db->Get(rocksdb::ReadOptions(), "key1", &value);
     SPDLOG_INFO("value: {}", value);
 
-    if (db != nullptr) {
-        delete db;
+    // close db
+    for (auto handle : handles) {
+        s = db->DestroyColumnFamilyHandle(handle);
+        assert(s.ok());
     }
+    delete db;
 
     return absl::OkStatus();
 }

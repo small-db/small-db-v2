@@ -12,51 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// The storage pattern of metadata is:
-//
-// - table metadata
-//   - key: T:<table ID>
-//   - value: <table metadata>
-// - column metadata
-//   - key: C:<table ID>:<column ID>
-//   - value: <column metadata>
-// - partition metadata
-//   - key: P:<table ID>:<partition ID>
-//   - value: <partition metadata>
-
 #pragma once
 
-#include <absl/status/status.h>
-#include <pg_query.h>
-#include <pg_query.pb-c.h>
+#include <rocksdb/db.h>
+#include <rocksdb/options.h>
 
-namespace schema {
+#include <iostream>
+#include <memory>
+#include <unordered_map>
+#include <vector>
 
-class Column {
-   public:
-    std::string name;
-    std::string type;
-
-    bool is_primary_key = false;
-
-    PgQuery__PartitionStrategy partitioning =
-        PG_QUERY__PARTITION_STRATEGY__PARTITION_STRATEGY_UNDEFINED;
-
-    Column(const std::string& name, const std::string& type);
-
-    void set_primary_key(bool set);
-
-    void set_partitioning(PgQuery__PartitionStrategy strategy);
-};
-
-class Table {
-   private:
-    std::string name;
-    std::vector<Column> columns;
-};
-
-absl::Status create_table(const std::string& table_name,
-                          const std::vector<Column>& columns);
+namespace rocks_wrapper {
 
 class RocksDBWrapper {
    public:
@@ -79,4 +45,4 @@ class RocksDBWrapper {
         const std::string& cf_name);
 };
 
-}  // namespace schema
+}  // namespace rocks_wrapper
