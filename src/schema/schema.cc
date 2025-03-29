@@ -128,163 +128,29 @@ std::optional<Table> get_table(const std::string& table_name) {
         return std::nullopt;
     }
 
-    // nlohmann::json j;
-    s = db->Get(rocksdb::ReadOptions(), table_name);
-    if (!s.ok()) {
-        return std::nullopt;
-    }
-
-    Table table;
-    j.get_to(table);
-
-    return table;
-}
-
-// "schemas" -> "<data_dir>/schemas.parquet"
-std::string gen_datafile_path(const std::string& tablename) {
-    return DATA_DIR + tablename + ".parquet";
+    return std::nullopt;
 }
 
 absl::Status create_table(const std::string& table_name,
                           const std::vector<Column>& columns) {
-    rocksdb::DB* db;
-    rocksdb::Options options;
+    auto table = get_table(table_name);
+    if (table.has_value()) {
+        return absl::AlreadyExistsError("Table already exists");
+    }
 
-    // Optimize RocksDB. This is the easiest way to get RocksDB to perform well.
-    options.IncreaseParallelism();
-    options.OptimizeLevelStyleCompaction();
-
-    // Create the DB if it's not already present.
-    options.create_if_missing = true;
-
-    std::vector<rocksdb::ColumnFamilyDescriptor> column_families = {
-        rocksdb::ColumnFamilyDescriptor(
-            "default", rocksdb::ColumnFamilyOptions()),  // Always required
-        rocksdb::ColumnFamilyDescriptor("TablesCF",
-                                        rocksdb::ColumnFamilyOptions()),
-        rocksdb::ColumnFamilyDescriptor("ColumnsCF",
-                                        rocksdb::ColumnFamilyOptions()),
-        rocksdb::ColumnFamilyDescriptor("PartitionsCF",
-                                        rocksdb::ColumnFamilyOptions())};
-
-    std::vector<rocksdb::ColumnFamilyHandle*> handles;
-
-    std::string DBPath = DATA_DIR + TABLE_TABLES;
-    rocksdb::Status s =
-        rocksdb::DB::Open(options, DBPath, column_families, &handles, &db);
-    if (!s.ok()) {
+    auto db = open_rocksdb(TABLE_TABLES);
+    if (db == nullptr) {
         return absl::InternalError("Failed to open RocksDB");
     }
 
     nlohmann::json j(columns);
     SPDLOG_INFO("json: {}", j.dump());
-    s = db->Put(rocksdb::WriteOptions(), table_name, j.dump());
+    rocksdb::Status s = db->Put(rocksdb::WriteOptions(), table_name, j.dump());
 
     // get value
     std::string value;
     s = db->Get(rocksdb::ReadOptions(), "key1", &value);
     SPDLOG_INFO("value: {}", value);
-
-    return absl::OkStatus();
-
-    auto pool = arrow::default_memory_pool();
-
-    if (columns.empty()) {
-        return absl::OkStatus();
-    }
-
-    // declare custom types
-    auto type_column_name = arrow::utf8();
-    auto type_column_type = arrow::utf8();
-    auto type_column = arrow::struct_({arrow::field("name", type_column_name),
-                                       arrow::field("type", type_column_type)});
-    auto type_columns = arrow::list(type_column);
-
-    // names
-    auto table_name_builder = arrow::StringBuilder();
-    PARQUET_THROW_NOT_OK(table_name_builder.Append(table_name));
-    std::shared_ptr<arrow::Array> table_names;
-    PARQUET_THROW_NOT_OK(table_name_builder.Finish(&table_names));
-
-    // columns
-    auto column_names_builder = std::make_shared<arrow::StringBuilder>();
-    auto column_types_builder = std::make_shared<arrow::StringBuilder>();
-    std::vector<std::shared_ptr<arrow::ArrayBuilder>> field_builders = {
-        column_names_builder, column_types_builder};
-    auto column_builder =
-        make_shared<arrow::StructBuilder>(type_column, pool, field_builders);
-    auto columns_builder =
-        make_shared<arrow::ListBuilder>(pool, column_builder);
-
-    PARQUET_THROW_NOT_OK(columns_builder->Append());
-
-    for (const auto& column : columns) {
-        PARQUET_THROW_NOT_OK(column_builder->Append());
-        PARQUET_THROW_NOT_OK(column_names_builder->Append(column.name));
-        PARQUET_THROW_NOT_OK(column_types_builder->Append(column.type));
-    }
-
-    std::shared_ptr<arrow::Array> columns_list;
-    PARQUET_THROW_NOT_OK(columns_builder->Finish(&columns_list));
-
-    // primary key
-    std::string pk_name;
-    for (const auto& column : columns) {
-        if (column.is_primary_key) {
-            pk_name = column.name;
-            break;
-        }
-    }
-    if (pk_name.empty()) {
-        return absl::InvalidArgumentError("No primary key found");
-    }
-    auto pk_builder = arrow::StringBuilder();
-    PARQUET_THROW_NOT_OK(pk_builder.Append(pk_name));
-    std::shared_ptr<arrow::Array> pk_names;
-    PARQUET_THROW_NOT_OK(pk_builder.Finish(&pk_names));
-
-    // partition key
-    auto type_partition_key =
-        arrow::struct_({arrow::field("name", arrow::utf8()),
-                        arrow::field("strategy", arrow::int8())});
-    auto partition_name_builder = std::make_shared<arrow::StringBuilder>();
-    auto partition_strategy_builder = std::make_shared<arrow::Int8Builder>();
-    std::vector<std::shared_ptr<arrow::ArrayBuilder>> partition_field_builders =
-        {partition_name_builder, partition_strategy_builder};
-    auto partition_key_builder = make_shared<arrow::StructBuilder>(
-        type_partition_key, pool, partition_field_builders);
-
-    std::string partition_name;
-    PgQuery__PartitionStrategy partition_strategy;
-    for (const auto& column : columns) {
-        if (column.partitioning !=
-            PG_QUERY__PARTITION_STRATEGY__PARTITION_STRATEGY_UNDEFINED) {
-            partition_name = column.name;
-            partition_strategy = column.partitioning;
-            break;
-        }
-    }
-
-    PARQUET_THROW_NOT_OK(partition_key_builder->Append());
-    PARQUET_THROW_NOT_OK(partition_name_builder->Append(partition_name));
-    PARQUET_THROW_NOT_OK(
-        partition_strategy_builder->Append(partition_strategy));
-
-    // create the table
-    std::shared_ptr<arrow::Schema> schema =
-        arrow::schema({arrow::field("name", arrow::utf8()),
-                       arrow::field("columns", type_columns),
-                       arrow::field("primary_key", arrow::utf8()),
-                       arrow::field("partition_key", type_partition_key)});
-    auto table =
-        arrow::Table::Make(schema, {table_names, columns_list, pk_names});
-
-    // write to disk
-    std::shared_ptr<arrow::io::FileOutputStream> outfile;
-    PARQUET_ASSIGN_OR_THROW(outfile, arrow::io::FileOutputStream::Open(
-                                         gen_datafile_path(TABLE_TABLES)));
-    PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(
-        *table, arrow::default_memory_pool(), outfile, 300));
 
     return absl::OkStatus();
 }
