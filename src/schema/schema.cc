@@ -76,6 +76,10 @@ rocksdb::DB* open_rocksdb(std::string_view db_path) {
     // Create the DB if it's not already present.
     options.create_if_missing = true;
 
+    // If true, missing column families will be automatically created on
+    // DB::Open().
+    options.create_missing_column_families = true;
+
     std::vector<rocksdb::ColumnFamilyDescriptor> column_families = {
         rocksdb::ColumnFamilyDescriptor(
             "default", rocksdb::ColumnFamilyOptions()),  // Always required
@@ -92,6 +96,7 @@ rocksdb::DB* open_rocksdb(std::string_view db_path) {
     rocksdb::Status s =
         rocksdb::DB::Open(options, DBPath, column_families, &handles, &db);
     if (!s.ok()) {
+        SPDLOG_ERROR("Failed to open RocksDB: {}", s.ToString());
         return nullptr;
     }
 
@@ -172,6 +177,10 @@ absl::Status create_table(const std::string& table_name,
     std::string value;
     s = db->Get(rocksdb::ReadOptions(), "key1", &value);
     SPDLOG_INFO("value: {}", value);
+
+    if (db != nullptr) {
+        delete db;
+    }
 
     return absl::OkStatus();
 }
