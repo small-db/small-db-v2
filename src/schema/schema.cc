@@ -140,17 +140,18 @@ absl::Status create_table(const std::string& table_name,
         db.Put("TablesCF", key, j.dump());
     }
 
-    // // store column metadata
-    // for (const auto& column : columns) {
-    //     nlohmann::json column_json;
-    //     to_json(column_json, column);
-    //     auto column_id = id::generate_id();
-    //     auto column_key = absl::StrFormat("C:%d", column_id);
-    //     db.Put("ColumnsCF", column_key, column_json.dump());
-    // }
-
     db.PrintAllKV();
 
     return absl::OkStatus();
 }
+
+absl::Status add_list_partition(const std::string& table_name,
+                                const std::string& partition_name,
+                                const std::vector<std::string>& values) {
+    SPDLOG_INFO(
+        "add_list_partition: table_name: {}, partition_name: {}, values: {}",
+        table_name, partition_name, values);
+    return absl::OkStatus();
+}
+
 }  // namespace schema

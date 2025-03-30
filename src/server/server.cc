@@ -397,8 +397,6 @@ void sendUnimplemented(int sockfd) {
     network_package->send_all(sockfd);
 }
 
-// absl::op
-
 void handle_stmt(PgQuery__Node* stmt) {
     switch (stmt->node_case) {
         case PG_QUERY__NODE__NODE_CREATE_STMT: {
@@ -427,13 +425,6 @@ void handle_stmt(PgQuery__Node* stmt) {
                                  create_stmt->partspec->n_part_params);
                     return;
                 }
-
-                // SPDLOG_INFO("node type: {}",
-                //             semantics::node_type_str(
-                //                 create_stmt->partspec->part_params[0]));
-                // SPDLOG_INFO("node internal name: {}",
-                //             create_stmt->partspec->part_params[0]
-                //                 ->partition_elem->name);
 
                 partition_column =
                     std::string(create_stmt->partspec->part_params[0]
