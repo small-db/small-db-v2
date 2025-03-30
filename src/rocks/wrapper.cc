@@ -97,7 +97,7 @@ void RocksDBWrapper::PrintAllKV() {
         rocksdb::ReadOptions read_options;
         rocksdb::Iterator* it = db_->NewIterator(read_options, cf.second);
         for (it->SeekToFirst(); it->Valid(); it->Next()) {
-            std::cout << "Key: " << it->key().ToString()
+            std::cout << "\tKey: " << it->key().ToString()
                       << ", Value: " << it->value().ToString() << std::endl;
         }
         delete it;

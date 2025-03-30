@@ -109,29 +109,10 @@ absl::Status create_table(const std::string& table_name,
 
     db.PrintAllKV();
 
-    // scan_all_kv(db);
-
     nlohmann::json j(columns);
     auto table_id = id::generate_id();
     auto key = absl::StrFormat("T:%d", table_id);
     db.Put("TablesCF", key, j.dump());
-
-    // SPDLOG_INFO("json: {}", j.dump());
-
-    // rocksdb::Status s = db->Put(rocksdb::WriteOptions(), table_name,
-    // j.dump());
-
-    // // get value
-    // std::string value;
-    // s = db->Get(rocksdb::ReadOptions(), "key1", &value);
-    // SPDLOG_INFO("value: {}", value);
-
-    // // close db
-    // for (auto handle : handles) {
-    //     s = db->DestroyColumnFamilyHandle(handle);
-    //     assert(s.ok());
-    // }
-    // delete db;
 
     return absl::OkStatus();
 }
