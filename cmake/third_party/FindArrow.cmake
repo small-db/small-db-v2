@@ -14,6 +14,10 @@ block()
   set(ARROW_COMPUTE ON)
   set(ARROW_BUILD_TESTS OFF)
 
+  # Due to a problem compiling rocksdb on clang++ 18.1.3 we need to disable
+  # deprecated declaration errors
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
+
   FetchContent_Declare(Arrow
     GIT_REPOSITORY https://github.com/apache/arrow.git
     GIT_TAG apache-arrow-19.0.1
