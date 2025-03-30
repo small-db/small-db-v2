@@ -3,7 +3,6 @@
 # - https://github.com/amoeba/arrow-cmake-fetchcontent/blob/main/CMakeLists.txt
 
 block()
-
   set(ARROW_BUILD_STATIC ON)
   set(ARROW_DEPENDENCY_SOURCE "BUNDLED")
   set(ARROW_SIMD_LEVEL NONE)
