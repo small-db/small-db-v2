@@ -42,6 +42,7 @@ class Column {
     PgQuery__PartitionStrategy partitioning =
         PG_QUERY__PARTITION_STRATEGY__PARTITION_STRATEGY_UNDEFINED;
 
+    Column();
     Column(const std::string& name, const std::string& type);
 
     void set_primary_key(bool set);

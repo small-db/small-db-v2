@@ -49,6 +49,8 @@
 
 namespace schema {
 
+Column::Column() = default;
+
 Column::Column(const std::string& name, const std::string& type)
     : name(name), type(type) {}
 
@@ -105,6 +107,7 @@ void to_json(nlohmann::json& j, const Table& t) {
 void from_json(const nlohmann::json& j, Table& t) {
     j.at("name").get_to(t.name);
     j.at("columns").get_to(t.columns);
+    // j.at("columns").get<Column>(t.columns);
 }
 
 absl::Status create_table(const std::string& table_name,
@@ -118,6 +121,11 @@ absl::Status create_table(const std::string& table_name,
     std::string db_path = DATA_DIR + "/" + table_name;
     rocks_wrapper::RocksDBWrapper db(db_path,
                                      {"TablesCF", "ColumnsCF", "PartitionsCF"});
+
+    SPDLOG_INFO("Table DefaultConstructible: {}",
+                std::is_default_constructible_v<Table>);
+    SPDLOG_INFO("Column DefaultConstructible: {}",
+                std::is_default_constructible_v<Column>);
 
     db.PrintAllKV();
 
