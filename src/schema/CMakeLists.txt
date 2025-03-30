@@ -17,4 +17,5 @@ target_link_libraries(schema_lib
     libpg_query_lib
     nlohmann_json::nlohmann_json
     rocksdb_wrapper_lib
+    id_lib
 )

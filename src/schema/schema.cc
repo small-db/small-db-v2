@@ -27,7 +27,12 @@
 #include <parquet/arrow/reader.h>
 #include <parquet/arrow/writer.h>
 #include <parquet/exception.h>
+
+// spdlog
 #include <spdlog/spdlog.h>
+
+// absl
+#include <absl/strings/str_format.h>
 
 // rocksdb
 #include <rocksdb/db.h>
@@ -40,6 +45,7 @@
 #include "src/rocks/wrapper.h"
 #include "src/schema/const.h"
 #include "src/schema/schema.h"
+#include "src/id/generator.h"
 
 namespace schema {
 
@@ -105,8 +111,13 @@ absl::Status create_table(const std::string& table_name,
 
     // scan_all_kv(db);
 
-    // nlohmann::json j(columns);
+    nlohmann::json j(columns);
+    auto table_id = id::generate_id();
+    auto key = absl::StrFormat("T:%d", table_id);
+    db.Put("TablesCF", key, j.dump());
+
     // SPDLOG_INFO("json: {}", j.dump());
+
     // rocksdb::Status s = db->Put(rocksdb::WriteOptions(), table_name,
     // j.dump());
 
