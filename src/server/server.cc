@@ -34,7 +34,6 @@
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 #include <iostream>
 
-#include "src/query/query.h"
 #include "src/schema/schema.h"
 #include "src/semantics/check.h"
 #include "src/server/args.h"
