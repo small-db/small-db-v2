@@ -66,44 +66,6 @@ void from_json(const nlohmann::json& j, Column& c) {
     j.at("partitioning").get_to(c.partitioning);
 }
 
-rocksdb::DB* open_rocksdb(std::string_view db_path) {
-    rocksdb::DB* db;
-    rocksdb::Options options;
-
-    // Optimize RocksDB. This is the easiest way to get RocksDB to perform well.
-    options.IncreaseParallelism();
-    options.OptimizeLevelStyleCompaction();
-
-    // Create the DB if it's not already present.
-    options.create_if_missing = true;
-
-    // If true, missing column families will be automatically created on
-    // DB::Open().
-    options.create_missing_column_families = true;
-
-    std::vector<rocksdb::ColumnFamilyDescriptor> column_families = {
-        rocksdb::ColumnFamilyDescriptor(
-            "default", rocksdb::ColumnFamilyOptions()),  // Always required
-        rocksdb::ColumnFamilyDescriptor("TablesCF",
-                                        rocksdb::ColumnFamilyOptions()),
-        rocksdb::ColumnFamilyDescriptor("ColumnsCF",
-                                        rocksdb::ColumnFamilyOptions()),
-        rocksdb::ColumnFamilyDescriptor("PartitionsCF",
-                                        rocksdb::ColumnFamilyOptions())};
-
-    std::vector<rocksdb::ColumnFamilyHandle*> handles;
-
-    std::string DBPath = DATA_DIR + db_path.data();
-    rocksdb::Status s =
-        rocksdb::DB::Open(options, DBPath, column_families, &handles, &db);
-    if (!s.ok()) {
-        SPDLOG_ERROR("Failed to open RocksDB: {}", s.ToString());
-        return nullptr;
-    }
-
-    return db;
-}
-
 std::optional<Table> get_table(const std::string& table_name) {
     return std::nullopt;
 }
@@ -135,14 +97,18 @@ absl::Status create_table(const std::string& table_name,
     }
 
     // auto db = open_rocksdb(TABLE_TABLES);
-    rocks_wrapper::RocksDBWrapper db("testdb",
+    std::string db_path = DATA_DIR + "/" + table_name;
+    rocks_wrapper::RocksDBWrapper db(db_path,
                                      {"TablesCF", "ColumnsCF", "PartitionsCF"});
+
+    db.PrintAllKV();
 
     // scan_all_kv(db);
 
     // nlohmann::json j(columns);
     // SPDLOG_INFO("json: {}", j.dump());
-    // rocksdb::Status s = db->Put(rocksdb::WriteOptions(), table_name, j.dump());
+    // rocksdb::Status s = db->Put(rocksdb::WriteOptions(), table_name,
+    // j.dump());
 
     // // get value
     // std::string value;

@@ -36,6 +36,8 @@ class RocksDBWrapper {
              std::string& value);
     bool Delete(const std::string& cf_name, const std::string& key);
 
+    void PrintAllKV();
+
    private:
     rocksdb::DB* db_;
     std::unordered_map<std::string, rocksdb::ColumnFamilyHandle*> cf_handles_;

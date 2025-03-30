@@ -90,4 +90,18 @@ bool RocksDBWrapper::Delete(const std::string& cf_name,
     return status.ok();
 }
 
+void RocksDBWrapper::PrintAllKV() {
+    for (const auto& cf : cf_handles_) {
+        std::cout << "Column Family: " << cf.first << std::endl;
+
+        rocksdb::ReadOptions read_options;
+        rocksdb::Iterator* it = db_->NewIterator(read_options, cf.second);
+        for (it->SeekToFirst(); it->Valid(); it->Next()) {
+            std::cout << "Key: " << it->key().ToString()
+                      << ", Value: " << it->value().ToString() << std::endl;
+        }
+        delete it;
+    }
+}
+
 }  // namespace rocks_wrapper
