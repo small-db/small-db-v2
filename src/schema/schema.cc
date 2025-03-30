@@ -148,9 +148,11 @@ absl::Status create_table(const std::string& table_name,
 absl::Status add_list_partition(const std::string& table_name,
                                 const std::string& partition_name,
                                 const std::vector<std::string>& values) {
-    SPDLOG_INFO(
-        "add_list_partition: table_name: {}, partition_name: {}, values: {}",
-        table_name, partition_name, values);
+    SPDLOG_INFO("add_list_partition: table_name: {}, partition_name: {}",
+                table_name, partition_name);
+    for (const auto& value : values) {
+        SPDLOG_INFO("value: {}", value);
+    }
     return absl::OkStatus();
 }
 

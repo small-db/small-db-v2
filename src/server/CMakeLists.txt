@@ -3,6 +3,8 @@ add_library(server_lib
     server.h
     args.cc
     args.h
+    stmt_handler.cc
+    stmt_handler.h
 )
 
 target_link_libraries(server_lib
