@@ -37,6 +37,7 @@
 // json
 #include <nlohmann/json.hpp>
 
+#include "src/rocks/wrapper.h"
 #include "src/schema/const.h"
 #include "src/schema/schema.h"
 
@@ -133,28 +134,27 @@ absl::Status create_table(const std::string& table_name,
         return absl::AlreadyExistsError("Table already exists");
     }
 
-    auto db = open_rocksdb(TABLE_TABLES);
-    if (db == nullptr) {
-        return absl::InternalError("Failed to open RocksDB");
-    }
+    // auto db = open_rocksdb(TABLE_TABLES);
+    rocks_wrapper::RocksDBWrapper db("testdb",
+                                     {"TablesCF", "ColumnsCF", "PartitionsCF"});
 
-    scan_all_kv(db);
+    // scan_all_kv(db);
 
-    nlohmann::json j(columns);
-    SPDLOG_INFO("json: {}", j.dump());
-    rocksdb::Status s = db->Put(rocksdb::WriteOptions(), table_name, j.dump());
+    // nlohmann::json j(columns);
+    // SPDLOG_INFO("json: {}", j.dump());
+    // rocksdb::Status s = db->Put(rocksdb::WriteOptions(), table_name, j.dump());
 
-    // get value
-    std::string value;
-    s = db->Get(rocksdb::ReadOptions(), "key1", &value);
-    SPDLOG_INFO("value: {}", value);
+    // // get value
+    // std::string value;
+    // s = db->Get(rocksdb::ReadOptions(), "key1", &value);
+    // SPDLOG_INFO("value: {}", value);
 
-    // close db
-    for (auto handle : handles) {
-        s = db->DestroyColumnFamilyHandle(handle);
-        assert(s.ok());
-    }
-    delete db;
+    // // close db
+    // for (auto handle : handles) {
+    //     s = db->DestroyColumnFamilyHandle(handle);
+    //     assert(s.ok());
+    // }
+    // delete db;
 
     return absl::OkStatus();
 }

@@ -58,25 +58,4 @@ class Table {
 absl::Status create_table(const std::string& table_name,
                           const std::vector<Column>& columns);
 
-class RocksDBWrapper {
-   public:
-    RocksDBWrapper(const std::string& db_path,
-                   const std::vector<std::string>& column_family_names);
-    ~RocksDBWrapper();
-
-    bool Put(const std::string& cf_name, const std::string& key,
-             const std::string& value);
-    bool Get(const std::string& cf_name, const std::string& key,
-             std::string& value);
-    bool Delete(const std::string& cf_name, const std::string& key);
-
-   private:
-    rocksdb::DB* db_;
-    std::unordered_map<std::string, rocksdb::ColumnFamilyHandle*> cf_handles_;
-
-    void Close();
-    rocksdb::ColumnFamilyHandle* GetColumnFamilyHandle(
-        const std::string& cf_name);
-};
-
 }  // namespace schema
