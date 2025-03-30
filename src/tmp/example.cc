@@ -20,12 +20,12 @@
 //  COPYING file in the root directory) and Apache 2.0 License
 //  (found in the LICENSE.Apache file in the root directory).
 
+#include <cstdio>
+#include <string>
+
 #include <rocksdb/db.h>
 #include <rocksdb/options.h>
 #include <rocksdb/slice.h>
-
-#include <cstdio>
-#include <string>
 
 using ROCKSDB_NAMESPACE::DB;
 using ROCKSDB_NAMESPACE::Options;
@@ -44,9 +44,9 @@ std::string kDBPath = "/tmp/rocksdb_simple_example";
 // (Doc section: Basic Example)
 
 // (Doc section: Includes)
-#include <arrow/api.h>
-
 #include <iostream>
+
+#include <arrow/api.h>
 // (Doc section: Includes)
 
 // (Doc section: RunMain Start)

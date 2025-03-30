@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <absl/base/options.h>
-
 #include <optional>
 #include <string>
+
+#include <absl/base/options.h>
 
 namespace semantics {
 

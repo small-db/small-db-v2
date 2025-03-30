@@ -1,12 +1,12 @@
 
+#include <optional>
+#include <string>
+
 #include <absl/base/options.h>
+#include <magic_enum/magic_enum.hpp>
 #include <pg_query.h>
 #include <pg_query.pb-c.h>
 #include <spdlog/spdlog.h>
-
-#include <magic_enum/magic_enum.hpp>
-#include <optional>
-#include <string>
 
 namespace semantics {
 

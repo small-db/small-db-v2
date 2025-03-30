@@ -15,13 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
+#include <iostream>
+
 #include <arrow/api.h>
 #include <arrow/io/api.h>
 #include <parquet/arrow/reader.h>
 #include <parquet/arrow/writer.h>
 #include <parquet/exception.h>
-
-#include <iostream>
 
 // #0 Build dummy data to pass around
 // To have some input data, we first create an Arrow Table that holds

@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gtest/gtest.h>
-
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
 #include <string>
 
+#include <gtest/gtest.h>
+
 // set level for "SPDLOG_<LEVEL>" macros
 // NB: must define SPDLOG_ACTIVE_LEVEL before `#include "spdlog/spdlog.h"`
 // to make it works
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
-#include <spdlog/spdlog.h>
-
 #include <pqxx/pqxx>
 
 #include "src/server/server.h"
+
+#include <spdlog/spdlog.h>
 
 class SmallEnvironment : public ::testing::Environment {
    public:

@@ -1,7 +1,7 @@
-#include <gtest/gtest.h>
-
 #include <iostream>
 #include <pqxx/pqxx>
+
+#include <gtest/gtest.h>
 
 // Demonstrate some basic assertions.
 TEST(HelloTest, BasicAssertions) {

@@ -27,10 +27,10 @@
 // NB: must define SPDLOG_ACTIVE_LEVEL before `#include "spdlog/spdlog.h"`
 // to make it works
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+#include "src/server/server.h"
+
 #include <spdlog/fmt/bin_to_hex.h>  // spdlog::to_hex (doesn't work in C++20 and later version)
 #include <spdlog/spdlog.h>
-
-#include "src/server/server.h"
 
 int main(int argc, char* argv[]) {
     spdlog::set_level(spdlog::level::debug);

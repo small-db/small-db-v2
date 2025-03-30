@@ -26,9 +26,23 @@
 
 #pragma once
 
-#include <absl/status/status.h>
-#include <pg_query.h>
-#include <pg_query.pb-c.h>
+// =====================================================================
+// c++ std
+// =====================================================================
+
+#include <string>
+#include <vector>
+
+// =====================================================================
+// third-party libraries
+// =====================================================================
+
+// absl
+#include "absl/status/status.h"
+
+// pg_query
+#include "pg_query.h"
+#include "pg_query.pb-c.h"
 
 namespace schema {
 

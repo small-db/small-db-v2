@@ -14,13 +14,13 @@
 
 #pragma once
 
-#include <rocksdb/db.h>
-#include <rocksdb/options.h>
-
 #include <iostream>
 #include <memory>
 #include <unordered_map>
 #include <vector>
+
+#include <rocksdb/db.h>
+#include <rocksdb/options.h>
 
 namespace rocks_wrapper {
 

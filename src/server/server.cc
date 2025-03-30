@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <mutex>
+#include <unordered_map>
+
 #include <arpa/inet.h>
 #include <errno.h>
 #include <netinet/in.h>
@@ -25,17 +28,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <mutex>
-#include <unordered_map>
-
 // set level for "SPDLOG_<LEVEL>" macros
 // NB: must define SPDLOG_ACTIVE_LEVEL before `#include "spdlog/spdlog.h"`
 // to make it works
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
-#include <absl/base/options.h>
-#include <spdlog/fmt/bin_to_hex.h>  // spdlog::to_hex (doesn't work in C++20 and later version)
-#include <spdlog/spdlog.h>
-
 #include <iostream>
 
 #include "src/query/query.h"
@@ -43,6 +39,10 @@
 #include "src/semantics/check.h"
 #include "src/server/args.h"
 #include "src/store/store.h"
+
+#include <absl/base/options.h>
+#include <spdlog/fmt/bin_to_hex.h>  // spdlog::to_hex (doesn't work in C++20 and later version)
+#include <spdlog/spdlog.h>
 
 #define BACKLOG 512
 #define MAX_EVENTS 128

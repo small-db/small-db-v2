@@ -307,7 +307,7 @@ def main():
     excludes = format.excludes_from_file(format.DEFAULT_CLANG_FORMAT_IGNORE)
 
     files = format.list_files(
-        args.dir,
+        files=[args.dir],
         exclude=excludes,
         extensions=args.extensions.split(","),
     )

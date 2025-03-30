@@ -17,15 +17,15 @@
 
 #include "query.h"
 
-#include <arrow/api.h>
-#include <arrow/compute/api.h>
-#include <arrow/engine/api.h>
-#include <spdlog/spdlog.h>
-
 #include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <vector>
+
+#include <arrow/api.h>
+#include <arrow/compute/api.h>
+#include <arrow/engine/api.h>
+#include <spdlog/spdlog.h>
 
 namespace eng = arrow::engine;
 namespace cp = arrow::compute;

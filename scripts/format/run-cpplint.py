@@ -5,7 +5,7 @@ import xiaochen_py
 from scripts import format
 
 
-def main() -> int:
+def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--dir",
@@ -25,7 +25,7 @@ def main() -> int:
     excludes = format.excludes_from_file(format.DEFAULT_CLANG_FORMAT_IGNORE)
 
     files = format.list_files(
-        args.dir,
+        files=[args.dir],
         exclude=excludes,
         extensions=args.extensions.split(","),
     )
@@ -35,4 +35,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
