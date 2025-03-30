@@ -5,7 +5,7 @@
 set(ARROW_BUILD_STATIC ON)
 set(ARROW_DEPENDENCY_SOURCE "BUNDLED")
 set(ARROW_SIMD_LEVEL NONE)
-set(ARROW_ACERO ON)
+set(ARROW_ACERO ON CACHE BOOL "acero")
 set(ARROW_PARQUET ON)
 set(ARROW_IPC ON)
 set(ARROW_DATASET ON)
@@ -19,17 +19,23 @@ FetchContent_Declare(Arrow
   GIT_SHALLOW TRUE
   SOURCE_SUBDIR cpp
 )
+
+get_all_targets(. BEFORE_TARGETS)
+
 FetchContent_MakeAvailable(Arrow)
+
+get_all_targets(. AFTER_TARGETS)
+print_added_target(BEFORE_TARGETS AFTER_TARGETS)
 
 add_library(arrow_lib INTERFACE IMPORTED)
 
 target_link_libraries(
   arrow_lib
   INTERFACE
-  arrow
-  arrow_dataset
-  arrow_acero
-  parquet
+  arrow_static
+  arrow_dataset_static
+  arrow_acero_static
+  parquet_static
 )
 
 target_include_directories(
