@@ -21,29 +21,29 @@ block()
     SOURCE_SUBDIR cpp
   )
   FetchContent_MakeAvailable(Arrow)
-
-  add_library(arrow_lib INTERFACE IMPORTED)
-
-  target_link_libraries(
-    arrow_lib
-    INTERFACE
-    arrow
-    arrow_dataset
-    arrow_acero
-    parquet
-  )
-
-  target_include_directories(
-    arrow_lib
-    INTERFACE
-    ${arrow_BINARY_DIR}/src
-    ${arrow_SOURCE_DIR}/cpp/src
-  )
-
-  target_link_directories(
-    arrow_lib
-    INTERFACE
-    ${arrow_BINARY_DIR}/debug
-  )
 endblock()
+
+add_library(arrow_lib INTERFACE IMPORTED)
+
+target_link_libraries(
+  arrow_lib
+  INTERFACE
+  arrow
+  arrow_dataset
+  arrow_acero
+  parquet
+)
+
+target_include_directories(
+  arrow_lib
+  INTERFACE
+  ${arrow_BINARY_DIR}/src
+  ${arrow_SOURCE_DIR}/cpp/src
+)
+
+target_link_directories(
+  arrow_lib
+  INTERFACE
+  ${arrow_BINARY_DIR}/debug
+)
 
