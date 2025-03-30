@@ -5,5 +5,7 @@ set -o errexit
 set -o nounset
 
 cmake --version
+clang++ --version
+
 cmake --preset=debug
 cmake --build ./build/debug
