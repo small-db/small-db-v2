@@ -30,6 +30,8 @@ block()
 
   add_library(arrow_lib INTERFACE IMPORTED)
 
+  target_compile_options(arrow_lib PRIVATE -Wno-error)
+
   target_link_libraries(
     arrow_lib
     INTERFACE
