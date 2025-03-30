@@ -411,6 +411,12 @@ void handle_stmt(PgQuery__Node* stmt) {
             std::string table_name = create_stmt->relation->relname;
             std::vector<schema::Column> columns;
 
+            if (create_stmt->n_inh_relations > 0) {
+                SPDLOG_INFO("create_stmt->n_inh_relations: {}",
+                            create_stmt->n_inh_relations);
+                return;
+            }
+
             std::string partition_column = "";
             PgQuery__PartitionStrategy strategy =
                 PG_QUERY__PARTITION_STRATEGY__PARTITION_STRATEGY_UNDEFINED;
@@ -430,9 +436,9 @@ void handle_stmt(PgQuery__Node* stmt) {
                 //             create_stmt->partspec->part_params[0]
                 //                 ->partition_elem->name);
 
-                partition_column = std::string(
-                    create_stmt->partspec->part_params[0]
-                        ->partition_elem->name);
+                partition_column =
+                    std::string(create_stmt->partspec->part_params[0]
+                                    ->partition_elem->name);
             }
 
             for (int i = 0; i < create_stmt->n_table_elts; i++) {

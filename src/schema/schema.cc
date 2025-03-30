@@ -42,10 +42,10 @@
 // json
 #include <nlohmann/json.hpp>
 
+#include "src/id/generator.h"
 #include "src/rocks/wrapper.h"
 #include "src/schema/const.h"
 #include "src/schema/schema.h"
-#include "src/id/generator.h"
 
 namespace schema {
 
@@ -109,7 +109,9 @@ absl::Status create_table(const std::string& table_name,
 
     db.PrintAllKV();
 
-    nlohmann::json j(columns);
+    nlohmann::json j;
+    j["name"] = table_name;
+
     auto table_id = id::generate_id();
     auto key = absl::StrFormat("T:%d", table_id);
     db.Put("TablesCF", key, j.dump());
