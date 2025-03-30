@@ -116,6 +116,8 @@ absl::Status create_table(const std::string& table_name,
     auto key = absl::StrFormat("T:%d", table_id);
     db.Put("TablesCF", key, j.dump());
 
+    db.PrintAllKV();
+
     return absl::OkStatus();
 }
 }  // namespace schema
