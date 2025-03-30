@@ -95,6 +95,18 @@ void scan_all_kv(rocksdb::DB* db) {
     }
 }
 
+Table::Table(const std::string& name, const std::vector<Column>& columns)
+    : name(name), columns(columns) {}
+
+void to_json(nlohmann::json& j, const Table& t) {
+    j = nlohmann::json{{"name", t.name}, {"columns", t.columns}};
+}
+
+void from_json(const nlohmann::json& j, Table& t) {
+    j.at("name").get_to(t.name);
+    j.at("columns").get_to(t.columns);
+}
+
 absl::Status create_table(const std::string& table_name,
                           const std::vector<Column>& columns) {
     auto table = get_table(table_name);
@@ -109,12 +121,25 @@ absl::Status create_table(const std::string& table_name,
 
     db.PrintAllKV();
 
-    nlohmann::json j;
-    j["name"] = table_name;
+    // store table metadata
+    {
+        auto table = Table(table_name, columns);
 
-    auto table_id = id::generate_id();
-    auto key = absl::StrFormat("T:%d", table_id);
-    db.Put("TablesCF", key, j.dump());
+        nlohmann::json j(table);
+
+        auto table_id = id::generate_id();
+        auto key = absl::StrFormat("T:%d", table_id);
+        db.Put("TablesCF", key, j.dump());
+    }
+
+    // // store column metadata
+    // for (const auto& column : columns) {
+    //     nlohmann::json column_json;
+    //     to_json(column_json, column);
+    //     auto column_id = id::generate_id();
+    //     auto column_key = absl::StrFormat("C:%d", column_id);
+    //     db.Put("ColumnsCF", column_key, column_json.dump());
+    // }
 
     db.PrintAllKV();
 

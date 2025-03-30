@@ -50,9 +50,11 @@ class Column {
 };
 
 class Table {
-   private:
+   public:
     std::string name;
     std::vector<Column> columns;
+
+    Table(const std::string& name, const std::vector<Column>& columns);
 };
 
 absl::Status create_table(const std::string& table_name,
