@@ -10,6 +10,5 @@ add_library(store_lib
 target_link_libraries(store_lib
     PUBLIC
     schema_lib
-    arrow_lib
     spdlog
 )

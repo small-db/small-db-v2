@@ -558,8 +558,6 @@ void handle_query(std::string& query, int sockfd) {
 }
 
 int RunServer(const server::ServerArgs& args) {
-    store::init();
-
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_len = sizeof(client_addr);
 

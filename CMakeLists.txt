@@ -30,7 +30,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/third_part
 include(FetchContent)
 
 # step 3: include third-party packages
-find_package(Arrow REQUIRED)
+# find_package(Arrow REQUIRED)
 find_package(Spdlog REQUIRED)
 find_package(PgQuery REQUIRED)
 find_package(Libpqxx REQUIRED)

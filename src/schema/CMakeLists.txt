@@ -10,7 +10,6 @@ add_library(schema_lib
 
 target_link_libraries(schema_lib
     PUBLIC
-    arrow_lib
     rocksdb
     spdlog
     absl_status

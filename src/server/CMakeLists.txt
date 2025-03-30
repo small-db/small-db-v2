@@ -9,7 +9,6 @@ target_link_libraries(server_lib
     PUBLIC
     query_lib
     schema_lib
-    store_lib
     spdlog
     libpg_query_lib
     semantics_lib
