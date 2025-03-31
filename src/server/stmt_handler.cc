@@ -41,7 +41,7 @@ absl::Status handle_create_table(PgQuery__CreateStmt* create_stmt) {
         if (create_stmt->partspec->n_part_params != 1) {
             SPDLOG_ERROR("number of part params: {}",
                          create_stmt->partspec->n_part_params);
-            return;
+            return absl::OkStatus();
         }
 
         partition_column = std::string(
@@ -125,7 +125,7 @@ absl::Status handle_add_partition(PgQuery__CreateStmt* create_stmt) {
         values.push_back(datum->a_const->sval->sval);
     }
 
-    schema::add_list_partition(table_name, partition_name, values);
+    return schema::add_list_partition(table_name, partition_name, values);
 }
 
 absl::Status handle_stmt(PgQuery__Node* stmt) {
@@ -147,6 +147,8 @@ absl::Status handle_stmt(PgQuery__Node* stmt) {
                         static_cast<int>(stmt->node_case));
             break;
     }
+
+    return absl::OkStatus();
 }
 
 }  // namespace stmt_handler
