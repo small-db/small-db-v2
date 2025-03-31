@@ -65,7 +65,8 @@ void to_json(nlohmann::json& j, const Column& c) {
     j = nlohmann::json{{"name", c.name},
                        {"type", c.type},
                        {"is_primary_key", c.is_primary_key},
-                       {"partitioning", c.partitioning}};
+                       {"partitioning", c.partitioning},
+                       {"partition_values", c.partition_values}};
 }
 
 void from_json(const nlohmann::json& j, Column& c) {
@@ -73,6 +74,7 @@ void from_json(const nlohmann::json& j, Column& c) {
     j.at("type").get_to(c.type);
     j.at("is_primary_key").get_to(c.is_primary_key);
     j.at("partitioning").get_to(c.partitioning);
+    j.at("partition_values").get_to(c.partition_values);
 }
 
 std::optional<Table> get_table(const std::string& table_name) {
@@ -148,6 +150,11 @@ absl::Status create_table(const std::string& table_name,
 absl::Status add_list_partition(const std::string& table_name,
                                 const std::string& partition_name,
                                 const std::vector<std::string>& values) {
+    auto table = get_table(table_name);
+    if (!table.has_value()) {
+        return absl::NotFoundError("Table not found");
+    }
+
     SPDLOG_INFO("add_list_partition: table_name: {}, partition_name: {}",
                 table_name, partition_name);
     for (const auto& value : values) {

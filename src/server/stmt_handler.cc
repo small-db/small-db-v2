@@ -12,6 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// =====================================================================
+// c++ std
+// =====================================================================
+
+#include <string>
+#include <vector>
+
 #include "src/schema/schema.h"
 #include "src/semantics/check.h"
 
@@ -109,7 +116,16 @@ absl::Status handle_create_table(PgQuery__CreateStmt* create_stmt) {
 }
 
 absl::Status handle_add_partition(PgQuery__CreateStmt* create_stmt) {
+    auto table_name = create_stmt->inh_relations[0]->range_var->relname;
+    auto partition_name = create_stmt->relation->relname;
 
+    std::vector<std::string> values;
+    for (int i = 0; i < create_stmt->partbound->n_listdatums; i++) {
+        const auto& datum = create_stmt->partbound->listdatums[i];
+        values.push_back(datum->a_const->sval->sval);
+    }
+
+    schema::add_list_partition(table_name, partition_name, values);
 }
 
 absl::Status handle_stmt(PgQuery__Node* stmt) {

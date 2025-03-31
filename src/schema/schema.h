@@ -53,6 +53,8 @@ class Column {
 
     bool is_primary_key = false;
 
+    std::vector<std::string> partition_values;
+
     PgQuery__PartitionStrategy partitioning =
         PG_QUERY__PARTITION_STRATEGY__PARTITION_STRATEGY_UNDEFINED;
 
@@ -74,5 +76,9 @@ class Table {
 
 absl::Status create_table(const std::string& table_name,
                           const std::vector<Column>& columns);
+
+absl::Status add_list_partition(const std::string& table_name,
+                                const std::string& partition_name,
+                                const std::vector<std::string>& values);
 
 }  // namespace schema
