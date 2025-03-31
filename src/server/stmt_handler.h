@@ -16,6 +16,6 @@
 
 namespace stmt_handler {
 
-void handle_stmt(PgQuery__Node* stmt);
+absl::Status handle_stmt(PgQuery__Node* stmt);
 
 }  // namespace stmt_handler
