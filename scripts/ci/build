@@ -7,5 +7,9 @@ set -o nounset
 cmake --version
 clang++ --version
 
+sudo apt install -y \
+    libpq-dev \
+    libpqxx-dev
+
 cmake --preset=debug
 cmake --build ./build/debug
