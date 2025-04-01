@@ -50,17 +50,6 @@
 
 namespace schema {
 
-Column::Column() = default;
-
-Column::Column(const std::string& name, const std::string& type)
-    : name(name), type(type) {}
-
-void Column::set_primary_key(bool set) { is_primary_key = set; }
-
-void Column::set_partitioning(PgQuery__PartitionStrategy strategy) {
-    partitioning = strategy;
-}
-
 void to_json(nlohmann::json& j, const Column& c) {
     j = nlohmann::json{{"name", c.name},
                        {"type", c.type},
@@ -77,31 +66,6 @@ void from_json(const nlohmann::json& j, Column& c) {
     j.at("partition_values").get_to(c.partition_values);
 }
 
-std::optional<Table> get_table(const std::string& table_name) {
-    return std::nullopt;
-}
-
-void scan_all_kv(rocksdb::DB* db) {
-    if (db == nullptr) {
-        SPDLOG_ERROR("RocksDB instance is null");
-        return;
-    }
-
-    std::unique_ptr<rocksdb::Iterator> it(
-        db->NewIterator(rocksdb::ReadOptions()));
-    for (it->SeekToFirst(); it->Valid(); it->Next()) {
-        std::string key = it->key().ToString();
-        std::string value = it->value().ToString();
-        SPDLOG_INFO("Key: {}, Value: {}", key, value);
-    }
-
-    if (!it->status().ok()) {
-        SPDLOG_ERROR("Error during iteration: {}", it->status().ToString());
-    }
-}
-
-Table::Table(const std::string& name, const std::vector<Column>& columns)
-    : name(name), columns(columns) {}
 
 void to_json(nlohmann::json& j, const Table& t) {
     j = nlohmann::json{{"name", t.name}, {"columns", t.columns}};
@@ -112,6 +76,92 @@ void from_json(const nlohmann::json& j, Table& t) {
     j.at("columns").get_to(t.columns);
 }
 
+class Catalog {
+   private:
+    // static pointer to the Singleton instance
+    static Catalog* instancePtr;
+
+    // mutex to ensure thread safety
+    static std::mutex mtx;
+
+    // private Constructor
+    Catalog() {
+        // Load tables from RocksDB
+        std::string db_path = DATA_DIR + "/" + TABLE_TABLES;
+        rocks_wrapper::RocksDBWrapper db(
+            db_path, {"TablesCF", "ColumnsCF", "PartitionsCF"});
+
+        auto kv_pairs = db.GetAllKV("TablesCF");
+        for (const auto& kv : kv_pairs) {
+            nlohmann::json j = nlohmann::json::parse(kv.second);
+            Table table;
+            from_json(j, table);
+            tables[table.name] = std::make_shared<Table>(table);
+        }
+    }
+
+    std::unordered_map<std::string, std::shared_ptr<Table>> tables;
+
+   public:
+    /**
+     * Delete the assignment operator.
+     */
+    void operator=(const Catalog&) = delete;
+
+    /**
+     * Delete the copy constructor.
+     */
+    Catalog(const Catalog& obj) = delete;
+
+    // Static method to get the Singleton instance
+    static Catalog* getInstance() {
+        if (instancePtr == nullptr) {
+            std::lock_guard<std::mutex> lock(mtx);
+            if (instancePtr == nullptr) {
+                instancePtr = new Catalog();
+            }
+        }
+        return instancePtr;
+    }
+
+    std::optional<std::shared_ptr<Table>> get_table(
+        const std::string& table_name) {
+        auto it = tables.find(table_name);
+        if (it != tables.end()) {
+            return it->second;
+        } else {
+            SPDLOG_ERROR("table not found: {}", table_name);
+            return std::nullopt;
+        }
+    }
+};
+
+// define the static members
+Catalog* Catalog::instancePtr = nullptr;
+std::mutex Catalog::mtx;
+
+// The type must be DefaultConstructible to be converted from JSON.
+// (https://github.com/nlohmann/json)
+Column::Column() = default;
+
+Column::Column(const std::string& name, const std::string& type)
+    : name(name), type(type) {}
+
+void Column::set_primary_key(bool set) { is_primary_key = set; }
+
+void Column::set_partitioning(PgQuery__PartitionStrategy strategy) {
+    partitioning = strategy;
+}
+
+std::optional<std::shared_ptr<Table>> get_table(const std::string& table_name) {
+    return Catalog::getInstance()->get_table(table_name);
+}
+
+Table::Table() = default;
+
+Table::Table(const std::string& name, const std::vector<Column>& columns)
+    : name(name), columns(columns) {}
+
 absl::Status create_table(const std::string& table_name,
                           const std::vector<Column>& columns) {
     auto table = get_table(table_name);
@@ -119,15 +169,9 @@ absl::Status create_table(const std::string& table_name,
         return absl::AlreadyExistsError("Table already exists");
     }
 
-    // auto db = open_rocksdb(TABLE_TABLES);
-    std::string db_path = DATA_DIR + "/" + table_name;
+    std::string db_path = DATA_DIR + "/" + TABLE_TABLES;
     rocks_wrapper::RocksDBWrapper db(db_path,
                                      {"TablesCF", "ColumnsCF", "PartitionsCF"});
-
-    SPDLOG_INFO("Table DefaultConstructible: {}",
-                std::is_default_constructible_v<Table>);
-    SPDLOG_INFO("Column DefaultConstructible: {}",
-                std::is_default_constructible_v<Column>);
 
     db.PrintAllKV();
 

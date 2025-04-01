@@ -83,6 +83,32 @@ bool RocksDBWrapper::Get(const std::string& cf_name, const std::string& key,
     return status.ok();
 }
 
+std::vector<std::pair<std::string, std::string>> RocksDBWrapper::GetAllKV(
+    const std::string& cf_name) {
+    std::vector<std::pair<std::string, std::string>> kv_pairs;
+
+    // Get the column family handle
+    auto* handle = GetColumnFamilyHandle(cf_name);
+
+    // Create an iterator for the column family
+    rocksdb::ReadOptions read_options;
+    std::unique_ptr<rocksdb::Iterator> it(
+        db_->NewIterator(read_options, handle));
+
+    // Iterate through all key-value pairs
+    for (it->SeekToFirst(); it->Valid(); it->Next()) {
+        kv_pairs.emplace_back(it->key().ToString(), it->value().ToString());
+    }
+
+    // Check for any errors during iteration
+    if (!it->status().ok()) {
+        throw std::runtime_error("Error during iteration: " +
+                                 it->status().ToString());
+    }
+
+    return kv_pairs;
+}
+
 bool RocksDBWrapper::Delete(const std::string& cf_name,
                             const std::string& key) {
     auto* handle = GetColumnFamilyHandle(cf_name);

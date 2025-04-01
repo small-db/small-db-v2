@@ -89,17 +89,24 @@ class SocketsManager {
    private:
     std::unordered_map<int, SocketState> socket_states;
 
-    // Static pointer to the Singleton instance
+    // Static pointer to the Singleton instance.
     static SocketsManager* instancePtr;
 
-    // Mutex to ensure thread safety
+    // Mutex to ensure thread safety.
     static std::mutex mtx;
 
     // Private Constructor
     SocketsManager() {}
 
    public:
-    // Deleting the copy constructor to prevent copies
+    /**
+     * Delete the assignment operator.
+     */
+    void operator=(const SocketsManager&) = delete;
+
+    /**
+     * Delete the copy constructor.
+     */
     SocketsManager(const SocketsManager& obj) = delete;
 
     // Static method to get the Singleton instance
@@ -139,7 +146,7 @@ class SocketsManager {
     }
 };
 
-// Define the static members
+// define the static members
 SocketsManager* SocketsManager::instancePtr = nullptr;
 std::mutex SocketsManager::mtx;
 

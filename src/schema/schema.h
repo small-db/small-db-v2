@@ -71,6 +71,7 @@ class Table {
     std::string name;
     std::vector<Column> columns;
 
+    Table();
     Table(const std::string& name, const std::vector<Column>& columns);
 };
 
