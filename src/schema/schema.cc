@@ -66,7 +66,6 @@ void from_json(const nlohmann::json& j, Column& c) {
     j.at("partition_values").get_to(c.partition_values);
 }
 
-
 void to_json(nlohmann::json& j, const Table& t) {
     j = nlohmann::json{{"name", t.name}, {"columns", t.columns}};
 }
@@ -134,6 +133,38 @@ class Catalog {
             return std::nullopt;
         }
     }
+
+    absl::Status add_table(const std::string& table_name,
+                           const std::vector<Column>& columns) {
+        auto table = get_table(table_name);
+        if (table.has_value()) {
+            return absl::AlreadyExistsError("Table already exists");
+        }
+
+        std::string db_path = DATA_DIR + "/" + TABLE_TABLES;
+        rocks_wrapper::RocksDBWrapper db(
+            db_path, {"TablesCF", "ColumnsCF", "PartitionsCF"});
+
+        db.PrintAllKV();
+
+        // store table metadata
+        {
+            auto table = Table(table_name, columns);
+
+            nlohmann::json j(table);
+
+            auto table_id = id::generate_id();
+            auto key = absl::StrFormat("T:%d", table_id);
+            db.Put("TablesCF", key, j.dump());
+
+            this->tables[table_name] =
+                std::make_shared<Table>(table_name, columns);
+        }
+
+        db.PrintAllKV();
+
+        return absl::OkStatus();
+    }
 };
 
 // define the static members
@@ -164,31 +195,7 @@ Table::Table(const std::string& name, const std::vector<Column>& columns)
 
 absl::Status create_table(const std::string& table_name,
                           const std::vector<Column>& columns) {
-    auto table = get_table(table_name);
-    if (table.has_value()) {
-        return absl::AlreadyExistsError("Table already exists");
-    }
-
-    std::string db_path = DATA_DIR + "/" + TABLE_TABLES;
-    rocks_wrapper::RocksDBWrapper db(db_path,
-                                     {"TablesCF", "ColumnsCF", "PartitionsCF"});
-
-    db.PrintAllKV();
-
-    // store table metadata
-    {
-        auto table = Table(table_name, columns);
-
-        nlohmann::json j(table);
-
-        auto table_id = id::generate_id();
-        auto key = absl::StrFormat("T:%d", table_id);
-        db.Put("TablesCF", key, j.dump());
-    }
-
-    db.PrintAllKV();
-
-    return absl::OkStatus();
+    return Catalog::getInstance()->add_table(table_name, columns);
 }
 
 absl::Status add_list_partition(const std::string& table_name,
