@@ -413,7 +413,11 @@ void handle_query(std::string& query, int sockfd) {
     auto node_case = unpacked->stmts[0]->stmt->node_case;
 
     for (int i = 0; i < unpacked->n_stmts; i++) {
-        stmt_handler::handle_stmt(unpacked->stmts[i]->stmt);
+        auto status = stmt_handler::handle_stmt(unpacked->stmts[i]->stmt);
+        if (!status.ok()) {
+            SPDLOG_ERROR("error handling statement: {}", status.ToString());
+            return;
+        }
     }
 
     sendUnimplemented(sockfd);
