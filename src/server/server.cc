@@ -423,7 +423,7 @@ void handle_query(std::string& query, int sockfd) {
         auto status = stmt_handler::handle_stmt(unpacked->stmts[i]->stmt);
         if (!status.ok()) {
             SPDLOG_ERROR("error handling statement: {}", status.ToString());
-            return;
+            break;
         }
     }
 

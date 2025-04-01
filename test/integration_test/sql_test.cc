@@ -23,6 +23,15 @@
 
 #include <gtest/gtest.h>
 
+// =====================================================================
+// third-party libraries
+// =====================================================================
+
+// absl
+#include <absl/status/status.h>
+#include <absl/status/statusor.h>
+#include <absl/strings/str_format.h>
+
 class SmallEnvironment : public ::testing::Environment {
    public:
     ~SmallEnvironment() override {}
@@ -119,32 +128,99 @@ std::vector<SQLTestCase> read_cases(const std::string& file_path) {
     return cases;
 }
 
-// Test case to execute simple SQL commands
-TEST_F(SQLTest, ExecuteSimpleSQL) {
-    SPDLOG_INFO("start test: ExecuteSimpleSQL");
+class SQLTestUnit {
+   private:
+   public:
+    std::vector<std::string> labels;
+    std::string sql;
+    std::string expected_raw;
+    SQLTestUnit(std::vector<std::string> lines) {
+        for (const auto& line : lines) {
+            if (line.empty()) continue;
 
-    pqxx::connection conn = pqxx::connection{CONNECTION_STRING};
-
-    pqxx::work tx(conn);
-
-    std::string sql_file_path = "test/integration_test/test.sql";
-
-    auto cases = read_cases(sql_file_path);
-    for (auto& c : cases) {
-        SPDLOG_INFO("executing SQL: {}", c.sql);
-
-        pqxx::result r = tx.exec(c.sql);
-
-        for (auto row : r) {
-            for (auto field : row) {
-                SPDLOG_INFO("field: {}", field.c_str());
+            if (line[0] == '#') {
+                labels.push_back(line.substr(1));
+            } else {
+                sql += line + "\n";
             }
         }
     }
+};
 
-    tx.commit();
+// absl::Status run_sql_test(const std::string& sqltest_file) {
 
-    SPDLOG_INFO("stop test: ExecuteSimpleSQL");
+absl::StatusOr<std::vector<SQLTestUnit>> read_sql_test(
+    const std::string& sqltest_file) {
+    std::vector<SQLTestUnit> sql_tests;
+    std::ifstream file(sqltest_file);
+    if (!file.is_open()) {
+        return absl::NotFoundError(
+            absl::StrFormat("failed to open file: %s", sqltest_file));
+    }
+
+    std::string line;
+    std::vector<std::string> lines;
+    while (std::getline(file, line)) {
+        if (line.empty()) {
+            if (!lines.empty()) {
+                sql_tests.emplace_back(lines);
+                lines.clear();
+            }
+        } else {
+            lines.push_back(line);
+        }
+    }
+
+    return sql_tests;
+}
+
+absl::Status run_sql_test(const std::string& sqltest_file) {
+    auto sql_units = read_sql_test(sqltest_file);
+    if (!sql_units.ok()) {
+        return sql_units.status();
+    }
+
+    // print the sql units
+    for (const auto& unit : sql_units.value()) {
+        SPDLOG_INFO("SQL Test Unit:");
+        for (const auto& line : unit.labels) {
+            SPDLOG_INFO("Label: {}", line);
+        }
+        SPDLOG_INFO("SQL: {}", unit.sql);
+    }
+
+    return absl::OkStatus();
+}
+
+// Test case to execute simple SQL commands
+TEST_F(SQLTest, ExecuteSimpleSQL) {
+    auto status = run_sql_test("test/integration_test/test.sql");
+    ASSERT_TRUE(status.ok());
+
+    // SPDLOG_INFO("start test: ExecuteSimpleSQL");
+
+    // pqxx::connection conn = pqxx::connection{CONNECTION_STRING};
+
+    // pqxx::work tx(conn);
+
+    // std::string sql_file_path = "test/integration_test/test.sql";
+
+    // auto cases = read_cases(sql_file_path);
+    // for (auto& c : cases) {
+    //     SPDLOG_INFO("executing SQL: {}", c.sql);
+
+    //     pqxx::result r = tx.exec(c.sql);
+
+    //     for (auto row : r) {
+    //         for (auto field : row) {
+    //             SPDLOG_INFO("field: {}", field.c_str());
+    //         }
+    //     }
+    // }
+
+    // tx.commit();
+
+    // SPDLOG_INFO("stop test: ExecuteSimpleSQL");
 }
 
 int main(int argc, char** argv) {

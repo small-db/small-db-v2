@@ -1,0 +1,35 @@
+statement ok
+SET AUTOCOMMIT = ON;
+
+statement ok
+CREATE TABLE users (
+    id INT PRIMARY KEY,
+    name STRING,
+    balance INT,
+    country STRING
+) PARTITION BY LIST (country);
+
+statement ok 
+CREATE TABLE users_eu PARTITION OF users FOR
+VALUES
+    IN ('Germany', 'France', 'Italy');
+
+statement ok 
+CREATE TABLE users_us PARTITION OF users FOR
+VALUES
+    IN ('USA', 'Canada');
+
+statement ok 
+CREATE TABLE users_asia PARTITION OF users FOR
+VALUES
+    IN ('China', 'Japan', 'Korea');
+
+query TTTTTT
+SHOW PARTITIONS FROM TABLE users;
+----
+database_name | table_name | partition_name | column_names | partition_value
+--------------+------------+----------------+--------------+--------------------------------
+default_db    | users      | users_eu       | country      | ('Germany', 'France', 'Italy')
+default_db    | users      | users_us       | country      | ('USA', 'Canada')
+default_db    | users      | users_asia     | country      | ('China', 'Japan', 'Korea')
+

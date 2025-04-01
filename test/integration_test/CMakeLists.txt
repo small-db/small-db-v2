@@ -11,6 +11,7 @@ target_link_libraries(
     pqxx
     spdlog
     server_lib
+    absl_status
 )
 
 include(GoogleTest)
