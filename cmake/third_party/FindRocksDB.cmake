@@ -1,3 +1,9 @@
+if (TARGET rocksdb)
+  message(STATUS "found target: rocksdb")
+else()
+  message(STATUS "not found target: rocksdb")
+endif()
+
 block()
   set(WITH_GFLAGS OFF CACHE BOOL "gflags")
   set(ROCKSDB_BUILD_SHARED OFF CACHE BOOL "rocksdb build shared")

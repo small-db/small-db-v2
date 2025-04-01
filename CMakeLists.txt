@@ -54,20 +54,5 @@ add_subdirectory(src)
 # clutter
 # ============================================================================== #
 
-enable_testing()
+add_subdirectory(test/integration_test)
 
-add_executable(
-    sql_test
-    test/integration_test/sql_test.cc
-)
-target_link_libraries(
-    sql_test
-    base_lib
-    GTest::gtest_main
-    pqxx
-    spdlog
-    server_lib
-)
-
-include(GoogleTest)
-gtest_discover_tests(sql_test)
