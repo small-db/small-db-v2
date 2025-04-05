@@ -11,4 +11,5 @@ target_link_libraries(base_lib
     spdlog
     absl_status
     absl_statusor
+    absl::strings
 )

@@ -28,6 +28,8 @@
 // =====================================================================
 
 // absl
+#include "absl/strings/str_split.h"
+
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
 #include <absl/strings/str_format.h>
@@ -92,17 +94,34 @@ class SQLTestUnit {
    public:
     std::vector<std::string> labels;
     std::string sql;
-    std::string expected_raw;
-    SQLTestUnit(std::vector<std::string> lines) {
-        for (const auto& line : lines) {
-            if (line.empty()) continue;
+    std::string raw_expected;
 
-            if (line[0] == '#') {
-                labels.push_back(line.substr(1));
-            } else {
-                sql += line + "\n";
-            }
+    SQLTestUnit(std::vector<std::string> labels, std::string sql,
+                std::string raw_expected)
+        : labels(labels), sql(sql), raw_expected(raw_expected) {}
+
+    static absl::StatusOr<std::unique_ptr<SQLTestUnit>> init(
+        std::vector<std::string> lines) {
+        // this first line is tags <tag1> <tag2>
+        if (lines.size() < 2) {
+            return absl::InvalidArgumentError(
+                "a sql unit must have at least 2 lines");
         }
+
+        auto tags = absl::StrSplit(lines[0], ' ');
+        auto sql = lines[1];
+        for (int row = 2; row < lines.size(); row++) {
+            if (lines[row] == "----") {
+                break;
+            }
+            sql += "\n" + lines[row];
+        }
+
+        auto sql_unit = std::make_unique<SQLTestUnit>(tags, sql, "");
+        if (sql_unit->sql.empty()) {
+            return absl::InvalidArgumentError("empty sql");
+        }
+        return sql_unit;
     }
 };
 
@@ -120,7 +139,12 @@ absl::StatusOr<std::vector<SQLTestUnit>> read_sql_test(
     while (std::getline(file, line)) {
         if (line.empty()) {
             if (!lines.empty()) {
-                sql_tests.emplace_back(lines);
+                auto sql_unit = SQLTestUnit::init(lines);
+                if (!sql_unit.ok()) {
+                    return sql_unit.status();
+                }
+
+                sql_tests.push_back(*sql_unit.value());
                 lines.clear();
             }
         } else {
