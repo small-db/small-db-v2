@@ -95,6 +95,12 @@ class SQLTestUnit {
     std::vector<std::string> labels;
     std::string sql;
     std::string raw_expected;
+    std::vector<std::vector<std::string>> expected;
+
+    enum class Type {
+        statementOK,
+        queryOK,
+    };
 
     SQLTestUnit(std::vector<std::string> labels, std::string sql,
                 std::string raw_expected)
