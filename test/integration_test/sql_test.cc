@@ -87,47 +87,6 @@ class SQLTest : public ::testing::Test {
 
 std::thread SQLTest::server_thread;
 
-class SQLTestCase {
-   public:
-    std::string sql;
-    std::string expected_output;
-};
-
-std::vector<SQLTestCase> read_cases(const std::string& file_path) {
-    std::vector<SQLTestCase> cases;
-
-    std::ifstream file(file_path);
-    if (!file.is_open()) {
-        SPDLOG_ERROR("failed to open file: {}", file_path);
-        return cases;
-    }
-
-    std::ostringstream currentSQL;
-    std::string line;
-    bool emptyBlock = true;
-
-    while (std::getline(file, line)) {
-        if (line.empty()) {
-            if (!emptyBlock && !currentSQL.str().empty()) {
-                cases.push_back({currentSQL.str(), ""});
-                currentSQL.str("");
-                currentSQL.clear();
-                emptyBlock = true;
-            }
-        } else {
-            currentSQL << line << '\n';
-            emptyBlock = false;
-        }
-    }
-
-    // Add the last SQL if there's no trailing empty line
-    if (!currentSQL.str().empty()) {
-        cases.push_back({currentSQL.str(), ""});
-    }
-
-    return cases;
-}
-
 class SQLTestUnit {
    private:
    public:
@@ -146,8 +105,6 @@ class SQLTestUnit {
         }
     }
 };
-
-// absl::Status run_sql_test(const std::string& sqltest_file) {
 
 absl::StatusOr<std::vector<SQLTestUnit>> read_sql_test(
     const std::string& sqltest_file) {
@@ -196,31 +153,6 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
 TEST_F(SQLTest, ExecuteSimpleSQL) {
     auto status = run_sql_test("test/integration_test/test.sql");
     ASSERT_TRUE(status.ok());
-
-    // SPDLOG_INFO("start test: ExecuteSimpleSQL");
-
-    // pqxx::connection conn = pqxx::connection{CONNECTION_STRING};
-
-    // pqxx::work tx(conn);
-
-    // std::string sql_file_path = "test/integration_test/test.sql";
-
-    // auto cases = read_cases(sql_file_path);
-    // for (auto& c : cases) {
-    //     SPDLOG_INFO("executing SQL: {}", c.sql);
-
-    //     pqxx::result r = tx.exec(c.sql);
-
-    //     for (auto row : r) {
-    //         for (auto field : row) {
-    //             SPDLOG_INFO("field: {}", field.c_str());
-    //         }
-    //     }
-    // }
-
-    // tx.commit();
-
-    // SPDLOG_INFO("stop test: ExecuteSimpleSQL");
 }
 
 int main(int argc, char** argv) {
