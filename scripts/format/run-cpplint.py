@@ -31,7 +31,7 @@ def main():
     )
 
     for file in files:
-        xiaochen_py.run_command(f"cpplint {file}", raise_on_failure=False)
+        xiaochen_py.run_command(f"cpplint {file}", raise_on_failure=True)
 
 
 if __name__ == "__main__":

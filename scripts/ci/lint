@@ -5,12 +5,8 @@ set -o errexit
 set -o nounset
 
 # install dependencies
-sudo apt install -y \
-    libpq-dev \
-    libpqxx-dev
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv tool install cpplint
 
-# configure cmake
-cmake --preset=debug
-
-# build all targets
-cmake --build ./build/debug
+# run cpplint
+uv run ./scripts/format/run-cpplint.py
