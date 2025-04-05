@@ -151,7 +151,7 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
 
 // Test case to execute simple SQL commands
 TEST_F(SQLTest, ExecuteSimpleSQL) {
-    auto status = run_sql_test("test/integration_test/test.sql");
+    auto status = run_sql_test("test/integration_test/test.sqltest");
     ASSERT_TRUE(status.ok());
 }
 
