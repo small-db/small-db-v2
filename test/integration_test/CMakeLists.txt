@@ -9,9 +9,7 @@ target_link_libraries(
     base_lib
     GTest::gtest_main
     pqxx
-    spdlog
     server_lib
-    absl_status
 )
 
 include(GoogleTest)

@@ -9,4 +9,6 @@ add_library(base_lib
 target_link_libraries(base_lib
     PUBLIC
     spdlog
+    absl_status
+    absl_statusor
 )
