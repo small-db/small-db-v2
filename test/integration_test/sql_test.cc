@@ -12,27 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// =====================================================================
+// c++ std
+// =====================================================================
+
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
-#include <pqxx/pqxx>
 #include <string>
-
-#include "src/base/base.h"
-#include "src/server/server.h"
-
-#include <gtest/gtest.h>
+#include <memory>
+#include <vector>
 
 // =====================================================================
 // third-party libraries
 // =====================================================================
 
 // absl
+#include "absl/status/status.h"
+#include "absl/status/statusor.h"
+#include "absl/strings/str_format.h"
 #include "absl/strings/str_split.h"
 
-#include <absl/status/status.h>
-#include <absl/status/statusor.h>
-#include <absl/strings/str_format.h>
+// pqxx
+#include "pqxx/pqxx"
+
+// gtest
+#include "gtest/gtest.h"
+
+// =====================================================================
+// local libraries
+// =====================================================================
+
+#include "src/base/base.h"
+#include "src/server/server.h"
 
 class SmallEnvironment : public ::testing::Environment {
    public:
@@ -50,7 +62,7 @@ class SmallEnvironment : public ::testing::Environment {
     void TearDown() override { SPDLOG_INFO("tearing down the environment"); }
 };
 
-const std::string CONNECTION_STRING =
+constexpr std::string_view CONNECTION_STRING =
     "dbname=postgres user=postgres password=postgres hostaddr=127.0.0.1 "
     "port=5432";
 
@@ -75,7 +87,7 @@ class SQLTest : public ::testing::Test {
     static void WaitServer() {
         std::this_thread::sleep_for(std::chrono::seconds(2));
 
-        pqxx::connection conn = pqxx::connection{CONNECTION_STRING};
+        pqxx::connection conn = pqxx::connection{CONNECTION_STRING.data()};
         auto version = conn.server_version();
         SPDLOG_INFO("server version: {}", version);
     }
@@ -90,7 +102,6 @@ class SQLTest : public ::testing::Test {
 std::thread SQLTest::server_thread;
 
 class SQLTestUnit {
-   private:
    public:
     std::vector<std::string> labels;
     std::string sql;
