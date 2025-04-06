@@ -12,26 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// =====================================================================
+// c std
+// =====================================================================
 
-#include <iostream>
-#include <mutex>
-#include <unordered_map>
-
-#include "src/base/base.h"
-#include "src/schema/schema.h"
-#include "src/semantics/check.h"
-#include "src/server/server.h"
-#include "src/server/args.h"
-#include "src/server/stmt_handler.h"
-#include "src/store/store.h"
-
-#include <absl/base/options.h>
 #include <arpa/inet.h>
 #include <errno.h>
 #include <netinet/in.h>
-#include <pg_query.h>
-#include <pg_query.pb-c.h>
-#include <spdlog/fmt/bin_to_hex.h>  // spdlog::to_hex (doesn't work in C++20 and later version)
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,6 +26,41 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+// =====================================================================
+// c++ std
+// =====================================================================
+
+#include <iostream>
+#include <mutex>
+#include <vector>
+#include <string>
+#include <unordered_map>
+
+// =====================================================================
+// local libraries
+// =====================================================================
+
+// absl
+#include "absl/base/options.h"
+
+// pg_query
+#include "pg_query.h"
+#include "pg_query.pb-c.h"
+
+// spdlog
+#include "spdlog/fmt/bin_to_hex.h"  // spdlog::to_hex (doesn't work in C++20 and later version)
+
+// =====================================================================
+// third-party libraries
+// =====================================================================
+
+#include "src/base/base.h"
+#include "src/schema/schema.h"
+#include "src/semantics/check.h"
+#include "src/server/args.h"
+#include "src/server/server.h"
+#include "src/server/stmt_handler.h"
 
 #define BACKLOG 512
 #define MAX_EVENTS 128
@@ -349,7 +371,10 @@ class BackendKeyData : public Message {
         append_int32(buffer, process_id);
 
         srand(time(nullptr));
-        int32_t secret_key = rand();
+
+        // TODO: use a thread-local seed
+        unsigned int seed = 42;
+        int32_t secret_key = rand_r(&seed);
         append_int32(buffer, secret_key);
     }
 };
@@ -433,7 +458,8 @@ void handle_query(std::string& query, int sockfd) {
 }
 
 int RunServer(const server::ServerArgs& args) {
-    struct sockaddr_in server_addr, client_addr;
+    struct sockaddr_in server_addr{};
+    struct sockaddr_in client_addr{};
     socklen_t client_len = sizeof(client_addr);
 
     char buffer[MAX_MESSAGE_LEN];
@@ -448,7 +474,6 @@ int RunServer(const server::ServerArgs& args) {
     int opt = 1;
     setsockopt(sock_listen_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
-    memset((char*)&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(args.port);
     server_addr.sin_addr.s_addr = INADDR_ANY;
