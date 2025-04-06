@@ -19,12 +19,29 @@
 #include <string>
 #include <vector>
 
+// =====================================================================
+// third-party libraries
+// =====================================================================
+
+// pg_query
+#include "pg_query.h"
+#include "pg_query.pb-c.h"
+
+// spdlog
+#include "spdlog/spdlog.h"
+
+// =====================================================================
+// local libraries
+// =====================================================================
+
 #include "src/schema/schema.h"
 #include "src/semantics/check.h"
 
-#include <pg_query.h>
-#include <pg_query.pb-c.h>
-#include <spdlog/spdlog.h>
+// =====================================================================
+// self header
+// =====================================================================
+
+#include "src/server/stmt_handler.h"
 
 namespace stmt_handler {
 

@@ -47,6 +47,11 @@
 #include "src/id/generator.h"
 #include "src/rocks/wrapper.h"
 #include "src/schema/const.h"
+
+// =====================================================================
+// self header
+// =====================================================================
+
 #include "src/schema/schema.h"
 
 namespace schema {
