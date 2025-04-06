@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 #include <iostream>
 #include <mutex>
 #include <unordered_map>
@@ -19,6 +20,7 @@
 #include "src/base/base.h"
 #include "src/schema/schema.h"
 #include "src/semantics/check.h"
+#include "src/server/server.h"
 #include "src/server/args.h"
 #include "src/server/stmt_handler.h"
 #include "src/store/store.h"
