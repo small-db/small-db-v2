@@ -4,13 +4,4 @@ set -o xtrace
 set -o errexit
 set -o nounset
 
-# install dependencies
-sudo apt install -y \
-    libpq-dev \
-    libpqxx-dev
-
-# configure cmake
-cmake --preset=debug
-
-# build all targets
-cmake --build ./build/debug
+./build/debug/test/integration_test/sql_test
