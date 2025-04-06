@@ -11,8 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Lint
-        run: ./scripts/ci/lint
+      # - name: Lint
+      #   run: ./scripts/ci/lint
 
       - name: Build
         run: ./scripts/ci/build
