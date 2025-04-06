@@ -14,3 +14,9 @@ target_link_libraries(
 
 include(GoogleTest)
 gtest_discover_tests(sql_test)
+
+# add_test(
+#     NAME sql_test
+#     COMMAND sql_test
+#     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+# )
