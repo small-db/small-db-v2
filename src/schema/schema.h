@@ -38,11 +38,11 @@
 // =====================================================================
 
 // absl
-#include <absl/status/status.h>
+#include "absl/status/status.h"
 
 // pg_query
-#include <pg_query.h>
-#include <pg_query.pb-c.h>
+#include "pg_query.h"
+#include "pg_query.pb-c.h"
 
 namespace schema {
 

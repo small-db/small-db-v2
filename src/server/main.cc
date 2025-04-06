@@ -12,25 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <pg_query.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/epoll.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-// set level for "SPDLOG_<LEVEL>" macros
-// NB: must define SPDLOG_ACTIVE_LEVEL before `#include "spdlog/spdlog.h"`
-// to make it works
-#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+#include "src/base/base.h"
 #include "src/server/server.h"
-
-#include <spdlog/fmt/bin_to_hex.h>  // spdlog::to_hex (doesn't work in C++20 and later version)
-#include <spdlog/spdlog.h>
 
 int main(int argc, char* argv[]) {
     spdlog::set_level(spdlog::level::debug);

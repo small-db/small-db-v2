@@ -19,7 +19,7 @@ class ServerArgs {
    public:
     int port;
 
-    ServerArgs(int port);
+    explicit ServerArgs(int port);
 };
 
 // extern ServerArgs DefaultArgs;

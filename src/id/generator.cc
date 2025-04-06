@@ -12,8 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// =====================================================================
+// c++ std
+// =====================================================================
+
 #include <atomic>
 #include <cstdint>
+
+// =====================================================================
+// self header
+// =====================================================================
+
+#include "src/id/generator.h"
 
 namespace id {
 
