@@ -9,4 +9,4 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 uv tool install cpplint
 
 # run cpplint
-# uv run ./scripts/format/run-cpplint.py
+uv run ./scripts/format/run-cpplint.py
