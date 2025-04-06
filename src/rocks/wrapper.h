@@ -14,13 +14,22 @@
 
 #pragma once
 
+// =====================================================================
+// c++ std
+// =====================================================================
+
 #include <iostream>
 #include <memory>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
-#include <rocksdb/db.h>
-#include <rocksdb/options.h>
+// =====================================================================
+// third-party libraries
+// =====================================================================
+
+#include "rocksdb/db.h"
+#include "rocksdb/options.h"
 
 namespace rocks_wrapper {
 
