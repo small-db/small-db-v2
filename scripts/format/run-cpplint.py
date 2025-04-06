@@ -1,6 +1,13 @@
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "cxc-toolkit",
+# ]
+# ///
 import argparse
 import sys
-import xiaochen_py
+
+import cxc_toolkit.exec
 
 from scripts import format
 
@@ -31,7 +38,9 @@ def main():
     )
 
     for file in files:
-        xiaochen_py.run_command(f"cpplint {file}", raise_on_failure=True)
+        import cxc_toolkit
+
+        cxc_toolkit.exec.run_command(f"cpplint {file}", raise_on_failure=True)
 
 
 if __name__ == "__main__":
