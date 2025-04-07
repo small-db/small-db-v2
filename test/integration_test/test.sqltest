@@ -24,6 +24,15 @@ CREATE TABLE users_asia PARTITION OF users FOR
 VALUES
     IN ('China', 'Japan', 'Korea');
 
+statement ok
+ALTER PARTITION users_eu OF TABLE users CONFIGURE ZONE USING constraints='[+region=eu]';
+
+statement ok
+ALTER PARTITION users_us OF TABLE users CONFIGURE ZONE USING constraints='[+region=us]';
+
+statement ok
+ALTER PARTITION users_asia OF TABLE users CONFIGURE ZONE USING constraints='[+region=asia]';
+
 query TTTTTT
 SHOW PARTITIONS FROM TABLE users;
 ----
@@ -32,4 +41,12 @@ database_name | table_name | partition_name | column_names | partition_value
 default_db    | users      | users_eu       | country      | ('Germany', 'France', 'Italy')
 default_db    | users      | users_us       | country      | ('USA', 'Canada')
 default_db    | users      | users_asia     | country      | ('China', 'Japan', 'Korea')
+
+statement ok
+INSERT INTO users (id, name, balance, country) VALUES
+(1, 'Alice', 1000, 'Germany'),
+(2, 'Bob', 2000, 'USA'),
+(3, 'Charlie', 1500, 'France'),
+(4, 'David', 3000, 'China'),
+(5, 'Eve', 2500, 'Japan');
 
