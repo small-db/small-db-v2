@@ -19,8 +19,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
-#include <string>
 #include <memory>
+#include <string>
 #include <vector>
 
 // =====================================================================
@@ -45,6 +45,8 @@
 
 #include "src/base/base.h"
 #include "src/server/server.h"
+#include "src/type/type.h"
+#include "test/parser/parser.h"
 
 class SmallEnvironment : public ::testing::Environment {
    public:
@@ -101,79 +103,8 @@ class SQLTest : public ::testing::Test {
 
 std::thread SQLTest::server_thread;
 
-class SQLTestUnit {
-   public:
-    std::vector<std::string> labels;
-    std::string sql;
-    std::string raw_expected;
-    std::vector<std::vector<std::string>> expected;
-
-    enum class Type {
-        statementOK,
-        queryOK,
-    };
-
-    SQLTestUnit(std::vector<std::string> labels, std::string sql,
-                std::string raw_expected)
-        : labels(labels), sql(sql), raw_expected(raw_expected) {}
-
-    static absl::StatusOr<std::unique_ptr<SQLTestUnit>> init(
-        std::vector<std::string> lines) {
-        // this first line is tags <tag1> <tag2>
-        if (lines.size() < 2) {
-            return absl::InvalidArgumentError(
-                "a sql unit must have at least 2 lines");
-        }
-
-        auto tags = absl::StrSplit(lines[0], ' ');
-        auto sql = lines[1];
-        for (int row = 2; row < lines.size(); row++) {
-            if (lines[row] == "----") {
-                break;
-            }
-            sql += "\n" + lines[row];
-        }
-
-        auto sql_unit = std::make_unique<SQLTestUnit>(tags, sql, "");
-        if (sql_unit->sql.empty()) {
-            return absl::InvalidArgumentError("empty sql");
-        }
-        return sql_unit;
-    }
-};
-
-absl::StatusOr<std::vector<SQLTestUnit>> read_sql_test(
-    const std::string& sqltest_file) {
-    std::vector<SQLTestUnit> sql_tests;
-    std::ifstream file(sqltest_file);
-    if (!file.is_open()) {
-        return absl::NotFoundError(
-            absl::StrFormat("failed to open file: %s", sqltest_file));
-    }
-
-    std::string line;
-    std::vector<std::string> lines;
-    while (std::getline(file, line)) {
-        if (line.empty()) {
-            if (!lines.empty()) {
-                auto sql_unit = SQLTestUnit::init(lines);
-                if (!sql_unit.ok()) {
-                    return sql_unit.status();
-                }
-
-                sql_tests.push_back(*sql_unit.value());
-                lines.clear();
-            }
-        } else {
-            lines.push_back(line);
-        }
-    }
-
-    return sql_tests;
-}
-
 absl::Status run_sql_test(const std::string& sqltest_file) {
-    auto sql_units = read_sql_test(sqltest_file);
+    auto sql_units = parser::read_sql_test(sqltest_file);
     if (!sql_units.ok()) {
         return sql_units.status();
     }
