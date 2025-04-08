@@ -25,13 +25,13 @@ VALUES
     IN ('China', 'Japan', 'Korea');
 
 statement ok
-ALTER PARTITION users_eu OF TABLE users CONFIGURE ZONE USING constraints='[+region=eu]';
+ALTER TABLE users_eu ADD CONSTRAINT check_region CHECK (region = 'eu');
 
 statement ok
-ALTER PARTITION users_us OF TABLE users CONFIGURE ZONE USING constraints='[+region=us]';
+ALTER TABLE users_us ADD CONSTRAINT check_region CHECK (region = 'us');
 
 statement ok
-ALTER PARTITION users_asia OF TABLE users CONFIGURE ZONE USING constraints='[+region=asia]';
+ALTER TABLE users_asia ADD CONSTRAINT check_region CHECK (region = 'asia');
 
 query TTTTTT
 SHOW PARTITIONS FROM TABLE users;
