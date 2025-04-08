@@ -163,6 +163,10 @@ absl::Status handle_stmt(PgQuery__Node* stmt) {
             SPDLOG_INFO("alter table statement");
             break;
         }
+        case PG_QUERY__NODE__NODE_INSERT_STMT: {
+            SPDLOG_INFO("insert statement");
+            break;
+        }
         default:
             SPDLOG_ERROR("unknown statement, node_case: {}",
                         static_cast<int>(stmt->node_case));
