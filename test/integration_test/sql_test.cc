@@ -22,9 +22,9 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <typeinfo>
 #include <variant>
 #include <vector>
-#include <typeinfo>
 
 // =====================================================================
 // third-party libraries
@@ -136,24 +136,14 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
 
 // Test case to execute simple SQL commands
 TEST_F(SQLTest, ExecuteSimpleSQL) {
-    try {
+    EXPECT_NO_THROW({
         auto status = run_sql_test("test/integration_test/test.sqltest");
         if (!status.ok()) {
             SPDLOG_ERROR("Test failed with status: {}", status.ToString());
         }
 
         ASSERT_TRUE(status.ok());
-    }
-
-    catch (const pqxx::syntax_error& e) {
-        std::cerr << "[SQL Syntax Error] " << e.what() << std::endl;
-        std::cerr << "Failed Query: " << e.query() << std::endl;
-    }
-
-    catch (const std::exception& e) {
-        std::cerr << "[Unknown Error] " << e.what() << std::endl;
-        std::cerr << "Exception type: " << typeid(e).name() << std::endl;
-    }
+    });
 }
 
 int main(int argc, char** argv) {
