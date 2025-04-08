@@ -1,7 +1,4 @@
 statement ok
-SET AUTOCOMMIT = ON;
-
-statement ok
 CREATE TABLE users (
     id INT PRIMARY KEY,
     name STRING,
