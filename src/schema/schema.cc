@@ -91,7 +91,6 @@ class Catalog {
 
     // private Constructor
     Catalog() {
-        // Load tables from RocksDB
         std::string db_path = DATA_DIR + "/" + TABLE_TABLES;
         rocks_wrapper::RocksDBWrapper db(
             db_path, {"TablesCF", "ColumnsCF", "PartitionsCF"});

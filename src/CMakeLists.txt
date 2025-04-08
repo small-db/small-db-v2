@@ -1,4 +1,5 @@
 add_subdirectory(base)
+add_subdirectory(file_system)
 add_subdirectory(id)
 add_subdirectory(type)
 add_subdirectory(rocks)
