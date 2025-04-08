@@ -134,7 +134,6 @@ class Catalog {
         if (it != tables.end()) {
             return it->second;
         } else {
-            SPDLOG_ERROR("table not found: {}", table_name);
             return std::nullopt;
         }
     }
