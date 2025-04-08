@@ -89,7 +89,7 @@ static absl::StatusOr<std::unique_ptr<SQLTestUnit>> init(
         return absl::InvalidArgumentError("unknown sql unit");
     }
 
-    auto sql_unit = std::make_unique<SQLTestUnit>(tags, sql, "");
+    auto sql_unit = std::make_unique<SQLTestUnit>(tags, sql, "", behavior);
     if (sql_unit->sql.empty()) {
         return absl::InvalidArgumentError("empty sql");
     }
@@ -110,7 +110,7 @@ absl::StatusOr<std::vector<SQLTestUnit>> read_sql_test(
     while (std::getline(file, line)) {
         if (line.empty()) {
             if (!lines.empty()) {
-                auto sql_unit = SQLTestUnit::init(lines);
+                auto sql_unit = init(lines);
                 if (!sql_unit.ok()) {
                     return sql_unit.status();
                 }
