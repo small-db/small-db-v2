@@ -21,6 +21,7 @@
 #include <fstream>
 #include <memory>
 #include <string>
+#include <variant>
 #include <vector>
 
 // =====================================================================
@@ -111,11 +112,21 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
 
     // print the sql units
     for (const auto& unit : sql_units.value()) {
-        SPDLOG_INFO("SQL Test Unit:");
-        for (const auto& line : unit.labels) {
-            SPDLOG_INFO("Label: {}", line);
+        if (auto stmtOK = std::get_if<parser::SQLTestUnit::StatementOK>(
+                &unit.expected_behavior)) {
+            pqxx::connection conn{CONNECTION_STRING.data()};
+            pqxx::work tx(conn);
+            pqxx::result r = tx.exec(unit.sql);
+            SPDLOG_INFO("sql: {}", unit.sql);
+            SPDLOG_INFO("result: {}", r.size());
+            tx.commit();
+        } else if (auto query = std::get_if<parser::SQLTestUnit::Query>(
+                       &unit.expected_behavior)) {
+            SPDLOG_INFO("SQL: {}", unit.sql);
+            for (const auto& column_name : query->column_names) {
+                SPDLOG_INFO("Column Name: {}", column_name);
+            }
         }
-        SPDLOG_INFO("SQL: {}", unit.sql);
     }
 
     return absl::OkStatus();
