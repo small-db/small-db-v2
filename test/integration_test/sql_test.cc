@@ -24,6 +24,7 @@
 #include <string>
 #include <variant>
 #include <vector>
+#include <typeinfo>
 
 // =====================================================================
 // third-party libraries
@@ -151,6 +152,7 @@ TEST_F(SQLTest, ExecuteSimpleSQL) {
 
     catch (const std::exception& e) {
         std::cerr << "[Unknown Error] " << e.what() << std::endl;
+        std::cerr << "Exception type: " << typeid(e).name() << std::endl;
     }
 }
 
