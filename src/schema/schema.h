@@ -78,6 +78,8 @@ class Table {
 absl::Status create_table(const std::string& table_name,
                           const std::vector<Column>& columns);
 
+absl::Status drop_table(const std::string& table_name);
+
 absl::Status add_list_partition(const std::string& table_name,
                                 const std::string& partition_name,
                                 const std::vector<std::string>& values);

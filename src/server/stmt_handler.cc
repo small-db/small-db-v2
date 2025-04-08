@@ -132,6 +132,11 @@ absl::Status handle_create_table(PgQuery__CreateStmt* create_stmt) {
     return schema::create_table(table_name, columns);
 }
 
+absl::Status handle_drop_table(PgQuery__DropStmt* drop_stmt) {
+    auto table_name = drop_stmt->objects[0]->list->items[0]->string->sval;
+    return schema::drop_table(table_name);
+}
+
 absl::Status handle_add_partition(PgQuery__CreateStmt* create_stmt) {
     auto table_name = create_stmt->inh_relations[0]->range_var->relname;
     auto partition_name = create_stmt->relation->relname;
@@ -154,6 +159,11 @@ absl::Status handle_stmt(PgQuery__Node* stmt) {
             } else {
                 return handle_add_partition(create_stmt);
             }
+            break;
+        }
+        case PG_QUERY__NODE__NODE_DROP_STMT: {
+            return handle_drop_table(stmt->drop_stmt);
+            break;
         }
         case PG_QUERY__NODE__NODE_TRANSACTION_STMT: {
             SPDLOG_INFO("transaction statement");
@@ -169,7 +179,7 @@ absl::Status handle_stmt(PgQuery__Node* stmt) {
         }
         default:
             SPDLOG_ERROR("unknown statement, node_case: {}",
-                        static_cast<int>(stmt->node_case));
+                         static_cast<int>(stmt->node_case));
             return absl::InvalidArgumentError(
                 fmt::format("unknown statement, node_case: {}",
                             static_cast<int>(stmt->node_case)));

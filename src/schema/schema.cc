@@ -139,6 +139,19 @@ class Catalog {
         }
     }
 
+    absl::Status drop_table(const std::string& table_name) {
+        auto it = tables.find(table_name);
+        if (it != tables.end()) {
+            tables.erase(it);
+        }
+
+        std::string db_path = DATA_DIR + "/" + TABLE_TABLES;
+        rocks_wrapper::RocksDBWrapper db(
+            db_path, {"TablesCF", "ColumnsCF", "PartitionsCF"});
+        db.Delete("TablesCF", table_name);
+        return absl::OkStatus();
+    }
+
     absl::Status add_table(const std::string& table_name,
                            const std::vector<Column>& columns) {
         auto table = get_table(table_name);
@@ -201,6 +214,10 @@ Table::Table(const std::string& name, const std::vector<Column>& columns)
 absl::Status create_table(const std::string& table_name,
                           const std::vector<Column>& columns) {
     return Catalog::getInstance()->add_table(table_name, columns);
+}
+
+absl::Status drop_table(const std::string& table_name) {
+    return Catalog::getInstance()->drop_table(table_name);
 }
 
 absl::Status add_list_partition(const std::string& table_name,
