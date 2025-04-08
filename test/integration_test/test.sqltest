@@ -9,7 +9,7 @@ CREATE TABLE users (
     country STRING
 ) PARTITION BY LIST (country);
 
-statement ok 
+statement ok
 CREATE TABLE users_eu PARTITION OF users FOR
 VALUES
     IN ('Germany', 'France', 'Italy');

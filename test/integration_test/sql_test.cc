@@ -124,6 +124,9 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
 // Test case to execute simple SQL commands
 TEST_F(SQLTest, ExecuteSimpleSQL) {
     auto status = run_sql_test("test/integration_test/test.sqltest");
+    if (!status.ok()) {
+        SPDLOG_ERROR("Test failed with status: {}", status.ToString());
+    }
     ASSERT_TRUE(status.ok());
 }
 

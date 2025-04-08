@@ -53,7 +53,15 @@ static absl::StatusOr<std::unique_ptr<SQLTestUnit>> init(
             "a sql unit must have at least 2 lines");
     }
 
-    auto tags = absl::StrSplit(lines[0], ' ');
+    for (int i = 0; i < lines.size(); i++) {
+        SPDLOG_DEBUG("line[{}]: {}", i, lines[i]);
+    }
+
+    std::vector<std::string> tags =
+        absl::StrSplit(lines[0], ' ', absl::SkipWhitespace());
+    for (const auto& tag : tags) {
+        SPDLOG_DEBUG("tag: ({})", tag);
+    }
     auto sql = lines[1];
     for (int row = 2; row < lines.size(); row++) {
         if (lines[row] == "----") {
@@ -62,11 +70,16 @@ static absl::StatusOr<std::unique_ptr<SQLTestUnit>> init(
         sql += "\n" + lines[row];
     }
 
+    if (tags.size() != 2) {
+        return absl::InvalidArgumentError(
+            "a sql unit must have exactly 2 tags");
+    }
+
     // statement ok
     SQLTestUnit::behaviour_t behavior;
-    if (lines[0] == "statement ok") {
+    if (tags[0] == "statement" && tags[1] == "ok") {
         behavior = SQLTestUnit::StatementOK();
-    } else if (*tags.begin() == "query") {
+    } else if (tags[0] == "query") {
         // query
         auto query = SQLTestUnit::Query();
         auto column_names = absl::StrSplit(lines[0], ' ');
@@ -86,6 +99,10 @@ static absl::StatusOr<std::unique_ptr<SQLTestUnit>> init(
         }
         behavior = query;
     } else {
+        SPDLOG_DEBUG("wrong sql unit");
+        for (const auto& tag : tags) {
+            SPDLOG_DEBUG("tag: ({})", tag);
+        }
         return absl::InvalidArgumentError("unknown sql unit");
     }
 

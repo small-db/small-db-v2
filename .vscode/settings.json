@@ -1,5 +1,3 @@
 {
-    "cmake.automaticReconfigure": false,
-    // "C_Cpp.default.compileCommands": "${workspaceFolder}/build/debug/compile_commands.json",
-    "C_Cpp.default.compileCommands": "/home/xiaochen/code/small-db-v2/build/debug/compile_commands.json",
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/build/debug/compile_commands.json",
 }
