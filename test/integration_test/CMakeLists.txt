@@ -11,6 +11,7 @@ target_link_libraries(
     GTest::gtest_main
     pqxx
     server_lib
+    parser_lib
 )
 
 

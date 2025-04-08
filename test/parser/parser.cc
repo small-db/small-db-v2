@@ -80,7 +80,7 @@ static absl::StatusOr<std::unique_ptr<SQLTestUnit>> init(
             auto values = absl::StrSplit(lines[row], ' ');
             std::vector<std::string> value;
             for (const auto& v : values) {
-                // value.push_back(v);
+                value.push_back(v.data());
             }
             query.expected_output.push_back(value);
         }

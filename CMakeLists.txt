@@ -49,9 +49,4 @@ include_directories(
 )
 
 add_subdirectory(src)
-
-# ============================================================================== #
-# clutter
-# ============================================================================== #
-
-add_subdirectory(test/integration_test)
+add_subdirectory(test)
