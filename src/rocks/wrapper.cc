@@ -34,7 +34,7 @@ namespace rocks_wrapper {
 RocksDBWrapper::RocksDBWrapper(
     const std::string& db_path,
     const std::vector<std::string>& column_family_names) {
-    bool _ = std::filesystem::create_directory(db_path);
+    bool _ = std::filesystem::create_directories(db_path);
 
     rocksdb::Options options;
     options.create_if_missing = true;
