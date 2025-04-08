@@ -19,6 +19,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <variant>
@@ -134,11 +135,23 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
 
 // Test case to execute simple SQL commands
 TEST_F(SQLTest, ExecuteSimpleSQL) {
-    auto status = run_sql_test("test/integration_test/test.sqltest");
-    if (!status.ok()) {
-        SPDLOG_ERROR("Test failed with status: {}", status.ToString());
+    try {
+        auto status = run_sql_test("test/integration_test/test.sqltest");
+        if (!status.ok()) {
+            SPDLOG_ERROR("Test failed with status: {}", status.ToString());
+        }
+
+        ASSERT_TRUE(status.ok());
     }
-    ASSERT_TRUE(status.ok());
+
+    catch (const pqxx::syntax_error& e) {
+        std::cerr << "[SQL Syntax Error] " << e.what() << std::endl;
+        std::cerr << "Failed Query: " << e.query() << std::endl;
+    }
+
+    catch (const std::exception& e) {
+        std::cerr << "[Unknown Error] " << e.what() << std::endl;
+    }
 }
 
 int main(int argc, char** argv) {

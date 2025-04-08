@@ -33,9 +33,9 @@
 
 #include <iostream>
 #include <mutex>
-#include <vector>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 // =====================================================================
 // local libraries
@@ -270,8 +270,11 @@ class ErrorResponse : public Message {
     const std::string error_message;
 
    public:
-    ErrorResponse(Severity severity = Severity::ERROR,
-                  const std::string& error_message = "error message")
+    explicit ErrorResponse(const std::string& error_message = "error message")
+        : severity(Severity::ERROR), error_message(error_message) {}
+
+    explicit ErrorResponse(Severity severity = Severity::ERROR,
+                           const std::string& error_message = "error message")
         : severity(severity), error_message(error_message) {}
 
     void encode(std::vector<char>& buffer) {
@@ -426,12 +429,24 @@ void sendUnimplemented(int sockfd) {
     network_package->send_all(sockfd);
 }
 
+void sendError(int sockfd, const std::string& error_message) {
+    NetworkPackage* network_package = new NetworkPackage();
+    network_package->add_message(new ErrorResponse(error_message));
+    network_package->add_message(new ReadyForQuery());
+    network_package->send_all(sockfd);
+}
+
 void handle_query(std::string& query, int sockfd) {
     SPDLOG_INFO("query: {}", query);
 
     PgQueryParseResult result;
 
     result = pg_query_parse(query.c_str());
+    if (result.error != nullptr) {
+        SPDLOG_ERROR("error parsing query: {}", result.error->message);
+        sendError(sockfd, result.error->message);
+        return;
+    }
     SPDLOG_INFO("parse_tree: {}", result.parse_tree);
     pg_query_free_parse_result(result);
 

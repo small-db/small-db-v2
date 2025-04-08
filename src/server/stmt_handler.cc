@@ -162,6 +162,9 @@ absl::Status handle_stmt(PgQuery__Node* stmt) {
         default:
             SPDLOG_INFO("unknown statement, node_case: {}",
                         static_cast<int>(stmt->node_case));
+            return absl::InvalidArgumentError(
+                fmt::format("unknown statement, node_case: {}",
+                            static_cast<int>(stmt->node_case)));
             break;
     }
 
