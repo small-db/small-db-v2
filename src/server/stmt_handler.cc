@@ -81,11 +81,6 @@ absl::Status handle_create_table(PgQuery__CreateStmt* create_stmt) {
 
                 auto type_name =
                     semantics::is_string(column_def->type_name->names[name_id]);
-                if (!type_name.has_value()) {
-                    SPDLOG_ERROR("type_name: unknown");
-                } else {
-                    SPDLOG_INFO("type_name: {}", type_name.value());
-                }
 
                 bool primary_key = false;
                 for (int j = 0; j < column_def->n_constraints; j++) {

@@ -503,7 +503,7 @@ int RunServer(const server::ServerArgs& args) {
     if (listen(sock_listen_fd, BACKLOG) < 0) {
         SPDLOG_ERROR("error listening: {}", strerror(errno));
     }
-    SPDLOG_INFO("epoll echo server listening for connections on port: {}",
+    SPDLOG_INFO("server listening on port: {}",
                 args.port);
 
     struct epoll_event ev, events[MAX_EVENTS];

@@ -53,15 +53,8 @@ static absl::StatusOr<std::unique_ptr<SQLTestUnit>> init(
             "a sql unit must have at least 2 lines");
     }
 
-    for (int i = 0; i < lines.size(); i++) {
-        SPDLOG_DEBUG("line[{}]: {}", i, lines[i]);
-    }
-
     std::vector<std::string> tags =
         absl::StrSplit(lines[0], ' ', absl::SkipWhitespace());
-    for (const auto& tag : tags) {
-        SPDLOG_DEBUG("tag: ({})", tag);
-    }
     auto sql = lines[1];
     for (int row = 2; row < lines.size(); row++) {
         if (lines[row] == "----") {
