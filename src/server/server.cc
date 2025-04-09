@@ -537,8 +537,6 @@ int RunServer(const server::ServerArgs& args) {
 
         for (int i = 0; i < new_events; ++i) {
             int event_fd = events[i].data.fd;
-            SPDLOG_DEBUG("new event, fd: {}, sock_listen_fd: {}", event_fd,
-                         sock_listen_fd);
 
             if (events[i].data.fd == sock_listen_fd) {
                 sock_conn_fd =
@@ -684,15 +682,6 @@ int RunServer(const server::ServerArgs& args) {
                             close(newsockfd);
                             continue;
                         }
-
-                        // Resize the buffer to the actual number of bytes
-                        // received buffer.resize(bytes_received);
-
-                        // Log the message in hex format
-                        SPDLOG_INFO(
-                            "received[{} bytes]: {}", bytes_received,
-                            spdlog::to_hex(buffer.data(),
-                                           buffer.data() + bytes_received));
 
                         char message_type = buffer[0];
                         switch (message_type) {

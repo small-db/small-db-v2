@@ -159,26 +159,21 @@ class Catalog {
         }
 
         std::string db_path = DATA_DIR + "/" + TABLE_TABLES;
-        rocks_wrapper::RocksDBWrapper db(
-            db_path, {"TablesCF", "ColumnsCF", "PartitionsCF"});
+        rocks_wrapper::RocksDBWrapper db(db_path, {"TablesCF"});
 
-        db.PrintAllKV();
-
-        // store table metadata
         {
+            // write to kv store
             auto table = Table(table_name, columns);
-
             nlohmann::json j(table);
 
             auto table_id = id::generate_id();
             auto key = absl::StrFormat("T:%d", table_id);
             db.Put("TablesCF", key, j.dump());
 
+            // write to in-memory cache
             this->tables[table_name] =
                 std::make_shared<Table>(table_name, columns);
         }
-
-        db.PrintAllKV();
 
         return absl::OkStatus();
     }

@@ -120,7 +120,7 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
             pqxx::work tx(conn);
             pqxx::result r = tx.exec(unit.sql);
             SPDLOG_INFO("sql: {}", unit.sql);
-            SPDLOG_INFO("result: {}", r.size());
+            SPDLOG_INFO("result size: {}", r.size());
             tx.commit();
         } else if (auto query = std::get_if<parser::SQLTestUnit::Query>(
                        &unit.expected_behavior)) {
