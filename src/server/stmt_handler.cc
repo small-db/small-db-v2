@@ -181,7 +181,7 @@ absl::Status handle_stmt(PgQuery__Node* stmt) {
                     ->alter_table_cmd->def->constraint->raw_expr->a_expr;
             auto lexpr = expr->lexpr->column_ref->fields[0]->string->sval;
             auto op = expr->name[0]->string->sval;
-            auto rexpr = expr->rexpr->column_ref->fields[0]->string->sval;
+            auto rexpr = expr->rexpr->a_const->sval->sval;
             SPDLOG_INFO("partition_name: {}, lexpr: {}, op: {}, rexpr: {}",
                         partition_name, lexpr, op, rexpr);
             break;
