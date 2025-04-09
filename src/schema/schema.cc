@@ -258,6 +258,9 @@ absl::Status add_list_partition(const std::string& table_name,
     for (const auto& value : values) {
         SPDLOG_INFO("value: {}", value);
     }
+
+    // Catalog::getInstance()->set_partition(table_name, p);
+
     return absl::OkStatus();
 }
 
