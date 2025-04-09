@@ -20,6 +20,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <utility>
 
 // =====================================================================
 // third-party libraries
@@ -27,6 +28,7 @@
 
 // absl
 #include "absl/status/status.h"
+#include "absl/status/statusor.h"
 #include "absl/strings/str_format.h"
 
 // json
@@ -107,8 +109,6 @@ class Catalog {
 
     std::unordered_map<std::string, std::shared_ptr<Table>> tables;
 
-    std::unordered_map<std::string, std::shared_ptr<partition_t>> paritition;
-
    public:
     /**
      * Delete the assignment operator.
@@ -175,6 +175,11 @@ class Catalog {
         return absl::OkStatus();
     }
 
+    std::optional<std::shared_ptr<partition_t>> get_partition(
+        const std::string& partition_name) {
+        return std::nullopt;
+    }
+
     absl::Status set_partition(const std::string& table_name,
                                const partition_t& partition) {
         auto table = get_table(table_name);
@@ -187,9 +192,8 @@ class Catalog {
         auto key = absl::StrFormat("P:%d", table.value()->id);
         db->Put("PartitionCF", key, j.dump());
 
-        // write to in-memory cache
-        this->paritition[table_name] = std::make_shared<partition_t>(partition);
-
+        // update in-memory cache
+        table.value()->partition = partition;
         return absl::OkStatus();
     }
 };
@@ -263,6 +267,12 @@ absl::Status add_list_partition(const std::string& table_name,
     }
 
     return absl::OkStatus();
+}
+
+absl::Status add_partition_constraint(
+    const std::string& partition_name,
+    const std::pair<std::string, std::string>& constraint) {
+    Catalog::getInstance()->get_partition(partition_name);
 }
 
 }  // namespace schema

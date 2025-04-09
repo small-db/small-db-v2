@@ -76,7 +76,7 @@ class Table {
     std::string name;
     std::vector<Column> columns;
 
-    partition_t partitioning;
+    partition_t partition;
 
     Table();
     Table(const std::string& name, const std::vector<Column>& columns);

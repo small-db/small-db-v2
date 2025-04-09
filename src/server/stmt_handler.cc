@@ -17,8 +17,8 @@
 // =====================================================================
 
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 // =====================================================================
 // third-party libraries
@@ -150,6 +150,21 @@ absl::Status handle_add_partition(PgQuery__CreateStmt* create_stmt) {
     return schema::add_list_partition(table_name, partition_name, values);
 }
 
+absl::Status handle_add_constraint(PgQuery__AlterTableStmt* alter_stmt) {
+    auto subtype = alter_stmt->cmds[0]->alter_table_cmd->subtype;
+
+    auto partition_name = alter_stmt->relation->relname;
+    auto expr =
+        alter_stmt->cmds[0]->alter_table_cmd->def->constraint->raw_expr->a_expr;
+    auto lexpr = expr->lexpr->column_ref->fields[0]->string->sval;
+    auto op = expr->name[0]->string->sval;
+    auto rexpr = expr->rexpr->a_const->sval->sval;
+    SPDLOG_INFO("partition_name: {}, lexpr: {}, op: {}, rexpr: {}",
+                partition_name, lexpr, op, rexpr);
+    return schema::add_partition_constraint(partition_name,
+                                     std::make_pair(lexpr, rexpr));
+}
+
 absl::Status handle_stmt(PgQuery__Node* stmt) {
     switch (stmt->node_case) {
         case PG_QUERY__NODE__NODE_CREATE_STMT: {
@@ -170,20 +185,7 @@ absl::Status handle_stmt(PgQuery__Node* stmt) {
             break;
         }
         case PG_QUERY__NODE__NODE_ALTER_TABLE_STMT: {
-            auto subtype =
-                stmt->alter_table_stmt->cmds[0]->alter_table_cmd->subtype;
-
-            auto partition_name = stmt->alter_table_stmt->relation->relname;
-            auto expr =
-                stmt->alter_table_stmt->cmds[0]
-                    ->alter_table_cmd->def->constraint->raw_expr->a_expr;
-            auto lexpr = expr->lexpr->column_ref->fields[0]->string->sval;
-            auto op = expr->name[0]->string->sval;
-            auto rexpr = expr->rexpr->a_const->sval->sval;
-            SPDLOG_INFO("partition_name: {}, lexpr: {}, op: {}, rexpr: {}",
-                        partition_name, lexpr, op, rexpr);
-            schema::add_partition_constraint(partition_name,
-                                             std::make_pair(lexpr, rexpr));
+            return handle_add_constraint(stmt->alter_table_stmt);
             break;
         }
         case PG_QUERY__NODE__NODE_INSERT_STMT: {
