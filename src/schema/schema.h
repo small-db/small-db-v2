@@ -31,6 +31,7 @@
 // =====================================================================
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 // =====================================================================
@@ -44,6 +45,12 @@
 #include "pg_query.h"
 #include "pg_query.pb-c.h"
 
+// =====================================================================
+// local libraries
+// =====================================================================
+
+#include "src/schema/partition.h"
+
 namespace schema {
 
 class Column {
@@ -55,21 +62,20 @@ class Column {
 
     std::vector<std::string> partition_values;
 
-    PgQuery__PartitionStrategy partitioning =
-        PG_QUERY__PARTITION_STRATEGY__PARTITION_STRATEGY_UNDEFINED;
-
     Column();
     Column(const std::string& name, const std::string& type);
 
     void set_primary_key(bool set);
-
-    void set_partitioning(PgQuery__PartitionStrategy strategy);
 };
 
 class Table {
    public:
+    uint64_t id;
+
     std::string name;
     std::vector<Column> columns;
+
+    partition_t partitioning;
 
     Table();
     Table(const std::string& name, const std::vector<Column>& columns);
@@ -79,6 +85,10 @@ absl::Status create_table(const std::string& table_name,
                           const std::vector<Column>& columns);
 
 absl::Status drop_table(const std::string& table_name);
+
+absl::Status set_partition(const std::string& table_name,
+                           const std::string& partition_column,
+                           PgQuery__PartitionStrategy strategy);
 
 absl::Status add_list_partition(const std::string& table_name,
                                 const std::string& partition_name,

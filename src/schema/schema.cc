@@ -52,24 +52,23 @@
 // self header
 // =====================================================================
 
+#include "src/schema/partition.h"
 #include "src/schema/schema.h"
 
 namespace schema {
 
 void to_json(nlohmann::json& j, const Column& c) {
-    j = nlohmann::json{{"name", c.name},
-                       {"type", c.type},
-                       {"is_primary_key", c.is_primary_key},
-                       {"partitioning", c.partitioning},
-                       {"partition_values", c.partition_values}};
+    j = nlohmann::json{
+        {"name", c.name},
+        {"type", c.type},
+        {"is_primary_key", c.is_primary_key},
+    };
 }
 
 void from_json(const nlohmann::json& j, Column& c) {
     j.at("name").get_to(c.name);
     j.at("type").get_to(c.type);
     j.at("is_primary_key").get_to(c.is_primary_key);
-    j.at("partitioning").get_to(c.partitioning);
-    j.at("partition_values").get_to(c.partition_values);
 }
 
 void to_json(nlohmann::json& j, const Table& t) {
@@ -79,6 +78,14 @@ void to_json(nlohmann::json& j, const Table& t) {
 void from_json(const nlohmann::json& j, Table& t) {
     j.at("name").get_to(t.name);
     j.at("columns").get_to(t.columns);
+}
+
+void to_json(nlohmann::json& j, const ListPartition& p) {
+
+}
+
+void from_json(const nlohmann::json& j, ListPartition& p) {
+
 }
 
 class Catalog {
@@ -94,7 +101,8 @@ class Catalog {
     // private Constructor
     Catalog() {
         std::string db_path = DATA_DIR + "/" + TABLE_TABLES;
-        this->db = new rocks_wrapper::RocksDBWrapper(db_path, {"TablesCF"});
+        this->db = new rocks_wrapper::RocksDBWrapper(
+            db_path, {"TablesCF", "PartitionCF"});
 
         auto kv_pairs = db->GetAllKV("TablesCF");
         for (const auto& kv : kv_pairs) {
@@ -172,6 +180,24 @@ class Catalog {
 
         return absl::OkStatus();
     }
+
+    absl::Status set_partition(const std::string& table_name,
+                               const partition_t& partition) {
+        auto table = get_table(table_name);
+        if (!table.has_value()) {
+            return absl::NotFoundError("Table not found");
+        }
+
+        nlohmann::json j(partition);
+
+        auto key = absl::StrFormat("P:%d", table.value()->id);
+        db->Put("PartitionCF", key, j.dump());
+
+        // write to in-memory cache
+        this->paritition[table_name] = std::make_shared<partition_t>(partition);
+
+        return absl::OkStatus();
+    }
 };
 
 // define the static members
@@ -186,10 +212,6 @@ Column::Column(const std::string& name, const std::string& type)
     : name(name), type(type) {}
 
 void Column::set_primary_key(bool set) { is_primary_key = set; }
-
-void Column::set_partitioning(PgQuery__PartitionStrategy strategy) {
-    partitioning = strategy;
-}
 
 std::optional<std::shared_ptr<Table>> get_table(const std::string& table_name) {
     return Catalog::getInstance()->get_table(table_name);
@@ -207,6 +229,31 @@ absl::Status create_table(const std::string& table_name,
 
 absl::Status drop_table(const std::string& table_name) {
     return Catalog::getInstance()->drop_table(table_name);
+}
+
+absl::Status set_partition(const std::string& table_name,
+                           const std::string& partition_column,
+                           PgQuery__PartitionStrategy strategy) {
+    auto table = get_table(table_name);
+    if (!table.has_value()) {
+        return absl::NotFoundError("Table not found");
+    }
+
+    switch (strategy) {
+        case PG_QUERY__PARTITION_STRATEGY__PARTITION_STRATEGY_LIST: {
+            auto p = ListPartition(partition_column);
+            table.value()->partitioning = p;
+            break;
+        }
+
+        default: {
+            return absl::InvalidArgumentError(
+                "Unsupported partition strategy: " +
+                std::to_string(static_cast<int>(strategy)));
+        }
+    }
+
+    return absl::OkStatus();
 }
 
 absl::Status add_list_partition(const std::string& table_name,

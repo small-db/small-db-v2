@@ -49,22 +49,6 @@ absl::Status handle_create_table(PgQuery__CreateStmt* create_stmt) {
     std::string table_name = create_stmt->relation->relname;
     std::vector<schema::Column> columns;
 
-    std::string partition_column = "";
-    PgQuery__PartitionStrategy strategy =
-        PG_QUERY__PARTITION_STRATEGY__PARTITION_STRATEGY_UNDEFINED;
-
-    if (create_stmt->partspec != NULL) {
-        strategy = create_stmt->partspec->strategy;
-        if (create_stmt->partspec->n_part_params != 1) {
-            SPDLOG_ERROR("number of part params: {}",
-                         create_stmt->partspec->n_part_params);
-            return absl::OkStatus();
-        }
-
-        partition_column = std::string(
-            create_stmt->partspec->part_params[0]->partition_elem->name);
-    }
-
     for (int i = 0; i < create_stmt->n_table_elts; i++) {
         auto node_case = create_stmt->table_elts[i]->node_case;
         switch (node_case) {
@@ -101,25 +85,47 @@ absl::Status handle_create_table(PgQuery__CreateStmt* create_stmt) {
                 if (primary_key) {
                     column.set_primary_key(true);
                 }
-                if (column_def->colname == partition_column) {
-                    column.set_partitioning(strategy);
-                }
                 columns.push_back(column);
 
                 break;
             }
             case PG_QUERY__NODE__NODE_CONSTRAINT: {
-                SPDLOG_INFO("constraint");
+                SPDLOG_ERROR("constraint");
                 break;
             }
             default:
-                SPDLOG_INFO("unknown table element, node_case: {}",
-                            static_cast<int>(node_case));
+                SPDLOG_ERROR("unknown table element, node_case: {}",
+                             static_cast<int>(node_case));
                 break;
         }
     }
 
-    return schema::create_table(table_name, columns);
+    auto status = schema::create_table(table_name, columns);
+    if (!status.ok()) {
+        SPDLOG_ERROR("create table failed: {}", status.ToString());
+        return status;
+    }
+
+    if (create_stmt->partspec != NULL) {
+        auto strategy = create_stmt->partspec->strategy;
+        if (create_stmt->partspec->n_part_params != 1) {
+            SPDLOG_ERROR("number of part params: {}",
+                         create_stmt->partspec->n_part_params);
+            return absl::OkStatus();
+        }
+
+        auto partition_column = std::string(
+            create_stmt->partspec->part_params[0]->partition_elem->name);
+
+        auto status =
+            schema::set_partition(table_name, partition_column, strategy);
+        if (!status.ok()) {
+            SPDLOG_ERROR("set partitioning failed: {}", status.ToString());
+            return status;
+        }
+    }
+
+    return absl::OkStatus();
 }
 
 absl::Status handle_drop_table(PgQuery__DropStmt* drop_stmt) {

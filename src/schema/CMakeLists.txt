@@ -1,11 +1,9 @@
-# ============================================================================== #
-# library: schema_lib
-# ============================================================================== #
-
 add_library(schema_lib
     const.h
     schema.cc
     schema.h
+    partition.cc
+    partition.h
 )
 
 target_link_libraries(schema_lib
