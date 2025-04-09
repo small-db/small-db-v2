@@ -162,15 +162,15 @@ absl::Status handle_stmt(PgQuery__Node* stmt) {
             break;
         }
         case PG_QUERY__NODE__NODE_TRANSACTION_STMT: {
-            SPDLOG_INFO("transaction statement");
+            SPDLOG_ERROR("transaction statement");
             break;
         }
         case PG_QUERY__NODE__NODE_ALTER_TABLE_STMT: {
-            SPDLOG_INFO("alter table statement");
+            SPDLOG_ERROR("alter table statement");
             break;
         }
         case PG_QUERY__NODE__NODE_INSERT_STMT: {
-            SPDLOG_INFO("insert statement");
+            SPDLOG_ERROR("insert statement");
             break;
         }
         default:
