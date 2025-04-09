@@ -228,15 +228,10 @@ absl::Status drop_table(const std::string& table_name) {
 absl::Status set_partition(const std::string& table_name,
                            const std::string& partition_column,
                            PgQuery__PartitionStrategy strategy) {
-    auto table = get_table(table_name);
-    if (!table.has_value()) {
-        return absl::NotFoundError("Table not found");
-    }
-
     switch (strategy) {
         case PG_QUERY__PARTITION_STRATEGY__PARTITION_STRATEGY_LIST: {
             auto p = ListPartition(partition_column);
-            table.value()->partitioning = p;
+            Catalog::getInstance()->set_partition(table_name, p);
             break;
         }
 
