@@ -89,13 +89,14 @@ class Catalog {
     // mutex to ensure thread safety
     static std::mutex mtx;
 
+    rocks_wrapper::RocksDBWrapper* db;
+
     // private Constructor
     Catalog() {
         std::string db_path = DATA_DIR + "/" + TABLE_TABLES;
-        rocks_wrapper::RocksDBWrapper db(
-            db_path, {"TablesCF", "ColumnsCF", "PartitionsCF"});
+        this->db = new rocks_wrapper::RocksDBWrapper(db_path, {"TablesCF"});
 
-        auto kv_pairs = db.GetAllKV("TablesCF");
+        auto kv_pairs = db->GetAllKV("TablesCF");
         for (const auto& kv : kv_pairs) {
             nlohmann::json j = nlohmann::json::parse(kv.second);
             Table table;
@@ -144,10 +145,7 @@ class Catalog {
             tables.erase(it);
         }
 
-        std::string db_path = DATA_DIR + "/" + TABLE_TABLES;
-        rocks_wrapper::RocksDBWrapper db(
-            db_path, {"TablesCF", "ColumnsCF", "PartitionsCF"});
-        db.Delete("TablesCF", table_name);
+        db->Delete("TablesCF", table_name);
         return absl::OkStatus();
     }
 
@@ -158,9 +156,6 @@ class Catalog {
             return absl::AlreadyExistsError("Table already exists");
         }
 
-        std::string db_path = DATA_DIR + "/" + TABLE_TABLES;
-        rocks_wrapper::RocksDBWrapper db(db_path, {"TablesCF"});
-
         {
             // write to kv store
             auto table = Table(table_name, columns);
@@ -168,7 +163,7 @@ class Catalog {
 
             auto table_id = id::generate_id();
             auto key = absl::StrFormat("T:%d", table_id);
-            db.Put("TablesCF", key, j.dump());
+            db->Put("TablesCF", key, j.dump());
 
             // write to in-memory cache
             this->tables[table_name] =
