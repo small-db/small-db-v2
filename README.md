@@ -1,5 +1,7 @@
 # small-db-v2
 
+[![lint/build/test](https://github.com/small-db/small-db-v2/actions/workflows/ci.yml/badge.svg)](https://github.com/small-db/small-db-v2/actions/workflows/ci.yml)
+
 ## Usage
 
 ### Start Cluster with Docker
