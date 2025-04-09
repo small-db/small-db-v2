@@ -32,6 +32,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 // =====================================================================
@@ -93,5 +94,9 @@ absl::Status set_partition(const std::string& table_name,
 absl::Status add_list_partition(const std::string& table_name,
                                 const std::string& partition_name,
                                 const std::vector<std::string>& values);
+
+absl::Status add_partition_constraint(
+    const std::string& partition_name,
+    const std::pair<std::string, std::string>& constraint);
 
 }  // namespace schema

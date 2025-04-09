@@ -174,6 +174,16 @@ absl::Status handle_stmt(PgQuery__Node* stmt) {
             SPDLOG_INFO("subtype: {}",
                         std::string(magic_enum::enum_name(subtype)));
             SPDLOG_ERROR("alter table statement");
+
+            auto partition_name = stmt->alter_table_stmt->relation->relname;
+            auto expr =
+                stmt->alter_table_stmt->cmds[0]
+                    ->alter_table_cmd->def->constraint->raw_expr->a_expr;
+            auto lexpr = expr->lexpr->column_ref->fields[0]->string->sval;
+            auto op = expr->name[0]->string->sval;
+            auto rexpr = expr->rexpr->column_ref->fields[0]->string->sval;
+            SPDLOG_INFO("partition_name: {}, lexpr: {}, op: {}, rexpr: {}",
+                        partition_name, lexpr, op, rexpr);
             break;
         }
         case PG_QUERY__NODE__NODE_INSERT_STMT: {
