@@ -169,6 +169,7 @@ absl::Status handle_stmt(PgQuery__Node* stmt) {
             break;
         }
         case PG_QUERY__NODE__NODE_ALTER_TABLE_STMT: {
+            SPDLOG_INFO("{}", stmt->alter_stats_stmt->n_defnames);
             auto subtype =
                 stmt->alter_stats_stmt->defnames[0]->alter_table_cmd->subtype;
             SPDLOG_INFO("subtype: {}",
