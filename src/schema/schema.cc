@@ -80,14 +80,6 @@ void from_json(const nlohmann::json& j, Table& t) {
     j.at("columns").get_to(t.columns);
 }
 
-void to_json(nlohmann::json& j, const ListPartition& p) {
-
-}
-
-void from_json(const nlohmann::json& j, ListPartition& p) {
-
-}
-
 class Catalog {
    private:
     // static pointer to the Singleton instance
@@ -114,6 +106,8 @@ class Catalog {
     }
 
     std::unordered_map<std::string, std::shared_ptr<Table>> tables;
+
+    std::unordered_map<std::string, std::shared_ptr<partition_t>> paritition;
 
    public:
     /**

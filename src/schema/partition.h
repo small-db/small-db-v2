@@ -21,6 +21,14 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <variant>
+
+// =====================================================================
+// third-party libraries
+// =====================================================================
+
+// json
+#include "nlohmann/json.hpp"
 
 namespace schema {
 
@@ -52,5 +60,9 @@ void to_json(nlohmann::json& j, const ListPartition& p);
 void from_json(const nlohmann::json& j, ListPartition& p);
 
 using partition_t = std::variant<ListPartition>;
+
+void to_json(nlohmann::json& j, const partition_t& p);
+
+void from_json(const nlohmann::json& j, partition_t& p);
 
 }  // namespace schema
