@@ -13,7 +13,56 @@
 // limitations under the License.
 
 // =====================================================================
+// c++ std
+// =====================================================================
+
+#include <string>
+
+// =====================================================================
 // self header
 // =====================================================================
 
 #include "src/schema/partition.h"
+
+namespace schema {
+
+void to_json(nlohmann::json& j, const partition_t& p) {
+    std::visit(
+        [&j](const auto& partition) {
+            using T = std::decay_t<decltype(partition)>;
+            if constexpr (std::is_same_v<T, ListPartition>) {
+                j["type"] = "ListPartition";
+                j["content"] = nlohmann::json{
+                    {"column_name", partition.column_name},
+                    {"values", partition.values},
+                    {"constraints", partition.constraints},
+                };
+            } else {
+                j["type"] = "NullPartition";
+                j["content"] = nullptr;
+            }
+        },
+        p);
+}
+
+void from_json(const nlohmann::json& j, partition_t& p) {
+    std::string type = j.at("type").get<std::string>();
+
+    if (type == "ListPartition") {
+        ListPartition partition;
+        const auto& content = j.at("content");
+
+        content.at("column_name").get_to(partition.column_name);
+        content.at("values").get_to(partition.values);
+        content.at("constraints").get_to(partition.constraints);
+
+        p = partition;
+    } else if (type == "NullPartition") {
+        p = NullPartition{};
+    } else {
+        throw std::runtime_error("Unknown partition type in from_json: " +
+                                 type);
+    }
+}
+
+}  // namespace schema

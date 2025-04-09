@@ -34,10 +34,6 @@ namespace schema {
 
 class NullPartition {};
 
-void to_json(nlohmann::json& j, const NullPartition& p);
-
-void from_json(const nlohmann::json& j, NullPartition& p);
-
 class ListPartition {
    public:
     // the partition column
@@ -55,11 +51,7 @@ class ListPartition {
         constraints;
 };
 
-void to_json(nlohmann::json& j, const ListPartition& p);
-
-void from_json(const nlohmann::json& j, ListPartition& p);
-
-using partition_t = std::variant<ListPartition>;
+using partition_t = std::variant<NullPartition, ListPartition>;
 
 void to_json(nlohmann::json& j, const partition_t& p);
 
