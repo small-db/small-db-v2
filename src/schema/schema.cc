@@ -19,8 +19,8 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <vector>
 #include <utility>
+#include <vector>
 
 // =====================================================================
 // third-party libraries
@@ -177,6 +177,15 @@ class Catalog {
 
     std::optional<std::shared_ptr<partition_t>> get_partition(
         const std::string& partition_name) {
+        for (const auto& [table_name, table] : tables) {
+            auto partition = std::get_if<ListPartition>(&table->partition);
+            if (partition != nullptr) {
+                auto it = partition->values.find(partition_name);
+                if (it != partition->values.end()) {
+                    return std::make_shared<partition_t>(table->partition);
+                }
+            }
+        }
         return std::nullopt;
     }
 
@@ -272,7 +281,7 @@ absl::Status add_list_partition(const std::string& table_name,
 absl::Status add_partition_constraint(
     const std::string& partition_name,
     const std::pair<std::string, std::string>& constraint) {
-    Catalog::getInstance()->get_partition(partition_name);
+    auto partition = Catalog::getInstance()->get_partition(partition_name);
 }
 
 }  // namespace schema
