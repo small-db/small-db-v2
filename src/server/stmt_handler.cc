@@ -169,9 +169,8 @@ absl::Status handle_stmt(PgQuery__Node* stmt) {
             break;
         }
         case PG_QUERY__NODE__NODE_ALTER_TABLE_STMT: {
-            SPDLOG_INFO("{}", stmt->alter_stats_stmt->n_defnames);
             auto subtype =
-                stmt->alter_stats_stmt->defnames[0]->alter_table_cmd->subtype;
+                stmt->alter_table_stmt->cmds[0]->alter_table_cmd->subtype;
             SPDLOG_INFO("subtype: {}",
                         std::string(magic_enum::enum_name(subtype)));
             SPDLOG_ERROR("alter table statement");
