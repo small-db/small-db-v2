@@ -231,7 +231,10 @@ absl::Status set_partition(const std::string& table_name,
     switch (strategy) {
         case PG_QUERY__PARTITION_STRATEGY__PARTITION_STRATEGY_LIST: {
             auto p = ListPartition(partition_column);
-            Catalog::getInstance()->set_partition(table_name, p);
+            auto status = Catalog::getInstance()->set_partition(table_name, p);
+            if (!status.ok()) {
+                return status;
+            }
             break;
         }
 
