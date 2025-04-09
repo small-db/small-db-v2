@@ -457,8 +457,6 @@ void handle_query(std::string& query, int sockfd) {
         NULL, pgquery_pbparse_result.parse_tree.len,
         (const uint8_t*)pgquery_pbparse_result.parse_tree.data);
 
-    SPDLOG_INFO(unpacked->n_stmts);
-
     auto node_case = unpacked->stmts[0]->stmt->node_case;
 
     for (int i = 0; i < unpacked->n_stmts; i++) {
@@ -600,11 +598,6 @@ int RunServer(const server::ServerArgs& args) {
                             continue;
                         }
 
-                        // log the message in hex format
-                        SPDLOG_DEBUG(
-                            "received[{} bytes]: {}", bytes_received,
-                            spdlog::to_hex(buffer, buffer + bytes_received));
-
                         std::string message = pq_getmessage(buffer);
 
                         // the first 4 bytes is version
@@ -637,12 +630,6 @@ int RunServer(const server::ServerArgs& args) {
                             if (!key.empty()) {
                                 recv_params[key] = value;
                             }
-                        }
-
-                        // Log the extracted key-value pairs
-                        for (const auto& kv : recv_params) {
-                            SPDLOG_DEBUG("Key: {}, Value: {}", kv.first,
-                                         kv.second);
                         }
 
                         NetworkPackage* network_package = new NetworkPackage();

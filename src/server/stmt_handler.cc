@@ -69,12 +69,7 @@ absl::Status handle_create_table(PgQuery__CreateStmt* create_stmt) {
         auto node_case = create_stmt->table_elts[i]->node_case;
         switch (node_case) {
             case PG_QUERY__NODE__NODE_COLUMN_DEF: {
-                SPDLOG_INFO("column definition");
                 auto column_def = create_stmt->table_elts[i]->column_def;
-                SPDLOG_INFO("column_def->colname: {}", column_def->colname);
-
-                SPDLOG_INFO("column_def->type_name->n_names: {}",
-                            column_def->type_name->n_names);
 
                 // choose the last name as the type name
                 // Q: why?
