@@ -18,6 +18,7 @@
 
 #include <string>
 #include <vector>
+#include <utility>
 
 // =====================================================================
 // third-party libraries
@@ -171,9 +172,6 @@ absl::Status handle_stmt(PgQuery__Node* stmt) {
         case PG_QUERY__NODE__NODE_ALTER_TABLE_STMT: {
             auto subtype =
                 stmt->alter_table_stmt->cmds[0]->alter_table_cmd->subtype;
-            SPDLOG_INFO("subtype: {}",
-                        std::string(magic_enum::enum_name(subtype)));
-            SPDLOG_ERROR("alter table statement");
 
             auto partition_name = stmt->alter_table_stmt->relation->relname;
             auto expr =
@@ -184,6 +182,8 @@ absl::Status handle_stmt(PgQuery__Node* stmt) {
             auto rexpr = expr->rexpr->a_const->sval->sval;
             SPDLOG_INFO("partition_name: {}, lexpr: {}, op: {}, rexpr: {}",
                         partition_name, lexpr, op, rexpr);
+            schema::add_partition_constraint(partition_name,
+                                             std::make_pair(lexpr, rexpr));
             break;
         }
         case PG_QUERY__NODE__NODE_INSERT_STMT: {
