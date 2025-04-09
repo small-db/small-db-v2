@@ -23,6 +23,9 @@
 // third-party libraries
 // =====================================================================
 
+// magic_enum
+#include "magic_enum/magic_enum.hpp"
+
 // pg_query
 #include "pg_query.h"
 #include "pg_query.pb-c.h"
@@ -162,10 +165,14 @@ absl::Status handle_stmt(PgQuery__Node* stmt) {
             break;
         }
         case PG_QUERY__NODE__NODE_TRANSACTION_STMT: {
-            SPDLOG_ERROR("transaction statement");
+            SPDLOG_INFO("transaction statement");
             break;
         }
         case PG_QUERY__NODE__NODE_ALTER_TABLE_STMT: {
+            auto subtype =
+                stmt->alter_stats_stmt->defnames[0]->alter_table_cmd->subtype;
+            SPDLOG_INFO("subtype: {}",
+                        std::string(magic_enum::enum_name(subtype)));
             SPDLOG_ERROR("alter table statement");
             break;
         }
