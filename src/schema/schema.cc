@@ -39,7 +39,7 @@
 #include "rocksdb/slice.h"
 
 // spdlog
-#include <spdlog/spdlog.h>
+#include "spdlog/spdlog.h"
 
 // =====================================================================
 // local libraries
@@ -202,7 +202,7 @@ class Catalog {
             if (auto* listP = std::get_if<ListPartition>(&table->partition)) {
                 for (auto& [pName, pConstraints] : listP->constraints) {
                     pConstraints.insert(constraint);
-                    write_partition(table->id, table->partition);
+                    write_partition(table);
                     return absl::OkStatus();
                 }
             }
@@ -210,10 +210,22 @@ class Catalog {
         return absl::NotFoundError("Partition not found");
     }
 
-    void write_partition(const uint64_t table_id,
-                         const partition_t& partition) {
-        nlohmann::json j(partition);
-        auto key = absl::StrFormat("P:%d", table_id);
+    absl::Status add_list_partition(const std::string& table_name,
+                                    const std::string& partition_name,
+                                    const std::vector<std::string>& values) {
+        for (const auto& [table_name, table] : tables) {
+            if (auto* listP = std::get_if<ListPartition>(&table->partition)) {
+                listP->values[partition_name] = values;
+                write_partition(table);
+                return absl::OkStatus();
+            }
+        }
+        return absl::NotFoundError("table not found");
+    }
+
+    void write_partition(const std::shared_ptr<schema::Table>& table) {
+        nlohmann::json j(table->partition);
+        auto key = absl::StrFormat("P:%d", table->id);
         db->Put("PartitionCF", key, j.dump());
     }
 };
