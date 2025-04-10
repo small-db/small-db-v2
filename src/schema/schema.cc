@@ -287,18 +287,8 @@ absl::Status set_partition(const std::string& table_name,
 absl::Status add_list_partition(const std::string& table_name,
                                 const std::string& partition_name,
                                 const std::vector<std::string>& values) {
-    auto table = get_table(table_name);
-    if (!table.has_value()) {
-        return absl::NotFoundError("Table not found");
-    }
-
-    SPDLOG_INFO("add_list_partition: table_name: {}, partition_name: {}",
-                table_name, partition_name);
-    for (const auto& value : values) {
-        SPDLOG_INFO("value: {}", value);
-    }
-
-    return absl::OkStatus();
+    return Catalog::getInstance()->add_list_partition(table_name,
+                                                      partition_name, values);
 }
 
 absl::Status add_partition_constraint(
