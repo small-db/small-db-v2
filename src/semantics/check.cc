@@ -31,7 +31,7 @@
 #include "pg_query.pb-c.h"
 
 // spdlog
-#include <spdlog/spdlog.h>
+#include "spdlog/spdlog.h"
 
 // =====================================================================
 // self header
