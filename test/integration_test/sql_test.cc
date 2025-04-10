@@ -60,9 +60,8 @@ class SmallEnvironment : public ::testing::Environment {
     // Override this to define how to set up the environment.
     void SetUp() override {
         spdlog::set_level(spdlog::level::debug);
-        spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] [%s:%#] [%@] %v");
+        spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] [%s:%#] %v");
 
-        spdlog::info("setting up the environment");
         SPDLOG_INFO("setting up the environment");
     }
 
