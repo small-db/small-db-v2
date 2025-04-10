@@ -4,6 +4,9 @@
 cmake_minimum_required(VERSION 3.28)
 project(small-db-v2)
 
+set(CMAKE_FILEAPI_FILE "${CMAKE_BINARY_DIR}/cmake-api.json")
+set(CMAKE_FILEAPI_ALLOW_RECURSIVE ON)
+
 # ============================================================================== #
 # compiler settings
 # ============================================================================== #
