@@ -41,12 +41,14 @@ find_package(Json REQUIRED)
 find_package(MagicEnum REQUIRED)
 
 # ============================================================================== #
-# subdirectories
+# source code
 # ============================================================================== #
 
 include_directories(
     ${CMAKE_SOURCE_DIR}
 )
+
+add_compile_definitions(SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE)
 
 add_subdirectory(src)
 add_subdirectory(test)
