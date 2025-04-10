@@ -202,11 +202,19 @@ class Catalog {
             if (auto* listP = std::get_if<ListPartition>(&table->partition)) {
                 for (auto& [pName, pConstraints] : listP->constraints) {
                     pConstraints.insert(constraint);
+                    write_partition(table->id, table->partition);
                     return absl::OkStatus();
                 }
             }
         }
         return absl::NotFoundError("Partition not found");
+    }
+
+    void write_partition(const uint64_t table_id,
+                         const partition_t& partition) {
+        nlohmann::json j(partition);
+        auto key = absl::StrFormat("P:%d", table_id);
+        db->Put("PartitionCF", key, j.dump());
     }
 };
 
