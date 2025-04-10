@@ -20,8 +20,8 @@
 
 #include <string>
 #include <unordered_map>
-#include <vector>
 #include <variant>
+#include <vector>
 
 // =====================================================================
 // third-party libraries
@@ -39,16 +39,13 @@ class ListPartition {
     // the partition column
     std::string column_name;
 
-    // key: partition name
-    // value: the values of the partition
-    std::unordered_map<std::string, std::vector<std::string>> values;
+    class SingleParition {
+       public:
+        std::vector<std::string> values;
+        std::unordered_map<std::string, std::string> constraints;
+    };
 
-    // key: partition name
-    // value: the constraints of the partition
-    //      e.g. (key) region = (value) 'asia'
-    std::unordered_map<std::string,
-                       std::unordered_map<std::string, std::string>>
-        constraints;
+    std::unordered_map<std::string, SingleParition> partitions;
 };
 
 using partition_t = std::variant<NullPartition, ListPartition>;

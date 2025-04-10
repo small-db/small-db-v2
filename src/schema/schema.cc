@@ -200,8 +200,10 @@ class Catalog {
         const std::pair<std::string, std::string>& constraint) {
         for (const auto& [table_name, table] : tables) {
             if (auto* listP = std::get_if<ListPartition>(&table->partition)) {
-                for (auto& [pName, pConstraints] : listP->constraints) {
-                    pConstraints.insert(constraint);
+                auto it = listP->partitions.find(partition_name);
+                if (it != listP->partitions.end()) {
+                    auto& p = it->second;
+                    p.constraints.insert(constraint);
                     write_partition(table);
                     return absl::OkStatus();
                 }
@@ -215,7 +217,8 @@ class Catalog {
                                     const std::vector<std::string>& values) {
         for (const auto& [table_name, table] : tables) {
             if (auto* listP = std::get_if<ListPartition>(&table->partition)) {
-                listP->values[partition_name] = values;
+                listP->partitions[partition_name] =
+                    ListPartition::SingleParition{values, {}};
                 write_partition(table);
                 return absl::OkStatus();
             }

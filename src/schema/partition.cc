@@ -26,6 +26,18 @@
 
 namespace schema {
 
+void to_json(nlohmann::json& j, const ListPartition::SingleParition& p) {
+    j = nlohmann::json{
+        {"values", p.values},
+        {"constraints", p.constraints},
+    };
+}
+
+void from_json(const nlohmann::json& j, ListPartition::SingleParition& p) {
+    j.at("values").get_to(p.values);
+    j.at("constraints").get_to(p.constraints);
+}
+
 void to_json(nlohmann::json& j, const partition_t& p) {
     std::visit(
         [&j](const auto& partition) {
@@ -34,8 +46,7 @@ void to_json(nlohmann::json& j, const partition_t& p) {
                 j["type"] = "ListPartition";
                 j["content"] = nlohmann::json{
                     {"column_name", partition.column_name},
-                    {"values", partition.values},
-                    {"constraints", partition.constraints},
+                    {"partitions", partition.partitions},
                 };
             } else {
                 j["type"] = "NullPartition";
@@ -53,8 +64,7 @@ void from_json(const nlohmann::json& j, partition_t& p) {
         const auto& content = j.at("content");
 
         content.at("column_name").get_to(partition.column_name);
-        content.at("values").get_to(partition.values);
-        content.at("constraints").get_to(partition.constraints);
+        content.at("partitions").get_to(partition.partitions);
 
         p = partition;
     } else if (type == "NullPartition") {
