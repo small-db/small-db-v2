@@ -114,15 +114,14 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
         return sql_units.status();
     }
 
+    pqxx::connection conn{CONNECTION_STRING.data()};
+
     // print the sql units
     for (const auto& unit : sql_units.value()) {
         if (auto stmtOK = std::get_if<parser::SQLTestUnit::StatementOK>(
                 &unit.expected_behavior)) {
-            pqxx::connection conn{CONNECTION_STRING.data()};
             pqxx::work tx(conn);
             pqxx::result r = tx.exec(unit.sql);
-            SPDLOG_INFO("sql: {}", unit.sql);
-            SPDLOG_INFO("result size: {}", r.size());
             tx.commit();
         } else if (auto query = std::get_if<parser::SQLTestUnit::Query>(
                        &unit.expected_behavior)) {
@@ -130,6 +129,11 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
             for (const auto& column_name : query->column_names) {
                 SPDLOG_INFO("Column Name: {}", column_name);
             }
+            pqxx::work tx(conn);
+            pqxx::result r = tx.exec(unit.sql);
+            SPDLOG_INFO("result rows: {}", r.size());
+            SPDLOG_INFO("result columns: {}", r.columns());
+            tx.commit();
         }
     }
 
