@@ -162,7 +162,7 @@ absl::Status handle_add_constraint(PgQuery__AlterTableStmt* alter_stmt) {
     SPDLOG_INFO("partition_name: {}, lexpr: {}, op: {}, rexpr: {}",
                 partition_name, lexpr, op, rexpr);
     return schema::add_partition_constraint(partition_name,
-                                     std::make_pair(lexpr, rexpr));
+                                            std::make_pair(lexpr, rexpr));
 }
 
 absl::Status handle_stmt(PgQuery__Node* stmt) {

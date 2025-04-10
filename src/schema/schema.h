@@ -87,6 +87,8 @@ absl::Status create_table(const std::string& table_name,
 
 absl::Status drop_table(const std::string& table_name);
 
+// Set the partition strategy for a table, reset the partition strategy if
+// the table already has one.
 absl::Status set_partition(const std::string& table_name,
                            const std::string& partition_column,
                            PgQuery__PartitionStrategy strategy);
