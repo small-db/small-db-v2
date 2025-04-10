@@ -28,7 +28,6 @@
 
 // absl
 #include "absl/status/status.h"
-#include "absl/status/statusor.h"
 #include "absl/strings/str_format.h"
 
 // json
@@ -109,6 +108,8 @@ class Catalog {
 
     std::unordered_map<std::string, std::shared_ptr<Table>> tables;
 
+    std::unordered_map<std::string, std::shared_ptr<partition_t>> paritition;
+
    public:
     /**
      * Delete the assignment operator.
@@ -175,20 +176,6 @@ class Catalog {
         return absl::OkStatus();
     }
 
-    std::optional<std::shared_ptr<partition_t>> get_partition(
-        const std::string& partition_name) {
-        for (const auto& [table_name, table] : tables) {
-            auto partition = std::get_if<ListPartition>(&table->partition);
-            if (partition != nullptr) {
-                auto it = partition->values.find(partition_name);
-                if (it != partition->values.end()) {
-                    return std::make_shared<partition_t>(table->partition);
-                }
-            }
-        }
-        return std::nullopt;
-    }
-
     absl::Status set_partition(const std::string& table_name,
                                const partition_t& partition) {
         auto table = get_table(table_name);
@@ -201,9 +188,22 @@ class Catalog {
         auto key = absl::StrFormat("P:%d", table.value()->id);
         db->Put("PartitionCF", key, j.dump());
 
-        // update in-memory cache
-        table.value()->partition = partition;
+        // write to in-memory cache
+        this->paritition[table_name] = std::make_shared<partition_t>(partition);
+
         return absl::OkStatus();
+    }
+
+    absl::Status add_partition_constraint(
+        const std::string& partition_name,
+        const std::pair<std::string, std::string>& constraint) {
+        for (const auto& [table_name, table] : tables) {
+            if (auto* listP = std::get_if<ListPartition>(&table->partition)) {
+                for (auto& [pName, pConstraints] : listP->constraints) {
+                    pConstraints.insert(constraint);
+                }
+            }
+        }
     }
 };
 
@@ -244,10 +244,7 @@ absl::Status set_partition(const std::string& table_name,
     switch (strategy) {
         case PG_QUERY__PARTITION_STRATEGY__PARTITION_STRATEGY_LIST: {
             auto p = ListPartition(partition_column);
-            auto status = Catalog::getInstance()->set_partition(table_name, p);
-            if (!status.ok()) {
-                return status;
-            }
+            Catalog::getInstance()->set_partition(table_name, p);
             break;
         }
 
@@ -281,7 +278,8 @@ absl::Status add_list_partition(const std::string& table_name,
 absl::Status add_partition_constraint(
     const std::string& partition_name,
     const std::pair<std::string, std::string>& constraint) {
-    auto partition = Catalog::getInstance()->get_partition(partition_name);
+    return Catalog::getInstance()->add_partition_constraint(partition_name,
+                                                            constraint);
 }
 
 }  // namespace schema
