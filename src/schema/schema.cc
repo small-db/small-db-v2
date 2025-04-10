@@ -190,6 +190,7 @@ class Catalog {
 
         // write to in-memory cache
         this->paritition[table_name] = std::make_shared<partition_t>(partition);
+        table.value()->partition = partition;
 
         return absl::OkStatus();
     }
