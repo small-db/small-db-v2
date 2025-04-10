@@ -34,7 +34,7 @@ statement ok
 ALTER TABLE users_asia ADD CONSTRAINT check_region CHECK (region = 'asia');
 
 query TTTTTT
-SHOW PARTITIONS FROM TABLE users;
+SELECT * FROM system_partitions WHERE table_name = 'users';
 ----
 table_name | partition_name | constraint      | column_names | partition_value
 -----------+----------------+-----------------+--------------+---------------------------------

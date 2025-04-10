@@ -188,16 +188,20 @@ absl::Status handle_stmt(PgQuery__Node* stmt) {
             return handle_add_constraint(stmt->alter_table_stmt);
             break;
         }
+        case PG_QUERY__NODE__NODE_SELECT_STMT: {
+            SPDLOG_ERROR("select statement");
+            break;
+        }
         case PG_QUERY__NODE__NODE_INSERT_STMT: {
             SPDLOG_ERROR("insert statement");
             break;
         }
         default:
             SPDLOG_ERROR("unknown statement, node_case: {}",
-                         static_cast<int>(stmt->node_case));
+                         magic_enum::enum_name(stmt->node_case));
             return absl::InvalidArgumentError(
                 fmt::format("unknown statement, node_case: {}",
-                            static_cast<int>(stmt->node_case)));
+                            magic_enum::enum_name(stmt->node_case)));
             break;
     }
 
