@@ -12,7 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "src/base/base.h"
+// =====================================================================
+// third-party libraries
+// =====================================================================
+
+// spdlog
+#include "spdlog/spdlog.h"
+
+// =====================================================================
+// local libraries
+// =====================================================================
+
 #include "src/server/server.h"
 
 int main(int argc, char* argv[]) {

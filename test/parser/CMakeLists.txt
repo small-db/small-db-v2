@@ -5,5 +5,4 @@ add_library(parser_lib
 
 target_link_libraries(parser_lib
     PRIVATE
-    base_lib
 )

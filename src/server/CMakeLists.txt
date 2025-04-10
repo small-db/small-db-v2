@@ -9,7 +9,6 @@ add_library(server_lib
 
 target_link_libraries(server_lib
     PUBLIC
-    base_lib
     schema_lib
     spdlog
     libpg_query_lib

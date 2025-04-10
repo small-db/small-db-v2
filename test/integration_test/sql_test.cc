@@ -42,11 +42,13 @@
 // gtest
 #include "gtest/gtest.h"
 
+// spdlog
+#include "spdlog/spdlog.h"
+
 // =====================================================================
 // local libraries
 // =====================================================================
 
-#include "src/base/base.h"
 #include "src/server/server.h"
 #include "src/type/type.h"
 #include "test/parser/parser.h"

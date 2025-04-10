@@ -38,7 +38,7 @@
 #include <vector>
 
 // =====================================================================
-// local libraries
+// third-party libraries
 // =====================================================================
 
 // absl
@@ -49,13 +49,13 @@
 #include "pg_query.pb-c.h"
 
 // spdlog
-#include <spdlog/fmt/bin_to_hex.h>  // spdlog::to_hex (doesn't work in C++20 and later version)
+#include "spdlog/spdlog.h"
+#include "spdlog/fmt/bin_to_hex.h"  // spdlog::to_hex (doesn't work in C++20 and later version)
 
 // =====================================================================
-// third-party libraries
+// local libraries
 // =====================================================================
 
-#include "src/base/base.h"
 #include "src/schema/schema.h"
 #include "src/semantics/check.h"
 #include "src/server/args.h"
@@ -503,8 +503,7 @@ int RunServer(const server::ServerArgs& args) {
     if (listen(sock_listen_fd, BACKLOG) < 0) {
         SPDLOG_ERROR("error listening: {}", strerror(errno));
     }
-    SPDLOG_INFO("server listening on port: {}",
-                args.port);
+    SPDLOG_INFO("server listening on port: {}", args.port);
 
     struct epoll_event ev, events[MAX_EVENTS];
     int new_events, sock_conn_fd, epollfd;

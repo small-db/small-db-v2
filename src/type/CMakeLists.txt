@@ -5,5 +5,4 @@ add_library(type_lib
 
 target_link_libraries(type_lib
     PRIVATE
-    base_lib
 )

@@ -30,7 +30,6 @@
 // local libraries
 // =====================================================================
 
-#include "src/base/base.h"
 #include "src/type/type.h"
 
 #pragma once
