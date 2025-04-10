@@ -5,4 +5,8 @@ add_library(parser_lib
 
 target_link_libraries(parser_lib
     PRIVATE
+    spdlog
+    absl_status
+    absl_statusor
+    absl::strings
 )

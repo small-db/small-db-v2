@@ -29,6 +29,9 @@
 #include "absl/status/statusor.h"
 #include "absl/strings/str_split.h"
 
+// spdlog
+#include "spdlog/spdlog.h"
+
 // =====================================================================
 // self header
 // =====================================================================
