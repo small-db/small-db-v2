@@ -49,7 +49,7 @@
 #include "pg_query.pb-c.h"
 
 // spdlog
-#include "spdlog/fmt/bin_to_hex.h"  // spdlog::to_hex (doesn't work in C++20 and later version)
+#include <spdlog/fmt/bin_to_hex.h>  // spdlog::to_hex (doesn't work in C++20 and later version)
 
 // =====================================================================
 // third-party libraries

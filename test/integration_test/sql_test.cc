@@ -60,6 +60,7 @@ class SmallEnvironment : public ::testing::Environment {
         spdlog::set_level(spdlog::level::debug);
         spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] [%@] %v");
 
+        spdlog::info("setting up the environment");
         SPDLOG_INFO("setting up the environment");
     }
 

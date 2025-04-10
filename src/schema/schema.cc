@@ -39,7 +39,7 @@
 #include "rocksdb/slice.h"
 
 // spdlog
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 
 // =====================================================================
 // local libraries
