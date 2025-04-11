@@ -9,4 +9,6 @@
 
 # Build a Single-Server Database
 
+- [Store Data](./single_server/store_data.md)
+
 # Partitioning & Sharding

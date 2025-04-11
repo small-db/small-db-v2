@@ -30,6 +30,8 @@
 #include "src/query/query.h"
 
 namespace query {
-void query(PgQuery__SelectStmt* select_stmt) { SPDLOG_ERROR("query"); }
+void query(PgQuery__SelectStmt* select_stmt) { 
+    SPDLOG_ERROR("query"); 
+}
 
 }  // namespace query
