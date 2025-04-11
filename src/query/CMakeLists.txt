@@ -8,4 +8,5 @@ target_link_libraries(query_lib
     spdlog
     absl_status
     libpg_query_lib
+    arrow_lib
 )

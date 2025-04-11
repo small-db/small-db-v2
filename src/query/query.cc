@@ -13,6 +13,13 @@
 // limitations under the License.
 
 // =====================================================================
+// c++ std
+// =====================================================================
+
+#include <iostream>
+#include <memory>
+
+// =====================================================================
 // third-party libraries
 // =====================================================================
 
@@ -23,6 +30,17 @@
 // spdlog
 #include "spdlog/spdlog.h"
 
+// arrow
+#include "arrow/api.h"
+#include "arrow/compute/api_vector.h"
+#include "arrow/status.h"
+
+// arrow gandiva
+#include "gandiva/filter.h"
+#include "gandiva/projector.h"
+#include "gandiva/selection_vector.h"
+#include "gandiva/tree_expr_builder.h"
+
 // =====================================================================
 // self header
 // =====================================================================
@@ -30,6 +48,15 @@
 #include "src/query/query.h"
 
 namespace query {
-void query(PgQuery__SelectStmt* select_stmt) { SPDLOG_ERROR("query"); }
+void query(PgQuery__SelectStmt* select_stmt) {
+    SPDLOG_ERROR("query");
+    // std::shared_ptr<arrow::RecordBatch> result =
+    //     arrow::RecordBatch::Make(output_schema, outputs[0]->length(),
+    //     outputs);
+    // //(Doc section: Evaluate projection)
+
+    // std::cout << "Project result:" << std::endl;
+    // std::cout << result->ToString() << std::endl;
+}
 
 }  // namespace query
