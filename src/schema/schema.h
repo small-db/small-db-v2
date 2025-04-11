@@ -62,8 +62,6 @@ class Column {
 
     bool is_primary_key = false;
 
-    std::vector<std::string> partition_values;
-
     Column();
     Column(const std::string& name, const type::Type& type);
 
