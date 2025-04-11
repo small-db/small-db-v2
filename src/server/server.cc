@@ -422,7 +422,7 @@ class NetworkPackage {
     }
 };
 
-void sendUnimplemented(int sockfd) {
+void sendEmptyResult(int sockfd) {
     NetworkPackage* network_package = new NetworkPackage();
     network_package->add_message(new EmptyQueryResponse());
     network_package->add_message(new ReadyForQuery());
@@ -467,7 +467,7 @@ void handle_query(std::string& query, int sockfd) {
         }
     }
 
-    sendUnimplemented(sockfd);
+    sendEmptyResult(sockfd);
 }
 
 int RunServer(const server::ServerArgs& args) {

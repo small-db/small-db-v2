@@ -1,5 +1,6 @@
 add_subdirectory(id)
 add_subdirectory(type)
+add_subdirectory(query)
 add_subdirectory(rocks)
 add_subdirectory(schema)
 add_subdirectory(semantics)

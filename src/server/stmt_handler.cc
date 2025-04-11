@@ -40,6 +40,7 @@
 
 #include "src/schema/schema.h"
 #include "src/semantics/check.h"
+#include "src/query/query.h"
 
 // =====================================================================
 // self header
@@ -189,7 +190,7 @@ absl::Status handle_stmt(PgQuery__Node* stmt) {
             break;
         }
         case PG_QUERY__NODE__NODE_SELECT_STMT: {
-            SPDLOG_ERROR("select statement");
+            query::query(stmt->select_stmt);
             break;
         }
         case PG_QUERY__NODE__NODE_INSERT_STMT: {

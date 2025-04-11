@@ -13,6 +13,7 @@ target_link_libraries(server_lib
     spdlog
     libpg_query_lib
     semantics_lib
+    query_lib
 )
 
 add_executable(server
