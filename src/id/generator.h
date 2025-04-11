@@ -18,6 +18,6 @@
 
 namespace id {
 
-uint64_t generate_id();
+int64_t generate_id();
 
 }  // namespace id

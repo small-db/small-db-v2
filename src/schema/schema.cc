@@ -83,6 +83,25 @@ void from_json(const nlohmann::json& j, Table& t) {
     j.at("columns").get_to(t.columns);
 }
 
+void write_row(rocks_wrapper::RocksDBWrapper* db, const Table* table,
+               const std::vector<type::Datum>& values) {
+    int pk_index = -1;
+    for (int i = 0; i < table->columns.size(); ++i) {
+        if (table->columns[i].is_primary_key) {
+            pk_index = i;
+            break;
+        }
+    }
+
+    for (int i = 0; i < table->columns.size(); ++i) {
+        if (!table->columns[i].is_primary_key) {
+            auto key = absl::StrFormat("/%d/%s/%d", table->id,
+                                       encode::encode(values[pk_index]), i);
+            db->Put(key, encode::encode(values[i]));
+        }
+    }
+}
+
 class Catalog {
    private:
     // static pointer to the Singleton instance
@@ -174,7 +193,7 @@ class Catalog {
         row.emplace_back(id::generate_id());
         row.emplace_back(table_name);
         row.emplace_back(nlohmann::json(columns).dump());
-        write(db, this->system_tables, row);
+        write_row(db, this->system_tables, row);
         return absl::OkStatus();
     }
 
@@ -234,25 +253,6 @@ class Catalog {
         db->Put("PartitionCF", key, j.dump());
     }
 };
-
-void write(rocks_wrapper::RocksDBWrapper* db, const Table* table,
-           const std::vector<type::Datum>& values) {
-    int pk_index = -1;
-    for (int i = 0; i < table->columns.size(); ++i) {
-        if (table->columns[i].is_primary_key) {
-            pk_index = i;
-            break;
-        }
-    }
-
-    for (int i = 0; i < table->columns.size(); ++i) {
-        if (!table->columns[i].is_primary_key) {
-            auto key = absl::StrFormat("/%d/%s/%d", table->id,
-                                       encode::encode(values[pk_index]), i);
-            db->Put(key, encode::encode(values[i]));
-        }
-    }
-}
 
 // define the static members
 Catalog* Catalog::instancePtr = nullptr;
