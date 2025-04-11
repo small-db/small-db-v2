@@ -38,9 +38,9 @@
 // local libraries
 // =====================================================================
 
+#include "src/query/query.h"
 #include "src/schema/schema.h"
 #include "src/semantics/check.h"
-#include "src/query/query.h"
 
 // =====================================================================
 // self header
@@ -86,7 +86,12 @@ absl::Status handle_create_table(PgQuery__CreateStmt* create_stmt) {
                     }
                 }
 
-                schema::Column column(column_def->colname, type_name.value());
+                auto type = type::from_string(type_name.value());
+                if (!type.ok()) {
+                    SPDLOG_ERROR("unknown type: {}", type_name.value());
+                    return type.status();
+                }
+                schema::Column column(column_def->colname, type.value());
                 if (primary_key) {
                     column.set_primary_key(true);
                 }

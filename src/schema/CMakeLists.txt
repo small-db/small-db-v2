@@ -15,4 +15,5 @@ target_link_libraries(schema_lib
     nlohmann_json::nlohmann_json
     rocksdb_wrapper_lib
     id_lib
+    type_lib
 )

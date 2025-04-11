@@ -55,6 +55,7 @@
 
 #include "src/schema/partition.h"
 #include "src/schema/schema.h"
+#include "src/type/type.h"
 
 namespace schema {
 
@@ -233,6 +234,18 @@ class Catalog {
     }
 };
 
+class Schema {
+   public:
+    class Column {
+        std::string name;
+        type::Type type;
+    };
+
+    std::vector<Column> columns;
+};
+
+void write(rocks_wrapper::RocksDBWrapper* db, int schema, int data) {}
+
 // define the static members
 Catalog* Catalog::instancePtr = nullptr;
 std::mutex Catalog::mtx;
@@ -241,7 +254,7 @@ std::mutex Catalog::mtx;
 // (https://github.com/nlohmann/json)
 Column::Column() = default;
 
-Column::Column(const std::string& name, const std::string& type)
+Column::Column(const std::string& name, const type::Type& type)
     : name(name), type(type) {}
 
 void Column::set_primary_key(bool set) { is_primary_key = set; }

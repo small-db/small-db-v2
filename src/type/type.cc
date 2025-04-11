@@ -17,3 +17,17 @@
 // =====================================================================
 
 #include "src/type/type.h"
+
+namespace type {
+
+absl::StatusOr<Type> from_string(const std::string& type_name) {
+    if (type_name == "int64") {
+        return Type::Int64;
+    } else if (type_name == "string") {
+        return Type::String;
+    } else {
+        return absl::InvalidArgumentError("Unknown type: " + type_name);
+    }
+}
+
+}  // namespace type

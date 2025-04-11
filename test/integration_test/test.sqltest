@@ -33,8 +33,16 @@ ALTER TABLE users_us ADD CONSTRAINT check_region CHECK (region = 'us');
 statement ok
 ALTER TABLE users_asia ADD CONSTRAINT check_region CHECK (region = 'asia');
 
-query TTTTTT
-SELECT * FROM system_partitions WHERE table_name = 'users';
+query TTTTT
+SELECT * FROM system.tables;
+----
+ table_name | columns 
+------------+--------
+ users      | {id(PK, INT), name(STRING), balance(INT), country(STRING)}
+
+
+query TTTTT
+SELECT * FROM system.partitions WHERE table_name = 'users';
 ----
 table_name | partition_name | constraint      | column_names | partition_value
 -----------+----------------+-----------------+--------------+---------------------------------

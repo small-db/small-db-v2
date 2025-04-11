@@ -14,11 +14,26 @@
 
 #pragma once
 
+// =====================================================================
+// c++ std
+// =====================================================================
+
+#include <string>
+
+// =====================================================================
+// third-party libraries
+// =====================================================================
+
+// absl
+#include "absl/status/statusor.h"
+
 namespace type {
 
 enum class Type {
     Int64 = 10,
     String = 20,
 };
+
+absl::StatusOr<Type> from_string(const std::string& type_name);
 
 }  // namespace type

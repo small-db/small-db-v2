@@ -51,20 +51,21 @@
 // =====================================================================
 
 #include "src/schema/partition.h"
+#include "src/type/type.h"
 
 namespace schema {
 
 class Column {
    public:
     std::string name;
-    std::string type;
+    type::Type type;
 
     bool is_primary_key = false;
 
     std::vector<std::string> partition_values;
 
     Column();
-    Column(const std::string& name, const std::string& type);
+    Column(const std::string& name, const type::Type& type);
 
     void set_primary_key(bool set);
 };
