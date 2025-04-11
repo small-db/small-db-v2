@@ -22,6 +22,7 @@
 #include <unordered_map>
 #include <variant>
 #include <vector>
+#include <map>
 
 // =====================================================================
 // third-party libraries
@@ -45,7 +46,8 @@ class ListPartition {
         std::unordered_map<std::string, std::string> constraints;
     };
 
-    std::unordered_map<std::string, SingleParition> partitions;
+    // use ordered map to keep a consistent order on disk
+    std::map<std::string, SingleParition> partitions;
 };
 
 using partition_t = std::variant<NullPartition, ListPartition>;

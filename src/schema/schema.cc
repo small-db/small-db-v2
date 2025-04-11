@@ -95,7 +95,7 @@ void write_row(rocks_wrapper::RocksDBWrapper* db, const Table* table,
 
     for (int i = 0; i < table->columns.size(); ++i) {
         if (!table->columns[i].is_primary_key) {
-            auto key = absl::StrFormat("/%d/%s/%d", table->id,
+            auto key = absl::StrFormat("/%s/%s/column_%d", table->name,
                                        encode::encode(values[pk_index]), i);
             db->Put(key, encode::encode(values[i]));
         }
@@ -118,10 +118,17 @@ class Catalog {
     // private Constructor
     Catalog() {
         std::vector<Column> columns;
-        columns.emplace_back("table_id", type::Type::Int64, true);
-        columns.emplace_back("table_name", type::Type::String);
+        columns.emplace_back("table_name", type::Type::String, true);
         columns.emplace_back("columns", type::Type::String);
         this->system_tables = new Table("system.tables", columns);
+
+        columns.clear();
+        columns.emplace_back("table_name", type::Type::String);
+        columns.emplace_back("partition_name", type::Type::String, true);
+        columns.emplace_back("constraint", type::Type::String);
+        columns.emplace_back("column_names", type::Type::String);
+        columns.emplace_back("partition_value", type::Type::String);
+        this->system_partitions = new Table("system.partitions", columns);
 
         std::string db_path = DATA_DIR + "/" + TABLE_TABLES;
         this->db = new rocks_wrapper::RocksDBWrapper(
@@ -190,7 +197,6 @@ class Catalog {
         }
 
         std::vector<type::Datum> row;
-        row.emplace_back(id::generate_id());
         row.emplace_back(table_name);
         row.emplace_back(nlohmann::json(columns).dump());
         write_row(db, this->system_tables, row);
@@ -206,8 +212,8 @@ class Catalog {
 
         nlohmann::json j(partition);
 
-        auto key = absl::StrFormat("P:%d", table.value()->id);
-        db->Put("PartitionCF", key, j.dump());
+        // auto key = absl::StrFormat("P:%d", table.value()->id);
+        // db->Put("PartitionCF", key, j.dump());
 
         // write to in-memory cache
         this->paritition[table_name] = std::make_shared<partition_t>(partition);
@@ -225,7 +231,7 @@ class Catalog {
                 if (it != listP->partitions.end()) {
                     auto& p = it->second;
                     p.constraints.insert(constraint);
-                    write_partition(table);
+                    write_list_partition(table);
                     return absl::OkStatus();
                 }
             }
@@ -240,17 +246,47 @@ class Catalog {
             if (auto* listP = std::get_if<ListPartition>(&table->partition)) {
                 listP->partitions[partition_name] =
                     ListPartition::SingleParition{values, {}};
-                write_partition(table);
+                write_list_partition(table);
                 return absl::OkStatus();
             }
         }
         return absl::NotFoundError("table not found");
     }
 
-    void write_partition(const std::shared_ptr<schema::Table>& table) {
-        nlohmann::json j(table->partition);
-        auto key = absl::StrFormat("P:%d", table->id);
-        db->Put("PartitionCF", key, j.dump());
+    void write_list_partition(const std::shared_ptr<schema::Table>& table) {
+        // nlohmann::json j(table->partition);
+        // auto key = absl::StrFormat("P:%d", table->id);
+        // db->Put("PartitionCF", key, j.dump());
+
+        // std::vector<type::Datum> row;
+        // row.emplace_back(id::generate_id());
+        // row.emplace_back(table_name);
+        // row.emplace_back(nlohmann::json(columns).dump());
+        // write_row(db, this->system_tables, row);
+        // return absl::OkStatus();
+
+        std::visit(
+            [&](auto&& partition) {
+                using T = std::decay_t<decltype(partition)>;
+
+                if constexpr (std::is_same_v<T, ListPartition>) {
+                    for (auto& [p_name, p] : partition.partitions) {
+                        std::vector<type::Datum> row;
+                        row.emplace_back(table->name);
+                        row.emplace_back(p_name);
+                        row.emplace_back(nlohmann::json(p.constraints).dump());
+                        row.emplace_back(partition.column_name);
+                        row.emplace_back(nlohmann::json(p.values).dump());
+                        write_row(db, this->system_partitions, row);
+                    }
+                } else if constexpr (std::is_same_v<T, NullPartition>) {
+                    // do nothing
+                } else {
+                    SPDLOG_ERROR("unsupported partition type: {}",
+                                 typeid(T).name());
+                }
+            },
+            table->partition);
     }
 };
 

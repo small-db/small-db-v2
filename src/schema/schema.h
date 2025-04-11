@@ -63,15 +63,14 @@ class Column {
     bool is_primary_key = false;
 
     Column();
-    Column(const std::string& name, const type::Type& type, bool is_primary_key = false);
+    Column(const std::string& name, const type::Type& type,
+           bool is_primary_key = false);
 
     void set_primary_key(bool set);
 };
 
 class Table {
    public:
-    uint64_t id;
-
     std::string name;
     std::vector<Column> columns;
 
