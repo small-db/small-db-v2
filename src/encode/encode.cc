@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#pragma once
-
 // =====================================================================
 // c++ std
 // =====================================================================
@@ -21,21 +19,31 @@
 #include <string>
 
 // =====================================================================
-// third-party libraries
+// self header
 // =====================================================================
 
-// absl
-#include "absl/status/statusor.h"
+#include "src/encode/encode.h"
 
-namespace type {
+namespace encode {
 
-enum class Type {
-    Int64 = 10,
-    String = 20,
-};
+std::string encode(const type::Datum& datum) {
+    if (std::holds_alternative<int64_t>(datum)) {
+        return std::to_string(std::get<int64_t>(datum));
+    } else if (std::holds_alternative<std::string>(datum)) {
+        return std::get<std::string>(datum);
+    }
+    throw std::runtime_error("Unsupported type for encoding");
+}
 
-using Datum = std::variant<int64_t, std::string>;
+type::Datum decode(const std::string& str, type::Type type) {
+    switch (type) {
+        case type::Type::Int64:
+            return std::stoll(str);
+        case type::Type::String:
+            return str;
+        default:
+            throw std::runtime_error("Unsupported type for decoding");
+    }
+}
 
-absl::StatusOr<Type> from_string(const std::string& type_name);
-
-}  // namespace type
+}  // namespace encode

@@ -16,4 +16,5 @@ target_link_libraries(schema_lib
     rocksdb_wrapper_lib
     id_lib
     type_lib
+    encode_lib
 )

@@ -53,6 +53,7 @@
 // self header
 // =====================================================================
 
+#include "src/encode/encode.h"
 #include "src/schema/partition.h"
 #include "src/schema/schema.h"
 #include "src/type/type.h"
@@ -234,17 +235,26 @@ class Catalog {
     }
 };
 
-class Schema {
-   public:
-    class Column {
-        std::string name;
-        type::Type type;
-    };
+void write(rocks_wrapper::RocksDBWrapper* db, const Table& table,
+           const std::vector<type::Datum>& values) {
+    int pk_index = -1;
+    for (int i = 0; i < table.columns.size(); ++i) {
+        if (table.columns[i].is_primary_key) {
+            pk_index = i;
+            break;
+        }
+    }
 
-    std::vector<Column> columns;
-};
-
-void write(rocks_wrapper::RocksDBWrapper* db, int schema, int data) {}
+    for (int i = 0; i < table.columns.size(); ++i) {
+        if (table.columns[i].is_primary_key) {
+        } else {
+            auto key =
+                // absl::StrFormat("/%d/%d/%d", table.id, values[pk_index], i);
+                absl::StrFormat("/%d/%s/%d", table.id,
+                                encode::encode(values[pk_index]), i);
+        }
+    }
+}
 
 // define the static members
 Catalog* Catalog::instancePtr = nullptr;

@@ -21,21 +21,15 @@
 #include <string>
 
 // =====================================================================
-// third-party libraries
+// local libraries
 // =====================================================================
 
-// absl
-#include "absl/status/statusor.h"
+#include "src/type/type.h"
 
-namespace type {
+namespace encode {
 
-enum class Type {
-    Int64 = 10,
-    String = 20,
-};
+std::string encode(const type::Datum& datum);
 
-using Datum = std::variant<int64_t, std::string>;
+type::Datum decode(const std::string& str, type::Type type);
 
-absl::StatusOr<Type> from_string(const std::string& type_name);
-
-}  // namespace type
+}  // namespace encode

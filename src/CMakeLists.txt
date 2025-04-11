@@ -1,4 +1,5 @@
 add_subdirectory(id)
+add_subdirectory(encode)
 add_subdirectory(type)
 add_subdirectory(query)
 add_subdirectory(rocks)
