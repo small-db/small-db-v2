@@ -196,10 +196,16 @@ class Catalog {
             return absl::AlreadyExistsError("Table already exists");
         }
 
+        // write to in-memory cache
+        auto new_table = std::make_shared<Table>(table_name, columns);
+        tables[table_name] = new_table;
+
+        // write to disk
         std::vector<type::Datum> row;
         row.emplace_back(table_name);
         row.emplace_back(nlohmann::json(columns).dump());
         write_row(db, this->system_tables, row);
+
         return absl::OkStatus();
     }
 
@@ -210,14 +216,12 @@ class Catalog {
             return absl::NotFoundError("Table not found");
         }
 
-        nlohmann::json j(partition);
-
-        // auto key = absl::StrFormat("P:%d", table.value()->id);
-        // db->Put("PartitionCF", key, j.dump());
-
         // write to in-memory cache
         this->paritition[table_name] = std::make_shared<partition_t>(partition);
         table.value()->partition = partition;
+
+        // write to disk
+        write_partition(table.value());
 
         return absl::OkStatus();
     }
@@ -231,7 +235,7 @@ class Catalog {
                 if (it != listP->partitions.end()) {
                     auto& p = it->second;
                     p.constraints.insert(constraint);
-                    write_list_partition(table);
+                    write_partition(table);
                     return absl::OkStatus();
                 }
             }
@@ -246,14 +250,14 @@ class Catalog {
             if (auto* listP = std::get_if<ListPartition>(&table->partition)) {
                 listP->partitions[partition_name] =
                     ListPartition::SingleParition{values, {}};
-                write_list_partition(table);
+                write_partition(table);
                 return absl::OkStatus();
             }
         }
         return absl::NotFoundError("table not found");
     }
 
-    void write_list_partition(const std::shared_ptr<schema::Table>& table) {
+    void write_partition(const std::shared_ptr<schema::Table>& table) {
         // nlohmann::json j(table->partition);
         // auto key = absl::StrFormat("P:%d", table->id);
         // db->Put("PartitionCF", key, j.dump());
