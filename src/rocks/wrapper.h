@@ -39,10 +39,14 @@ class RocksDBWrapper {
                    const std::vector<std::string>& column_family_names);
     ~RocksDBWrapper();
 
+    bool Put(const std::string& key, const std::string& value);
     bool Put(const std::string& cf_name, const std::string& key,
              const std::string& value);
+
+    bool Get(const std::string& key, std::string& value);
     bool Get(const std::string& cf_name, const std::string& key,
              std::string& value);
+
     std::vector<std::pair<std::string, std::string>> GetAllKV(
         const std::string& cf_name);
     bool Delete(const std::string& cf_name, const std::string& key);

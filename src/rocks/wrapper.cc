@@ -84,11 +84,21 @@ rocksdb::ColumnFamilyHandle* RocksDBWrapper::GetColumnFamilyHandle(
     return it->second;
 }
 
+bool RocksDBWrapper::Put(const std::string& key, const std::string& value) {
+    rocksdb::Status status = db_->Put(rocksdb::WriteOptions(), key, value);
+    return status.ok();
+}
+
 bool RocksDBWrapper::Put(const std::string& cf_name, const std::string& key,
                          const std::string& value) {
     auto* handle = GetColumnFamilyHandle(cf_name);
     rocksdb::Status status =
         db_->Put(rocksdb::WriteOptions(), handle, key, value);
+    return status.ok();
+}
+
+bool RocksDBWrapper::Get(const std::string& key, std::string& value) {
+    rocksdb::Status status = db_->Get(rocksdb::ReadOptions(), key, &value);
     return status.ok();
 }
 

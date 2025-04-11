@@ -93,8 +93,17 @@ class Catalog {
 
     rocks_wrapper::RocksDBWrapper* db;
 
+    Table* system_tables;
+    Table* system_partitions;
+
     // private Constructor
     Catalog() {
+        std::vector<Column> columns;
+        columns.emplace_back("table_id", type::Type::Int64, true);
+        columns.emplace_back("table_name", type::Type::String);
+        columns.emplace_back("columns", type::Type::String);
+        this->system_tables = new Table("system.tables", columns);
+
         std::string db_path = DATA_DIR + "/" + TABLE_TABLES;
         this->db = new rocks_wrapper::RocksDBWrapper(
             db_path, {"TablesCF", "PartitionCF"});
@@ -161,20 +170,11 @@ class Catalog {
             return absl::AlreadyExistsError("Table already exists");
         }
 
-        {
-            // write to kv store
-            auto table = Table(table_name, columns);
-            nlohmann::json j(table);
-
-            auto table_id = id::generate_id();
-            auto key = absl::StrFormat("T:%d", table_id);
-            db->Put("TablesCF", key, j.dump());
-
-            // write to in-memory cache
-            this->tables[table_name] =
-                std::make_shared<Table>(table_name, columns);
-        }
-
+        std::vector<type::Datum> row;
+        row.emplace_back(id::generate_id());
+        row.emplace_back(table_name);
+        row.emplace_back(nlohmann::json(columns).dump());
+        write(db, this->system_tables, row);
         return absl::OkStatus();
     }
 
@@ -235,23 +235,21 @@ class Catalog {
     }
 };
 
-void write(rocks_wrapper::RocksDBWrapper* db, const Table& table,
+void write(rocks_wrapper::RocksDBWrapper* db, const Table* table,
            const std::vector<type::Datum>& values) {
     int pk_index = -1;
-    for (int i = 0; i < table.columns.size(); ++i) {
-        if (table.columns[i].is_primary_key) {
+    for (int i = 0; i < table->columns.size(); ++i) {
+        if (table->columns[i].is_primary_key) {
             pk_index = i;
             break;
         }
     }
 
-    for (int i = 0; i < table.columns.size(); ++i) {
-        if (table.columns[i].is_primary_key) {
-        } else {
-            auto key =
-                // absl::StrFormat("/%d/%d/%d", table.id, values[pk_index], i);
-                absl::StrFormat("/%d/%s/%d", table.id,
-                                encode::encode(values[pk_index]), i);
+    for (int i = 0; i < table->columns.size(); ++i) {
+        if (!table->columns[i].is_primary_key) {
+            auto key = absl::StrFormat("/%d/%s/%d", table->id,
+                                       encode::encode(values[pk_index]), i);
+            db->Put(key, encode::encode(values[i]));
         }
     }
 }
@@ -264,8 +262,9 @@ std::mutex Catalog::mtx;
 // (https://github.com/nlohmann/json)
 Column::Column() = default;
 
-Column::Column(const std::string& name, const type::Type& type)
-    : name(name), type(type) {}
+Column::Column(const std::string& name, const type::Type& type,
+               bool is_primary_key)
+    : name(name), type(type), is_primary_key(is_primary_key) {}
 
 void Column::set_primary_key(bool set) { is_primary_key = set; }
 
