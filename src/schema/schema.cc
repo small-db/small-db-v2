@@ -236,6 +236,9 @@ class Catalog {
                     auto& p = it->second;
                     p.constraints.insert(constraint);
                     write_partition(table);
+
+                    db->PrintAllKV();
+
                     return absl::OkStatus();
                 }
             }
