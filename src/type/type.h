@@ -41,6 +41,8 @@ using Datum = std::variant<int64_t, std::string>;
 
 absl::StatusOr<Type> from_string(const std::string& type_name);
 
+std::string to_string(Type type);
+
 gandiva::DataTypePtr to_gandiva_type(Type type);
 
 }  // namespace type

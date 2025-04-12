@@ -111,7 +111,8 @@ std::vector<std::shared_ptr<arrow::ArrayBuilder>> get_builders(
                 builders.push_back(std::make_shared<arrow::StringBuilder>());
                 break;
             default:
-                SPDLOG_ERROR("unsupported type: {}", column.type);
+                SPDLOG_ERROR("unsupported type: {}",
+                             type::to_string(column.type));
                 break;
         }
     }
