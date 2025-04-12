@@ -186,6 +186,7 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
         arrow::RecordBatch::Make(input_schema, num_records, columns);
 
     SPDLOG_INFO("input batch: {}", in_batch->ToString());
+    return arrow::Status::OK();
 
     // TODO
     gandiva::NodePtr root_node;
