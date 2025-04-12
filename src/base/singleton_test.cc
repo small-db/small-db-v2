@@ -62,5 +62,5 @@ TEST(SingletonTest, DeletedAssignmentOperator) {
 
     // Uncommenting the following line should cause a compilation error
     // because the assignment operator is deleted.
-    // *p2 = *p1; // Assignment operator test
+    *p2 = *p1; // Assignment operator test
 }
