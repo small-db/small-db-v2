@@ -39,7 +39,7 @@ class Singleton {
     /**
      * Delete the assignment operator.
      */
-    void operator=(const Singleton&) = delete;
+    Singleton& operator=(const Singleton&) = delete;
 
     /**
      * Delete the copy constructor.
