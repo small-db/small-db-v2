@@ -22,6 +22,28 @@
 // spdlog
 #include "spdlog/spdlog.h"
 
+// =====================================================================
+// local libraries
+// =====================================================================
+
+#include "src/base/singleton.h"
+
+class Person {
+    friend class base::Singleton<Person>;
+
+   private:
+    Person() {}
+    ~Person() {}
+
+   public:
+    int age;
+    void print(void) { SPDLOG_INFO("person age: {}", age); }
+};
+
 TEST(SingletonTest, SingletonInstance) {
-    SPDLOG_INFO("Testing Singleton instance creation");
+    auto p1 = base::Singleton<Person>::getInstance();
+    auto p2 = base::Singleton<Person>::getInstance();
+
+    p1->age = 10;
+    p2->print();
 }

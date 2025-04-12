@@ -26,4 +26,30 @@
 
 namespace base {
 
+template <typename T>
+class Singleton {
+   private:
+    // static pointer to the Singleton instance
+    static Singleton* instancePtr;
+
+    // mutex to ensure thread safety
+    static std::mutex mtx;
+
+   public:
+    /**
+     * Delete the assignment operator.
+     */
+    void operator=(const Singleton&) = delete;
+
+    /**
+     * Delete the copy constructor.
+     */
+    Singleton(const Singleton& obj) = delete;
+
+    static T* getInstance() {
+        static T instance;
+        return &instance;
+    }
+};
+
 }  // namespace base
