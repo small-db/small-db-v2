@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <memory>
+#include <string>
 
 // =====================================================================
 // third-party libraries
@@ -53,12 +54,12 @@ namespace query {
 arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
     SPDLOG_ERROR("query");
 
+    return arrow::Status::OK();
+
     std::string db_path = schema::DATA_DIR + "/" + schema::TABLE_TABLES;
     auto db =
         new rocks_wrapper::RocksDBWrapper(db_path, {"TablesCF", "PartitionCF"});
     db->GetAll("/system.tables");
-
-    return arrow::Status::OK();
 
     std::shared_ptr<arrow::Field> field_result =
         arrow::field("table_name", arrow::utf8());
