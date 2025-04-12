@@ -187,6 +187,30 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
 
     SPDLOG_INFO("input batch: {}", in_batch->ToString());
 
+    // TODO
+    gandiva::NodePtr root_node;
+    gandiva::FieldPtr result_field;
+    std::shared_ptr<gandiva::Expression> expression =
+        gandiva::TreeExprBuilder::MakeExpression(root_node, result_field);
+
+    std::shared_ptr<gandiva::Projector> projector;
+    arrow::Status status;
+    std::vector<std::shared_ptr<gandiva::Expression>> expressions = {
+        expression};
+    status = gandiva::Projector::Make(input_schema, expressions, &projector);
+
+    // TODO
+    gandiva::SchemaPtr output_schema;
+
+    auto pool = arrow::default_memory_pool();
+    arrow::ArrayVector outputs;
+    status = projector->Evaluate(*in_batch, pool, &outputs);
+    ARROW_RETURN_NOT_OK(status);
+    std::shared_ptr<arrow::RecordBatch> result =
+        arrow::RecordBatch::Make(output_schema, outputs[0]->length(), outputs);
+
+    SPDLOG_INFO("project result: {}", result->ToString());
+
     return arrow::Status::OK();
 }
 
