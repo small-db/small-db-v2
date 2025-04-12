@@ -82,17 +82,10 @@ std::tuple<std::string_view, std::string_view> parse_key(
 std::shared_ptr<arrow::Schema> get_input_schema(const schema::Table& table) {
     arrow::FieldVector fields;
     for (const auto& column : table.columns) {
-        // fields.push_back(
-        //     arrow::field(column.name, type::get_arrow_type(column.type)));
+        fields.push_back(
+            arrow::field(column.name, type::to_gandiva_type(column.type)));
     }
-
-    gandiva::DataTypePtr t;
-
-    std::shared_ptr<arrow::Field> field_table_name =
-        arrow::field("table_name", arrow::utf8());
-    std::shared_ptr<arrow::Field> field_columns =
-        arrow::field("columns", arrow::utf8());
-    return arrow::schema({field_table_name, field_columns});
+    return arrow::schema(fields);
 }
 
 arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
@@ -114,6 +107,16 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
         auto [table_name, pk] = parse_key(kv.first);
         SPDLOG_INFO("table_name: {}, pk: {}", table_name, pk);
     }
+
+    auto table = schema::get_table(table_name);
+    if (!table) {
+        SPDLOG_ERROR("table not found: {}", table_name);
+        return arrow::Status::Invalid("table not found");
+    }
+    auto schema = get_input_schema(*table.value());
+
+    SPDLOG_INFO("schema: {}", schema->ToString());
+
     return arrow::Status::OK();
 }
 

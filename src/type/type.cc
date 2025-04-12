@@ -22,6 +22,9 @@
 // third-party libraries
 // =====================================================================
 
+// arrow
+#include "arrow/api.h"
+
 // arrow gandiva
 #include "gandiva/arrow.h"
 
@@ -43,6 +46,15 @@ absl::StatusOr<Type> from_string(const std::string& type_name) {
     }
 }
 
-gandiva::DataTypePtr to_gandiva_type(Type type);
+gandiva::DataTypePtr to_gandiva_type(Type type) {
+    switch (type) {
+        case Type::Int64:
+            return arrow::int64();
+        case Type::String:
+            return arrow::utf8();
+        default:
+            throw std::runtime_error("Unsupported type for Gandiva");
+    }
+}
 
 }  // namespace type

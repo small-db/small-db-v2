@@ -9,4 +9,5 @@ target_link_libraries(parser_lib
     absl_status
     absl_statusor
     absl::strings
+    type_lib
 )

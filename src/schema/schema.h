@@ -80,6 +80,8 @@ class Table {
     Table(const std::string& name, const std::vector<Column>& columns);
 };
 
+std::optional<std::shared_ptr<Table>> get_table(const std::string& table_name);
+
 absl::Status create_table(const std::string& table_name,
                           const std::vector<Column>& columns);
 

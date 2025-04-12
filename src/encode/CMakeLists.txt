@@ -7,4 +7,5 @@ target_link_libraries(encode_lib
     PUBLIC
     spdlog
     absl_status
+    type_lib
 )
