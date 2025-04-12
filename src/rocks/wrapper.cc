@@ -136,7 +136,8 @@ std::vector<std::pair<std::string, std::string>> RocksDBWrapper::GetAll(
 
     std::unique_ptr<rocksdb::Iterator> it(db_->NewIterator(read_options));
     std::vector<std::pair<std::string, std::string>> kv_pairs;
-    for (it->Seek(prefix); it->Valid(); it->Next()) {
+    for (it->Seek(prefix); it->Valid() && it->key().starts_with(prefix);
+         it->Next()) {
         kv_pairs.emplace_back(it->key().ToString(), it->value().ToString());
     }
     return kv_pairs;
