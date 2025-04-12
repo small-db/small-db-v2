@@ -57,8 +57,8 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
     return arrow::Status::OK();
 
     std::string db_path = schema::DATA_DIR + "/" + schema::TABLE_TABLES;
-    auto db =
-        new rocks_wrapper::RocksDBWrapper(db_path, {"TablesCF", "PartitionCF"});
+    auto db = rocks_wrapper::RocksDBWrapper::GetInstance(
+        db_path, {"TablesCF", "PartitionCF"});
     db->GetAll("/system.tables");
 
     std::shared_ptr<arrow::Field> field_result =

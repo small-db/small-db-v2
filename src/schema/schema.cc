@@ -131,7 +131,7 @@ class Catalog {
         this->system_partitions = new Table("system.partitions", columns);
 
         std::string db_path = DATA_DIR + "/" + TABLE_TABLES;
-        this->db = new rocks_wrapper::RocksDBWrapper(
+        this->db = rocks_wrapper::RocksDBWrapper::GetInstance(
             db_path, {"TablesCF", "PartitionCF"});
     }
 

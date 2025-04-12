@@ -41,7 +41,7 @@ class RocksDBWrapper {
     ~RocksDBWrapper();
 
    public:
-    RocksDBWrapper* GetInstance(
+    static RocksDBWrapper* GetInstance(
         const std::string& db_path,
         const std::vector<std::string>& column_family_names) {
         static std::unordered_map<std::string, RocksDBWrapper*> instances;
