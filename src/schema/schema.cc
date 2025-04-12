@@ -95,11 +95,9 @@ void write_row(rocks_wrapper::RocksDBWrapper* db,
     }
 
     for (int i = 0; i < table->columns.size(); ++i) {
-        if (!table->columns[i].is_primary_key) {
-            auto key = absl::StrFormat("/%s/%s/column_%d", table->name,
-                                       encode::encode(values[pk_index]), i);
-            db->Put(key, encode::encode(values[i]));
-        }
+        auto key = absl::StrFormat("/%s/%s/column_%d", table->name,
+                                   encode::encode(values[pk_index]), i);
+        db->Put(key, encode::encode(values[i]));
     }
 }
 

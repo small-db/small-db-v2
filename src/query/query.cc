@@ -154,9 +154,7 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
     for (const auto& kv : kv_pairs) {
         SPDLOG_INFO("key: {}, value: {}", kv.first, kv.second);
 
-        auto [table_name, pk, column_id] = parse_key(kv.first);
-        SPDLOG_INFO("table_name: {}, pk: {}, column_id: {}", table_name, pk,
-                    column_id);
+        auto [_, _, column_id] = parse_key(kv.first);
 
         // append to builder
         auto& builder = builders[column_id];
