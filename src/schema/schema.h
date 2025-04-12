@@ -78,6 +78,8 @@ class Table {
 
     Table();
     Table(const std::string& name, const std::vector<Column>& columns);
+
+    int get_pk_index();
 };
 
 std::optional<std::shared_ptr<Table>> get_table(const std::string& table_name);

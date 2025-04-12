@@ -317,6 +317,15 @@ Table::Table() = default;
 Table::Table(const std::string& name, const std::vector<Column>& columns)
     : name(name), columns(columns) {}
 
+int Table::get_pk_index() {
+    for (int i = 0; i < columns.size(); ++i) {
+        if (columns[i].is_primary_key) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 absl::Status create_table(const std::string& table_name,
                           const std::vector<Column>& columns) {
     return Catalog::getInstance()->add_table(table_name, columns);

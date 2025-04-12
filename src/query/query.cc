@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 #include <tuple>
+#include <vector>
 
 // =====================================================================
 // third-party libraries
@@ -54,7 +55,9 @@
 
 namespace query {
 
-std::tuple<std::string_view, std::string_view> parse_key(
+// parse key from rocksdb, the format is:
+// /<table_name>/<pk>/column_<column_id>
+std::tuple<std::string_view, std::string_view, int> parse_key(
     const std::string& key) {
     size_t first_slash = key.find('/');
     if (first_slash == std::string::npos) {
@@ -76,7 +79,15 @@ std::tuple<std::string_view, std::string_view> parse_key(
     std::string_view pk = std::string_view(key).substr(
         second_slash + 1, third_slash - second_slash - 1);
 
-    return {table_name, pk};
+    std::string_view column_part =
+        std::string_view(key).substr(third_slash + 1);
+    if (column_part.find("column_") != 0) {
+        throw std::invalid_argument(
+            "Invalid key format: missing 'column_' prefix");
+    }
+    int column_id = std::stoi(std::string(column_part.substr(7)));
+
+    return {table_name, pk, column_id};
 }
 
 std::shared_ptr<arrow::Schema> get_input_schema(const schema::Table& table) {
@@ -88,6 +99,25 @@ std::shared_ptr<arrow::Schema> get_input_schema(const schema::Table& table) {
     return arrow::schema(fields);
 }
 
+std::vector<std::shared_ptr<arrow::ArrayBuilder>> get_builders(
+    const schema::Table& table) {
+    std::vector<std::shared_ptr<arrow::ArrayBuilder>> builders;
+    for (const auto& column : table.columns) {
+        switch (column.type) {
+            case type::Type::Int64:
+                builders.push_back(std::make_shared<arrow::Int64Builder>());
+                break;
+            case type::Type::String:
+                builders.push_back(std::make_shared<arrow::StringBuilder>());
+                break;
+            default:
+                SPDLOG_ERROR("unsupported type: {}", column.type);
+                break;
+        }
+    }
+    return builders;
+}
+
 arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
     SPDLOG_ERROR("query");
 
@@ -96,26 +126,67 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
 
     auto table_name = std::string(schemaname) + "." + std::string(relname);
 
-    std::string db_path = schema::DATA_DIR;
-    auto db = rocks_wrapper::RocksDBWrapper::GetInstance(db_path, {});
-    auto scan_preix = "/" + table_name + "/";
-    auto kv_pairs = db->GetAll(scan_preix);
-
-    for (const auto& kv : kv_pairs) {
-        SPDLOG_INFO("key: {}, value: {}", kv.first, kv.second);
-
-        auto [table_name, pk] = parse_key(kv.first);
-        SPDLOG_INFO("table_name: {}, pk: {}", table_name, pk);
-    }
-
+    // get the input schema
     auto table = schema::get_table(table_name);
     if (!table) {
         SPDLOG_ERROR("table not found: {}", table_name);
         return arrow::Status::Invalid("table not found");
     }
-    auto schema = get_input_schema(*table.value());
+    auto input_schema = get_input_schema(*table.value());
+    SPDLOG_INFO("schema: {}", input_schema->ToString());
 
-    SPDLOG_INFO("schema: {}", schema->ToString());
+    // read kv pairs from rocksdb
+    std::string db_path = schema::DATA_DIR;
+    auto db = rocks_wrapper::RocksDBWrapper::GetInstance(db_path, {});
+    auto scan_preix = "/" + table_name + "/";
+    auto kv_pairs = db->GetAll(scan_preix);
+
+    // init builders
+    auto builders = get_builders(*table.value());
+
+    int pk_index = table.value()->get_pk_index();
+    if (pk_index == -1) {
+        SPDLOG_ERROR("primary key not found");
+        return arrow::Status::Invalid("primary key not found");
+    }
+
+    for (const auto& kv : kv_pairs) {
+        SPDLOG_INFO("key: {}, value: {}", kv.first, kv.second);
+
+        auto [table_name, pk, column_id] = parse_key(kv.first);
+        SPDLOG_INFO("table_name: {}, pk: {}, column_id: {}", table_name, pk,
+                    column_id);
+
+        // append to builder
+        auto& builder = builders[column_id];
+        if (auto int_builder =
+                std::dynamic_pointer_cast<arrow::Int64Builder>(builder)) {
+            int64_t value = std::stoll(kv.second);  // Convert string to int64_t
+            ARROW_RETURN_NOT_OK(int_builder->Append(value));
+        } else if (auto string_builder =
+                       std::dynamic_pointer_cast<arrow::StringBuilder>(
+                           builder)) {
+            ARROW_RETURN_NOT_OK(string_builder->Append(kv.second));
+        } else {
+            SPDLOG_ERROR("Unsupported builder type for column_id: {}",
+                         column_id);
+            return arrow::Status::Invalid("Unsupported builder type");
+        }
+    }
+
+    arrow::ArrayVector columns;
+    for (const auto& builder : builders) {
+        ARROW_ASSIGN_OR_RAISE(std::shared_ptr<arrow::Array> column,
+                              builder->Finish());
+        columns.push_back(column);
+    }
+
+    int num_records = columns[0]->length();
+
+    auto in_batch =
+        arrow::RecordBatch::Make(input_schema, num_records, columns);
+
+    SPDLOG_INFO("input batch: {}", in_batch->ToString());
 
     return arrow::Status::OK();
 }
