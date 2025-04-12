@@ -34,10 +34,32 @@
 namespace rocks_wrapper {
 
 class RocksDBWrapper {
-   public:
+   private:
+    // singleton instance
     RocksDBWrapper(const std::string& db_path,
                    const std::vector<std::string>& column_family_names);
     ~RocksDBWrapper();
+
+   public:
+    RocksDBWrapper* GetInstance(
+        const std::string& db_path,
+        const std::vector<std::string>& column_family_names) {
+        static std::unordered_map<std::string, RocksDBWrapper*> instances;
+        auto it = instances.find(db_path);
+        if (it != instances.end()) {
+            return it->second;
+        }
+
+        // Create a new instance if it doesn't exist
+        instances[db_path] = new RocksDBWrapper(db_path, column_family_names);
+        return instances[db_path];
+    }
+
+    // copy blocker
+    RocksDBWrapper(const RocksDBWrapper&) = delete;
+
+    // assignment blocker
+    void operator=(const RocksDBWrapper&) = delete;
 
     bool Put(const std::string& key, const std::string& value);
     bool Put(const std::string& cf_name, const std::string& key,
