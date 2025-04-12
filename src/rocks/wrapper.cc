@@ -31,7 +31,7 @@
 #include "rocksdb/options.h"
 #include "rocksdb/table.h"
 #include "rocksdb/filter_policy.h"
-#include "rocksdb/slice.h"
+#include "rocksdb/slice_transform.h"
 
 // =====================================================================
 // self header
