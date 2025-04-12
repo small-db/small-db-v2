@@ -52,3 +52,46 @@ add_compile_definitions(SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE)
 
 add_subdirectory(src)
 add_subdirectory(test)
+
+message(STATUS "== CMake configuration complete ==")
+
+# get_property(all_targets DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY BUILDSYSTEM_TARGETS)
+
+# foreach(tgt ${all_targets})
+#     if(tgt MATCHES "::")
+#         message(STATUS "Namespaced target: ${tgt}")
+#     endif()
+# endforeach()
+
+# get_property(all_targets GLOBAL PROPERTY TARGETS)
+
+# foreach(tgt ${all_targets})
+#     get_target_property(is_imported ${tgt} IMPORTED)
+#     if(is_imported AND tgt MATCHES "::")
+#         message(STATUS "Imported namespaced target: ${tgt}")
+#     endif()
+# endforeach()
+
+function(print_all_targets DIR)
+  get_property(TGTS DIRECTORY "${DIR}" PROPERTY BUILDSYSTEM_TARGETS)
+  foreach(TGT IN LISTS TGTS)
+    message(STATUS "build target: ${TGT}")
+  endforeach()
+
+  get_property(TGTS DIRECTORY "${DIR}" PROPERTY ALIASED_TARGET)
+  foreach(TGT IN LISTS TGTS)
+    message(STATUS "aliased target: ${TGT}")
+  endforeach()
+
+  get_property(TGTS DIRECTORY "${DIR}" PROPERTY IMPORTED_TARGETS)
+  foreach(TGT IN LISTS TGTS)
+    message(STATUS "imported target: ${TGT}")
+  endforeach()
+
+  get_property(SUBDIRS DIRECTORY "${DIR}" PROPERTY SUBDIRECTORIES)
+  foreach(SUBDIR IN LISTS SUBDIRS)
+    print_all_targets("${SUBDIR}")
+  endforeach()
+endfunction()
+
+print_all_targets(.)

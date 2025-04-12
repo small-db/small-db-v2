@@ -48,15 +48,54 @@
 #include "src/query/query.h"
 
 namespace query {
-void query(PgQuery__SelectStmt* select_stmt) {
+arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
     SPDLOG_ERROR("query");
-    // std::shared_ptr<arrow::RecordBatch> result =
-    //     arrow::RecordBatch::Make(output_schema, outputs[0]->length(),
-    //     outputs);
-    // //(Doc section: Evaluate projection)
 
-    // std::cout << "Project result:" << std::endl;
-    // std::cout << result->ToString() << std::endl;
+    return arrow::Status::OK();
+
+    std::shared_ptr<arrow::Field> field_result =
+        arrow::field("table_name", arrow::utf8());
+
+    std::shared_ptr<arrow::Schema> output_schema =
+        arrow::schema({field_result});
+
+    std::shared_ptr<gandiva::Projector> projector;
+
+    std::shared_ptr<arrow::Field> field_table_name =
+        arrow::field("table_name", arrow::utf8());
+    std::shared_ptr<arrow::Field> field_columns =
+        arrow::field("columns", arrow::utf8());
+    std::shared_ptr<arrow::Schema> input_schema =
+        arrow::schema({field_table_name, field_columns});
+
+    int num_records = 1;
+
+    arrow::Int32Builder builder;
+    int32_t values[4] = {1, 2, 3, 4};
+    ARROW_RETURN_NOT_OK(builder.AppendValues(values, 4));
+    ARROW_ASSIGN_OR_RAISE(std::shared_ptr<arrow::Array> array,
+                          builder.Finish());
+
+    auto in_batch =
+        arrow::RecordBatch::Make(input_schema, num_records, {array});
+
+    auto pool = arrow::default_memory_pool();
+
+    arrow::ArrayVector outputs;
+    arrow::Status status;
+    status = projector->Evaluate(*in_batch, pool, &outputs);
+
+    std::shared_ptr<arrow::RecordBatch> result =
+        arrow::RecordBatch::Make(output_schema, outputs[0]->length(), outputs);
+
+    SPDLOG_INFO("project result: {}", result->ToString());
+}
+
+void query(PgQuery__SelectStmt* select_stmt) {
+    auto status = query2(select_stmt);
+    if (!status.ok()) {
+        SPDLOG_ERROR("query failed: {}", status.ToString());
+    }
 }
 
 }  // namespace query

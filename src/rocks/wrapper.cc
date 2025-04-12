@@ -24,6 +24,16 @@
 #include <vector>
 
 // =====================================================================
+// third-party libraries
+// =====================================================================
+
+#include "rocksdb/db.h"
+#include "rocksdb/options.h"
+#include "rocksdb/table.h"
+#include "rocksdb/filter_policy.h"
+#include "rocksdb/slice.h"
+
+// =====================================================================
 // self header
 // =====================================================================
 
@@ -108,6 +118,51 @@ bool RocksDBWrapper::Get(const std::string& cf_name, const std::string& key,
     rocksdb::Status status =
         db_->Get(rocksdb::ReadOptions(), handle, key, &value);
     return status.ok();
+}
+
+std::vector<std::pair<std::string, std::string>> RocksDBWrapper::GetAll(
+    const std::string& prefix) {
+    // rocksdb::DB* db;
+    // rocksdb::Options options;
+    // options.create_if_missing = true;
+
+    // // Enable prefix seeks
+    // options.prefix_extractor.reset(
+    //     rocksdb::NewFixedPrefixTransform(3));  // assumes prefix length is 3
+
+    // rocksdb::Status status = rocksdb::DB::Open(options, "/path/to/db", &db);
+    // assert(status.ok());
+
+    // std::string prefix = "key";  // assuming prefix is "key"
+
+    // rocksdb::ReadOptions read_options;
+    // read_options.prefix_same_as_start = true;
+
+    // std::unique_ptr<rocksdb::Iterator> it(db->NewIterator(read_options));
+    // for (it->Seek(prefix); it->Valid() && it->key().starts_with(prefix);
+    //      it->Next()) {
+    //     std::cout << it->key().ToString() << ": " << it->value().ToString()
+    //               << std::endl;
+    // }
+
+    rocksdb::Options options;
+    // Set up bloom filter
+    rocksdb::BlockBasedTableOptions table_options;
+    table_options.filter_policy.reset(rocksdb::NewBloomFilterPolicy(10, false));
+    table_options.whole_key_filtering =
+        false;  // If you also need Get() to use whole key filters, leave it to
+                // true.
+    options.table_factory.reset(rocksdb::NewBlockBasedTableFactory(
+        table_options));  // For multiple column family setting, set up specific
+                          // column family's ColumnFamilyOptions.table_factory
+                          // instead.
+
+    // Define a prefix. In this way, a fixed length prefix extractor. A
+    // recommended one to use.
+    options.prefix_extractor.reset(NewCappedPrefixTransform(3));
+
+    // DB* db;
+    // Status s = DB::Open(options, "/tmp/rocksdb", &db);
 }
 
 std::vector<std::pair<std::string, std::string>> RocksDBWrapper::GetAllKV(

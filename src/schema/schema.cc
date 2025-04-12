@@ -133,14 +133,6 @@ class Catalog {
         std::string db_path = DATA_DIR + "/" + TABLE_TABLES;
         this->db = new rocks_wrapper::RocksDBWrapper(
             db_path, {"TablesCF", "PartitionCF"});
-
-        auto kv_pairs = db->GetAllKV("TablesCF");
-        for (const auto& kv : kv_pairs) {
-            nlohmann::json j = nlohmann::json::parse(kv.second);
-            Table table;
-            from_json(j, table);
-            tables[table.name] = std::make_shared<Table>(table);
-        }
     }
 
     std::unordered_map<std::string, std::shared_ptr<Table>> tables;
