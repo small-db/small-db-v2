@@ -72,26 +72,53 @@ message(STATUS "== CMake configuration complete ==")
 #     endif()
 # endforeach()
 
-function(print_all_targets DIR)
-  get_property(TGTS DIRECTORY "${DIR}" PROPERTY BUILDSYSTEM_TARGETS)
-  foreach(TGT IN LISTS TGTS)
-    message(STATUS "build target: ${TGT}")
-  endforeach()
+# print_all_targets(.)
+print_all_targets(.)
 
-  get_property(TGTS DIRECTORY "${DIR}" PROPERTY ALIASED_TARGET)
-  foreach(TGT IN LISTS TGTS)
-    message(STATUS "aliased target: ${TGT}")
-  endforeach()
+function(print_target_properties target_name)
+    if(NOT TARGET ${target_name})
+        message(WARNING "[target-inspect] Target '${target_name}' not found.")
+        return()
+    endif()
 
-  get_property(TGTS DIRECTORY "${DIR}" PROPERTY IMPORTED_TARGETS)
-  foreach(TGT IN LISTS TGTS)
-    message(STATUS "imported target: ${TGT}")
-  endforeach()
+    message(STATUS "🔍 Inspecting target: ${target_name}")
+    
+    # Print basic info
+    get_target_property(type ${target_name} TYPE)
+    get_target_property(imported ${target_name} IMPORTED)
+    message(STATUS "  - Type: ${type}")
+    message(STATUS "  - Imported: ${imported}")
 
-  get_property(SUBDIRS DIRECTORY "${DIR}" PROPERTY SUBDIRECTORIES)
-  foreach(SUBDIR IN LISTS SUBDIRS)
-    print_all_targets("${SUBDIR}")
-  endforeach()
+    # List of common useful properties
+    set(props
+        INTERFACE_INCLUDE_DIRECTORIES
+        INCLUDE_DIRECTORIES
+        INTERFACE_LINK_LIBRARIES
+        LINK_LIBRARIES
+        INTERFACE_COMPILE_DEFINITIONS
+        COMPILE_DEFINITIONS
+        INTERFACE_COMPILE_OPTIONS
+        COMPILE_OPTIONS
+        INTERFACE_LINK_OPTIONS
+        LINK_OPTIONS
+        IMPORTED_LOCATION
+        IMPORTED_CONFIGURATIONS
+        INTERFACE_SOURCES
+        SOURCES
+    )
+
+    foreach(prop IN LISTS props)
+        get_target_property(val ${target_name} ${prop})
+        if(val)
+            message(STATUS "  - ${prop}: ${val}")
+        endif()
+    endforeach()
 endfunction()
 
-print_all_targets(.)
+print_target_properties(spdlog)
+print_target_properties(absl_status)
+print_target_properties(absl_statusor)
+print_target_properties(absl::strings)
+print_target_properties(absl_strings)
+print_target_properties(rocksdb)
+

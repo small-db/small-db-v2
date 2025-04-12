@@ -28,3 +28,26 @@ function(print_added_target LIST_A LIST_B)
         message(STATUS "- ${ITEM}")
     endforeach()
 endfunction()
+
+
+function(print_all_targets DIR)
+    get_property(TGTS DIRECTORY "${DIR}" PROPERTY BUILDSYSTEM_TARGETS)
+    foreach(TGT IN LISTS TGTS)
+        message(STATUS "build target: ${TGT}")
+    endforeach()
+
+    get_property(TGTS DIRECTORY "${DIR}" PROPERTY ALIASED_TARGET)
+    foreach(TGT IN LISTS TGTS)
+        message(STATUS "aliased target: ${TGT}")
+    endforeach()
+
+    get_property(TGTS DIRECTORY "${DIR}" PROPERTY IMPORTED_TARGETS)
+    foreach(TGT IN LISTS TGTS)
+        message(STATUS "imported target: ${TGT}")
+    endforeach()
+
+    get_property(SUBDIRS DIRECTORY "${DIR}" PROPERTY SUBDIRECTORIES)
+    foreach(SUBDIR IN LISTS SUBDIRS)
+        print_all_targets("${SUBDIR}")
+    endforeach()
+endfunction()
