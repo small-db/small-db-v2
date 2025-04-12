@@ -41,10 +41,10 @@ class Singleton {
      */
     Singleton& operator=(const Singleton&) = delete;
 
-    /**
-     * Delete the copy constructor.
-     */
-    Singleton(const Singleton& obj) = delete;
+    // /**
+    //  * Delete the copy constructor.
+    //  */
+    // Singleton(const Singleton& obj) = delete;
 
     static T* getInstance() {
         static T instance;

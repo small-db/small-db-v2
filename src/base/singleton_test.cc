@@ -47,3 +47,20 @@ TEST(SingletonTest, SingletonInstance) {
     p1->age = 10;
     p2->print();
 }
+
+TEST(SingletonTest, DeletedCopyConstructor) {
+    auto p1 = base::Singleton<Person>::getInstance();
+
+    // Uncommenting the following line should cause a compilation error
+    // because the copy constructor is deleted.
+    // auto p2 = *p1; // Copy constructor test
+}
+
+TEST(SingletonTest, DeletedAssignmentOperator) {
+    auto p1 = base::Singleton<Person>::getInstance();
+    auto p2 = base::Singleton<Person>::getInstance();
+
+    // Uncommenting the following line should cause a compilation error
+    // because the assignment operator is deleted.
+    // *p2 = *p1; // Assignment operator test
+}
