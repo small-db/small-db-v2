@@ -87,32 +87,32 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
     auto db = rocks_wrapper::RocksDBWrapper::GetInstance(db_path, {});
     auto kv_pairs = db->GetAll("/system.tables");
 
-    arrow::StringBuilder pk_builder;
+    // arrow::StringBuilder pk_builder;
 
-    for (const auto& kv : kv_pairs) {
-        SPDLOG_INFO("key: {}, value: {}", kv.first, kv.second);
+    // for (const auto& kv : kv_pairs) {
+    //     SPDLOG_INFO("key: {}, value: {}", kv.first, kv.second);
 
-        auto [table_name, pk] = parse_key(kv.first);
-        SPDLOG_INFO("table_name: {}, pk: {}", table_name, pk);
+    //     auto [table_name, pk] = parse_key(kv.first);
+    //     SPDLOG_INFO("table_name: {}, pk: {}", table_name, pk);
 
-        ARROW_RETURN_NOT_OK(
-            pk_builder.Append(std::string(pk.data(), pk.size())));
-    }
+    //     ARROW_RETURN_NOT_OK(
+    //         pk_builder.Append(std::string(pk.data(), pk.size())));
+    // }
 
-    ARROW_ASSIGN_OR_RAISE(std::shared_ptr<arrow::Array> array,
-                          pk_builder.Finish());
+    // ARROW_ASSIGN_OR_RAISE(std::shared_ptr<arrow::Array> array,
+    //                       pk_builder.Finish());
 
-    std::shared_ptr<arrow::Field> field_table_name =
-        arrow::field("table_name", arrow::utf8());
-    std::shared_ptr<arrow::Field> field_columns =
-        arrow::field("columns", arrow::utf8());
-    std::shared_ptr<arrow::Schema> input_schema =
-        arrow::schema({field_table_name, field_columns});
+    // std::shared_ptr<arrow::Field> field_table_name =
+    //     arrow::field("table_name", arrow::utf8());
+    // std::shared_ptr<arrow::Field> field_columns =
+    //     arrow::field("columns", arrow::utf8());
+    // std::shared_ptr<arrow::Schema> input_schema =
+    //     arrow::schema({field_table_name, field_columns});
 
-    int num_records = kv_pairs.size();
+    // int num_records = kv_pairs.size();
 
-    auto in_batch =
-        arrow::RecordBatch::Make(input_schema, num_records, {array});
+    // auto in_batch =
+    //     arrow::RecordBatch::Make(input_schema, num_records, {array});
 
     return arrow::Status::OK();
 
