@@ -54,11 +54,13 @@ namespace query {
 arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
     SPDLOG_ERROR("query");
 
-
     std::string db_path = schema::DATA_DIR + "/" + schema::TABLE_TABLES;
-    auto db = rocks_wrapper::RocksDBWrapper::GetInstance(
-        db_path, {"TablesCF", "PartitionCF"});
-    db->GetAll("/system.tables");
+    auto db = rocks_wrapper::RocksDBWrapper::GetInstance(db_path, {});
+    auto kv_pairs = db->GetAll("/system.tables");
+
+    for (const auto& kv : kv_pairs) {
+        SPDLOG_INFO("key: {}, value: {}", kv.first, kv.second);
+    }
 
     return arrow::Status::OK();
 
@@ -98,6 +100,8 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
         arrow::RecordBatch::Make(output_schema, outputs[0]->length(), outputs);
 
     SPDLOG_INFO("project result: {}", result->ToString());
+
+    return arrow::Status::OK();
 }
 
 void query(PgQuery__SelectStmt* select_stmt) {
