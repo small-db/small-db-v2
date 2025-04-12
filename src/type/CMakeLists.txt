@@ -6,4 +6,5 @@ add_library(type_lib
 target_link_libraries(type_lib
     PRIVATE
     absl::statusor
+    arrow_lib
 )

@@ -50,6 +50,7 @@
 #include "src/query/query.h"
 #include "src/rocks/wrapper.h"
 #include "src/schema/const.h"
+#include "src/schema/schema.h"
 
 namespace query {
 
@@ -78,26 +79,58 @@ std::tuple<std::string_view, std::string_view> parse_key(
     return {table_name, pk};
 }
 
+std::shared_ptr<arrow::Schema> get_input_schema(const schema::Table& table) {
+    arrow::FieldVector fields;
+    for (const auto& column : table.columns) {
+        // fields.push_back(
+        //     arrow::field(column.name, type::get_arrow_type(column.type)));
+    }
+
+    gandiva::DataTypePtr t;
+
+    std::shared_ptr<arrow::Field> field_table_name =
+        arrow::field("table_name", arrow::utf8());
+    std::shared_ptr<arrow::Field> field_columns =
+        arrow::field("columns", arrow::utf8());
+    return arrow::schema({field_table_name, field_columns});
+}
+
 arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
     SPDLOG_ERROR("query");
 
-    return arrow::Status::OK();
+    auto schemaname = select_stmt->from_clause[0]->range_var->schemaname;
+    auto relname = select_stmt->from_clause[0]->range_var->relname;
+
+    auto table_name = std::string(schemaname) + "." + std::string(relname);
 
     std::string db_path = schema::DATA_DIR + "/" + schema::TABLE_TABLES;
     auto db = rocks_wrapper::RocksDBWrapper::GetInstance(db_path, {});
-    auto kv_pairs = db->GetAll("/system.tables");
+    auto scan_preix = "/" + table_name + "/";
+    auto kv_pairs = db->GetAll(scan_preix);
+
+    for (const auto& kv : kv_pairs) {
+        SPDLOG_INFO("key: {}, value: {}", kv.first, kv.second);
+
+        auto [table_name, pk] = parse_key(kv.first);
+        SPDLOG_INFO("table_name: {}, pk: {}", table_name, pk);
+    }
+    return arrow::Status::OK();
+}
+
+arrow::Status query3(PgQuery__SelectStmt* select_stmt) {
+    // std::shared_ptr<arrow::Field> field_table_name =
+    //     arrow::field("table_name", arrow::utf8());
+    // std::shared_ptr<arrow::Field> field_columns =
+    //     arrow::field("columns", arrow::utf8());
+    // std::shared_ptr<arrow::Schema> input_schema =
+    //     arrow::schema({field_table_name, field_columns});
+
+    // auto in_batch =
+    //     arrow::RecordBatch::Make(input_schema, num_records, {array});
+
+    return arrow::Status::OK();
 
     // arrow::StringBuilder pk_builder;
-
-    // for (const auto& kv : kv_pairs) {
-    //     SPDLOG_INFO("key: {}, value: {}", kv.first, kv.second);
-
-    //     auto [table_name, pk] = parse_key(kv.first);
-    //     SPDLOG_INFO("table_name: {}, pk: {}", table_name, pk);
-
-    //     ARROW_RETURN_NOT_OK(
-    //         pk_builder.Append(std::string(pk.data(), pk.size())));
-    // }
 
     // ARROW_ASSIGN_OR_RAISE(std::shared_ptr<arrow::Array> array,
     //                       pk_builder.Finish());

@@ -27,6 +27,9 @@
 // absl
 #include "absl/status/statusor.h"
 
+// // arrow gandiva
+// #include "gandiva/arrow.h"
+
 namespace type {
 
 enum class Type {
@@ -37,5 +40,7 @@ enum class Type {
 using Datum = std::variant<int64_t, std::string>;
 
 absl::StatusOr<Type> from_string(const std::string& type_name);
+
+// gandiva::DataTypePtr to_gandiva_type(Type type);
 
 }  // namespace type

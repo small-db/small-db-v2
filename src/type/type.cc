@@ -19,6 +19,13 @@
 #include <string>
 
 // =====================================================================
+// third-party libraries
+// =====================================================================
+
+// arrow gandiva
+#include "gandiva/arrow.h"
+
+// =====================================================================
 // self include
 // =====================================================================
 
@@ -35,5 +42,7 @@ absl::StatusOr<Type> from_string(const std::string& type_name) {
         return absl::InvalidArgumentError("Unknown type: " + type_name);
     }
 }
+
+gandiva::DataTypePtr to_gandiva_type(Type type);
 
 }  // namespace type
