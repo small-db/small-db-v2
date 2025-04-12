@@ -83,7 +83,8 @@ void from_json(const nlohmann::json& j, Table& t) {
     j.at("columns").get_to(t.columns);
 }
 
-void write_row(rocks_wrapper::RocksDBWrapper* db, const Table* table,
+void write_row(rocks_wrapper::RocksDBWrapper* db,
+               const std::shared_ptr<Table>& table,
                const std::vector<type::Datum>& values) {
     int pk_index = -1;
     for (int i = 0; i < table->columns.size(); ++i) {
@@ -112,15 +113,17 @@ class Catalog {
 
     rocks_wrapper::RocksDBWrapper* db;
 
-    Table* system_tables;
-    Table* system_partitions;
+    std::shared_ptr<schema::Table> system_tables;
+    std::shared_ptr<schema::Table> system_partitions;
 
     // private Constructor
     Catalog() {
         std::vector<Column> columns;
         columns.emplace_back("table_name", type::Type::String, true);
         columns.emplace_back("columns", type::Type::String);
-        this->system_tables = new Table("system.tables", columns);
+        this->tables["system.tables"] =
+            std::make_shared<Table>("system.tables", columns);
+        this->system_tables = this->tables["system.tables"];
 
         columns.clear();
         columns.emplace_back("table_name", type::Type::String);
@@ -128,9 +131,11 @@ class Catalog {
         columns.emplace_back("constraint", type::Type::String);
         columns.emplace_back("column_names", type::Type::String);
         columns.emplace_back("partition_value", type::Type::String);
-        this->system_partitions = new Table("system.partitions", columns);
+        this->tables["system.partitions"] =
+            std::make_shared<Table>("system.partitions", columns);
+        this->system_partitions = this->tables["system.partitions"];
 
-        std::string db_path = DATA_DIR + "/" + TABLE_TABLES;
+        std::string db_path = DATA_DIR;
         this->db = rocks_wrapper::RocksDBWrapper::GetInstance(
             db_path, {"TablesCF", "PartitionCF"});
     }

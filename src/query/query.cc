@@ -96,7 +96,7 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
 
     auto table_name = std::string(schemaname) + "." + std::string(relname);
 
-    std::string db_path = schema::DATA_DIR + "/" + schema::TABLE_TABLES;
+    std::string db_path = schema::DATA_DIR;
     auto db = rocks_wrapper::RocksDBWrapper::GetInstance(db_path, {});
     auto scan_preix = "/" + table_name + "/";
     auto kv_pairs = db->GetAll(scan_preix);
