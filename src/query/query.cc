@@ -19,6 +19,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <tuple>
 
 // =====================================================================
 // third-party libraries
@@ -51,6 +52,32 @@
 #include "src/schema/const.h"
 
 namespace query {
+
+std::tuple<std::string_view, std::string_view> parse_key(
+    const std::string& key) {
+    size_t first_slash = key.find('/');
+    if (first_slash == std::string::npos) {
+        throw std::invalid_argument("Invalid key format: missing first slash");
+    }
+
+    size_t second_slash = key.find('/', first_slash + 1);
+    if (second_slash == std::string::npos) {
+        throw std::invalid_argument("Invalid key format: missing second slash");
+    }
+
+    size_t third_slash = key.find('/', second_slash + 1);
+    if (third_slash == std::string::npos) {
+        throw std::invalid_argument("Invalid key format: missing third slash");
+    }
+
+    std::string_view table_name = std::string_view(key).substr(
+        first_slash + 1, second_slash - first_slash - 1);
+    std::string_view pk = std::string_view(key).substr(
+        second_slash + 1, third_slash - second_slash - 1);
+
+    return {table_name, pk};
+}
+
 arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
     SPDLOG_ERROR("query");
 
@@ -60,6 +87,9 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
 
     for (const auto& kv : kv_pairs) {
         SPDLOG_INFO("key: {}, value: {}", kv.first, kv.second);
+
+        auto [table_name, pk] = parse_key(kv.first);
+        SPDLOG_INFO("table_name: {}, pk: {}", table_name, pk);
     }
 
     return arrow::Status::OK();
