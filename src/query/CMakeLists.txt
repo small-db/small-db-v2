@@ -11,4 +11,5 @@ target_link_libraries(query_lib
     arrow_lib
     rocksdb_wrapper_lib
     schema_lib
+    magic_enum
 )

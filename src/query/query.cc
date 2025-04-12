@@ -44,6 +44,9 @@
 #include "gandiva/selection_vector.h"
 #include "gandiva/tree_expr_builder.h"
 
+// magic_enum
+#include "magic_enum/magic_enum.hpp"
+
 // =====================================================================
 // self header
 // =====================================================================
@@ -186,6 +189,15 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
         arrow::RecordBatch::Make(input_schema, num_records, columns);
 
     SPDLOG_INFO("input batch: {}", in_batch->ToString());
+
+    // get result schema
+    auto column_ref = select_stmt->target_list[0]->res_target->val->column_ref;
+    for (int i = 0; i < column_ref->n_fields; i++) {
+        auto field = column_ref->fields[i];
+        // if (field->node_case)
+        SPDLOG_INFO("field type: {}", magic_enum::enum_name(field->node_case));
+    }
+
     return arrow::Status::OK();
 
     // TODO
