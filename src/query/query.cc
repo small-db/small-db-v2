@@ -46,10 +46,17 @@
 // =====================================================================
 
 #include "src/query/query.h"
+#include "src/rocks/wrapper.h"
+#include "src/schema/const.h"
 
 namespace query {
 arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
     SPDLOG_ERROR("query");
+
+    std::string db_path = schema::DATA_DIR + "/" + schema::TABLE_TABLES;
+    auto db =
+        new rocks_wrapper::RocksDBWrapper(db_path, {"TablesCF", "PartitionCF"});
+    db->GetAll("/system.tables");
 
     return arrow::Status::OK();
 

@@ -28,10 +28,10 @@
 // =====================================================================
 
 #include "rocksdb/db.h"
-#include "rocksdb/options.h"
-#include "rocksdb/table.h"
 #include "rocksdb/filter_policy.h"
+#include "rocksdb/options.h"
 #include "rocksdb/slice_transform.h"
+#include "rocksdb/table.h"
 
 // =====================================================================
 // self header
@@ -159,7 +159,22 @@ std::vector<std::pair<std::string, std::string>> RocksDBWrapper::GetAll(
 
     // Define a prefix. In this way, a fixed length prefix extractor. A
     // recommended one to use.
-    options.prefix_extractor.reset(NewCappedPrefixTransform(3));
+    options.prefix_extractor.reset(rocksdb::NewCappedPrefixTransform(3));
+
+    rocksdb::ReadOptions read_options;
+    read_options.prefix_same_as_start = true;
+
+    std::unique_ptr<rocksdb::Iterator> it(db_->NewIterator(read_options));
+    for (it->Seek(prefix); it->Valid(); it->Next()) {
+        std::cout << it->key().ToString() << ": " << it->value().ToString()
+                  << std::endl;
+    }
+
+    // for (it->Seek(prefix); it->Valid() && it->key().starts_with(prefix);
+    //      it->Next()) {
+    //     std::cout << it->key().ToString() << ": " << it->value().ToString()
+    //               << std::endl;
+    // }
 
     // DB* db;
     // Status s = DB::Open(options, "/tmp/rocksdb", &db);
