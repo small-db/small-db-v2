@@ -1,3 +1,4 @@
+add_subdirectory(base)
 add_subdirectory(id)
 add_subdirectory(encode)
 add_subdirectory(type)
