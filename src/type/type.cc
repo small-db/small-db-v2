@@ -57,7 +57,7 @@ std::string to_string(Type type) {
     }
 }
 
-gandiva::DataTypePtr to_gandiva_type(Type type) {
+gandiva::DataTypePtr get_gandiva_type(Type type) {
     switch (type) {
         case Type::Int64:
             return arrow::int64();
@@ -65,6 +65,24 @@ gandiva::DataTypePtr to_gandiva_type(Type type) {
             return arrow::utf8();
         default:
             throw std::runtime_error("Unsupported type for Gandiva");
+    }
+}
+
+// > For a fixed-size type, typlen is the number of bytes in the internal
+// > representation of the type. But for a variable-length type, typlen is
+// > negative. -1 indicates a “varlena” type (one that has a length word), -2
+// > indicates a null-terminated C string.
+//
+// source:
+// https://www.postgresql.org/docs/current/catalog-pg-type.html
+int16_t get_pgwire_size(Type type) {
+    switch (type) {
+        case Type::Int64:
+            return 8;
+        case Type::String:
+            return -1;
+        default:
+            throw std::runtime_error("Unsupported type for pgwire");
     }
 }
 

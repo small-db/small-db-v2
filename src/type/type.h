@@ -43,6 +43,8 @@ absl::StatusOr<Type> from_string(const std::string& type_name);
 
 std::string to_string(Type type);
 
-gandiva::DataTypePtr to_gandiva_type(Type type);
+gandiva::DataTypePtr get_gandiva_type(Type type);
+
+int16_t get_pgwire_size(Type type);
 
 }  // namespace type

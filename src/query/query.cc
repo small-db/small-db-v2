@@ -97,7 +97,7 @@ std::shared_ptr<arrow::Schema> get_input_schema(const schema::Table& table) {
     arrow::FieldVector fields;
     for (const auto& column : table.columns) {
         fields.push_back(
-            arrow::field(column.name, type::to_gandiva_type(column.type)));
+            arrow::field(column.name, type::get_gandiva_type(column.type)));
     }
     return arrow::schema(fields);
 }

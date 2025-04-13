@@ -32,6 +32,7 @@
 // =====================================================================
 
 #include <iostream>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
@@ -214,10 +215,22 @@ class Message {
         buffer.push_back(value);
     }
 
+    void append_int16(std::vector<char>& buffer, int16_t value) {
+        int16_t network_value = htons(value);
+        const char* data = reinterpret_cast<const char*>(&network_value);
+        buffer.insert(buffer.end(), data, data + sizeof(network_value));
+    }
+
     void append_int32(std::vector<char>& buffer, int32_t value) {
         int32_t network_value = htonl(value);
         const char* data = reinterpret_cast<const char*>(&network_value);
         buffer.insert(buffer.end(), data, data + sizeof(network_value));
+    }
+
+    void write_int32(std::vector<char>& buffer, int32_t value, int offset) {
+        int32_t network_value = htonl(value);
+        const char* data = reinterpret_cast<const char*>(&network_value);
+        memcpy(buffer.data() + offset, data, sizeof(network_value));
     }
 
     void append_cstring(std::vector<char>& buffer, const std::string& value) {
@@ -250,6 +263,57 @@ class EmptyQueryResponse : public Message {
     void encode(std::vector<char>& buffer) {
         append_char(buffer, 'I');
         append_int32(buffer, 4);
+    }
+};
+
+class RowDescriptionResponse : public Message {
+   public:
+    const std::shared_ptr<arrow::Schema>& schema;
+
+    explicit RowDescriptionResponse(
+        const std::shared_ptr<arrow::Schema>& schema)
+        : schema(schema) {}
+
+    void encode(std::vector<char>& buffer) {
+        append_char(buffer, 'T');
+
+        // TODO: Length of message contents in bytes, including self.
+        int pre_bytes = buffer.size();
+        append_int32(buffer, 0);
+
+        int16_t num_fields = schema->num_fields();
+        append_int16(buffer, num_fields);
+
+        for (int i = 0; i < num_fields; ++i) {
+            const auto& field = schema->field(i);
+
+            // The field name.
+            append_cstring(buffer, field->name());
+
+            // The table OID.
+            append_int32(buffer, 0);
+
+            // The column attribute number.
+            append_int16(buffer, 0);
+
+            // The field's data type OID.
+            append_int32(buffer, 0);
+
+            // The data type size.
+            int16_t type_size = type::get_pgwire_size(
+                type::from_string(field->type()->ToString().c_str()).value());
+            append_int16(buffer, type_size);
+
+            // The type modifier.
+            append_int32(buffer, 0);
+
+            // The format code. (0 for text, 1 for binary)
+            append_int16(buffer, 0);
+        }
+
+        // Update the length of the message
+        int32_t message_length = buffer.size() - pre_bytes;
+        write_int32(buffer, message_length, pre_bytes);
     }
 };
 
@@ -425,6 +489,13 @@ class NetworkPackage {
 void sendEmptyResult(int sockfd) {
     NetworkPackage* network_package = new NetworkPackage();
     network_package->add_message(new EmptyQueryResponse());
+    network_package->add_message(new ReadyForQuery());
+    network_package->send_all(sockfd);
+}
+
+void sendBatch(int sockfd, const std::shared_ptr<arrow::RecordBatch>& batch) {
+    NetworkPackage* network_package = new NetworkPackage();
+    network_package->add_message(new RowDescriptionResponse(batch->schema()));
     network_package->add_message(new ReadyForQuery());
     network_package->send_all(sockfd);
 }
