@@ -468,10 +468,19 @@ void handle_query(std::string& query, int sockfd) {
         }
 
         auto record_batch = result.value();
-        SPDLOG_INFO("record_batch: {}", record_batch->ToString());
-    }
 
-    sendEmptyResult(sockfd);
+        if (record_batch->num_rows() == 0) {
+            SPDLOG_INFO("empty result");
+            sendEmptyResult(sockfd);
+            return;
+        } else {
+            SPDLOG_INFO("record_batch: {}", record_batch->ToString());
+            SPDLOG_INFO("result rows: {}", record_batch->num_rows());
+            SPDLOG_INFO("result columns: {}", record_batch->num_columns());
+            SPDLOG_INFO("result schema: {}",
+                        record_batch->schema()->ToString());
+        }
+    }
 }
 
 int RunServer(const server::ServerArgs& args) {
