@@ -122,7 +122,8 @@ std::vector<std::shared_ptr<arrow::ArrayBuilder>> get_builders(
     return builders;
 }
 
-arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
+absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> query2(
+    PgQuery__SelectStmt* select_stmt) {
     SPDLOG_ERROR("query");
 
     auto schemaname = select_stmt->from_clause[0]->range_var->schemaname;
@@ -134,7 +135,8 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
     auto table = schema::get_table(table_name);
     if (!table) {
         SPDLOG_ERROR("table not found: {}", table_name);
-        return arrow::Status::Invalid("table not found");
+        return absl::Status(absl::StatusCode::kNotFound,
+                            "table not found: " + table_name);
     }
     auto input_schema = get_input_schema(*table.value());
     SPDLOG_INFO("schema: {}", input_schema->ToString());
@@ -151,7 +153,8 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
     int pk_index = table.value()->get_pk_index();
     if (pk_index == -1) {
         SPDLOG_ERROR("primary key not found");
-        return arrow::Status::Invalid("primary key not found");
+        return absl::Status(absl::StatusCode::kInvalidArgument,
+                            "primary key not found");
     }
 
     for (const auto& kv : kv_pairs) {
@@ -164,22 +167,39 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
         if (auto int_builder =
                 std::dynamic_pointer_cast<arrow::Int64Builder>(builder)) {
             int64_t value = std::stoll(kv.second);  // Convert string to int64_t
-            ARROW_RETURN_NOT_OK(int_builder->Append(value));
+            auto result = int_builder->Append(value);
+            if (!result.ok()) {
+                SPDLOG_ERROR("Failed to append value: {}", result.ToString());
+                return absl::Status(absl::StatusCode::kInternal,
+                                    "Failed to append value");
+            }
         } else if (auto string_builder =
                        std::dynamic_pointer_cast<arrow::StringBuilder>(
                            builder)) {
-            ARROW_RETURN_NOT_OK(string_builder->Append(kv.second));
+            auto result = string_builder->Append(kv.second);
+            if (!result.ok()) {
+                SPDLOG_ERROR("Failed to append value: {}", result.ToString());
+                return absl::Status(absl::StatusCode::kInternal,
+                                    "Failed to append value");
+            }
         } else {
             SPDLOG_ERROR("Unsupported builder type for column_id: {}",
                          column_id);
-            return arrow::Status::Invalid("Unsupported builder type");
+            return absl::Status(absl::StatusCode::kInvalidArgument,
+                                "Unsupported builder type for column_id: " +
+                                    std::to_string(column_id));
         }
     }
 
     arrow::ArrayVector columns;
     for (const auto& builder : builders) {
-        ARROW_ASSIGN_OR_RAISE(std::shared_ptr<arrow::Array> column,
-                              builder->Finish());
+        auto result = builder->Finish();
+        if (!result.ok()) {
+            return absl::Status(
+                absl::StatusCode::kInternal,
+                "Failed to finish builder: " + result.status().ToString());
+        }
+        auto column = result.ValueOrDie();
         columns.push_back(column);
     }
 
@@ -212,7 +232,10 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
                 break;
             default:
                 SPDLOG_ERROR("unsupported field type");
-                return arrow::Status::Invalid("unsupported field type");
+                return absl::Status(
+                    absl::StatusCode::kInvalidArgument,
+                    "unsupported field type: " +
+                        std::string(magic_enum::enum_name(field->node_case)));
         }
     }
 
@@ -222,17 +245,26 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
     std::shared_ptr<gandiva::Projector> projector;
     arrow::Status status;
     status = gandiva::Projector::Make(input_schema, expressions, &projector);
+    if (!status.ok()) {
+        SPDLOG_ERROR("projector make failed: {}", status.ToString());
+        return absl::Status(absl::StatusCode::kInternal,
+                            "projector make failed: " + status.ToString());
+    }
 
     auto pool = arrow::default_memory_pool();
     arrow::ArrayVector outputs;
     status = projector->Evaluate(*in_batch, pool, &outputs);
-    ARROW_RETURN_NOT_OK(status);
+    if (!status.ok()) {
+        SPDLOG_ERROR("projector evaluate failed: {}", status.ToString());
+        return absl::Status(absl::StatusCode::kInternal,
+                            "projector evaluate failed: " + status.ToString());
+    }
     std::shared_ptr<arrow::RecordBatch> result =
         arrow::RecordBatch::Make(output_schema, outputs[0]->length(), outputs);
 
     SPDLOG_INFO("project result: {}", result->ToString());
 
-    return arrow::Status::OK();
+    return result;
 }
 
 arrow::Status query3(PgQuery__SelectStmt* select_stmt) {
@@ -302,16 +334,17 @@ arrow::Status query3(PgQuery__SelectStmt* select_stmt) {
     std::shared_ptr<arrow::RecordBatch> result =
         arrow::RecordBatch::Make(output_schema, outputs[0]->length(), outputs);
 
-    SPDLOG_INFO("project result: {}", result->ToString());
-
     return arrow::Status::OK();
 }
 
 void query(PgQuery__SelectStmt* select_stmt) {
     auto status = query2(select_stmt);
     if (!status.ok()) {
-        SPDLOG_ERROR("query failed: {}", status.ToString());
+        SPDLOG_ERROR("query failed: {}", status.status().ToString());
     }
+
+    auto batch = status.value();
+    SPDLOG_INFO("batch: {}", batch->ToString());
 }
 
 }  // namespace query
