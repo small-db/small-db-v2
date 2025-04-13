@@ -28,6 +28,9 @@
 // arrow gandiva
 #include "gandiva/arrow.h"
 
+// magic_enum
+#include "magic_enum/magic_enum.hpp"
+
 // =====================================================================
 // self include
 // =====================================================================
@@ -53,7 +56,8 @@ std::string to_string(Type type) {
         case Type::String:
             return "string";
         default:
-            throw std::runtime_error("unknown type");
+            throw std::runtime_error("unknown type" +
+                                     std::string(magic_enum::enum_name(type)));
     }
 }
 

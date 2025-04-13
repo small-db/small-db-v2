@@ -300,8 +300,11 @@ class RowDescriptionResponse : public Message {
             append_int32(buffer, 0);
 
             // The data type size.
-            int16_t type_size = type::get_pgwire_size(
-                type::from_string(field->type()->ToString().c_str()).value());
+            auto type =
+                type::from_string(field->type()->ToString().c_str()).value();
+            int16_t type_size = type::get_pgwire_size(type);
+            SPDLOG_DEBUG("type: {}, size: {}", type::to_string(type),
+                         type_size);
             append_int16(buffer, type_size);
 
             // The type modifier.

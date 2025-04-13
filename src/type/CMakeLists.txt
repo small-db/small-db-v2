@@ -7,4 +7,5 @@ target_link_libraries(type_lib
     PUBLIC
     absl::statusor
     arrow_lib
+    magic_enum
 )
