@@ -550,6 +550,8 @@ void handle_query(std::string& query, int sockfd) {
             SPDLOG_INFO("result columns: {}", record_batch->num_columns());
             SPDLOG_INFO("result schema: {}",
                         record_batch->schema()->ToString());
+            sendBatch(sockfd, record_batch);
+            return;
         }
     }
 }
