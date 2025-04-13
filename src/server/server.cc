@@ -282,9 +282,10 @@ class RowDescriptionResponse : public Message {
         append_int32(buffer, 0);
 
         int16_t num_fields = schema->num_fields();
-        append_int16(buffer, num_fields);
+        // append_int16(buffer, num_fields);
+        append_int16(buffer, 0);
 
-        for (int i = 0; i < num_fields; ++i) {
+        for (int i = 0; i < 0; ++i) {
             const auto& field = schema->field(i);
 
             // The field name.
@@ -321,6 +322,24 @@ class RowDescriptionResponse : public Message {
         SPDLOG_DEBUG(
             "package: {}",
             spdlog::to_hex(buffer.data(), buffer.data() + buffer.size()));
+    }
+};
+
+class DataRowResponse : public Message {
+   public:
+    DataRowResponse() = default;
+
+    void encode(std::vector<char>& buffer) {
+        // DataRow (B)
+
+        // identifier
+        append_char(buffer, 'D');
+
+        // length of message
+        append_int32(buffer, 6);
+
+        // number of columns
+        append_int16(buffer, 0);
     }
 };
 
@@ -503,6 +522,7 @@ void sendEmptyResult(int sockfd) {
 void sendBatch(int sockfd, const std::shared_ptr<arrow::RecordBatch>& batch) {
     NetworkPackage* network_package = new NetworkPackage();
     network_package->add_message(new RowDescriptionResponse(batch->schema()));
+    network_package->add_message(new DataRowResponse());
     network_package->add_message(new ReadyForQuery());
     network_package->send_all(sockfd);
 }
