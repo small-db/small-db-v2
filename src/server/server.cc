@@ -317,6 +317,10 @@ class RowDescriptionResponse : public Message {
         // Update the length of the message
         int32_t message_length = buffer.size() - pre_bytes;
         write_int32(buffer, message_length, pre_bytes);
+
+        SPDLOG_DEBUG(
+            "package: {}",
+            spdlog::to_hex(buffer.data(), buffer.data() + buffer.size()));
     }
 };
 
