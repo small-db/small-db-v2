@@ -34,6 +34,9 @@
 // spdlog
 #include "spdlog/spdlog.h"
 
+// absl
+#include "absl/status/status.h"
+
 // =====================================================================
 // local libraries
 // =====================================================================
@@ -171,20 +174,37 @@ absl::Status handle_add_constraint(PgQuery__AlterTableStmt* alter_stmt) {
                                             std::make_pair(lexpr, rexpr));
 }
 
+absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> WrapEmptyStatus(
+    const std::function<absl::Status()>& func) {
+    absl::Status status = func();
+
+    if (status.ok()) {
+        return absl::Status(absl::StatusCode::kOk, "");
+    } else {
+        return status;
+    }
+}
+
 absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> handle_stmt(
     PgQuery__Node* stmt) {
     switch (stmt->node_case) {
         case PG_QUERY__NODE__NODE_CREATE_STMT: {
             auto create_stmt = stmt->create_stmt;
             if (create_stmt->n_inh_relations == 0) {
-                return handle_create_table(create_stmt);
+                // return handle_create_table(create_stmt);
+                return WrapEmptyStatus(
+                    [&]() { return handle_create_table(create_stmt); });
             } else {
-                return handle_add_partition(create_stmt);
+                // return handle_add_partition(create_stmt);
+                return WrapEmptyStatus(
+                    [&]() { return handle_add_partition(create_stmt); });
             }
             break;
         }
         case PG_QUERY__NODE__NODE_DROP_STMT: {
-            return handle_drop_table(stmt->drop_stmt);
+            // return handle_drop_table(stmt->drop_stmt);
+            return WrapEmptyStatus(
+                [&]() { return handle_drop_table(stmt->drop_stmt); });
             break;
         }
         case PG_QUERY__NODE__NODE_TRANSACTION_STMT: {
@@ -192,7 +212,10 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> handle_stmt(
             break;
         }
         case PG_QUERY__NODE__NODE_ALTER_TABLE_STMT: {
-            return handle_add_constraint(stmt->alter_table_stmt);
+            // return handle_add_constraint(stmt->alter_table_stmt);
+            return WrapEmptyStatus([&]() {
+                return handle_add_constraint(stmt->alter_table_stmt);
+            });
             break;
         }
         case PG_QUERY__NODE__NODE_SELECT_STMT: {
@@ -212,7 +235,9 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> handle_stmt(
             break;
     }
 
-    return absl::OkStatus();
+    return absl::InvalidArgumentError(
+        fmt::format("unknown statement, node_case: {}",
+                    magic_enum::enum_name(stmt->node_case)));
 }
 
 }  // namespace stmt_handler

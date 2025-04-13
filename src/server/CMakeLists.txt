@@ -14,6 +14,7 @@ target_link_libraries(server_lib
     libpg_query_lib
     semantics_lib
     query_lib
+    absl::status
 )
 
 add_executable(server
