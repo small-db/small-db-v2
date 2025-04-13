@@ -10,7 +10,10 @@ project(small-db-v2)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_CXX_EXTENSIONS OFF)  # disables GNU extensions
+# set(CMAKE_CXX_EXTENSIONS OFF)  # disables GNU extensions
+
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+# set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lc++ -lc++abi")
 
 # # https://discourse.cmake.org/t/cmake-3-28-cmake-cxx-compiler-clang-scan-deps-notfound-not-found/9244/4
 # set(CMAKE_CXX_SCAN_FOR_MODULES 0)

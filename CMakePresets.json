@@ -9,16 +9,31 @@
         {
             "name": "base",
             "hidden": true,
-            "generator": "Ninja",
+            "generator": "Ninja"
+        },
+        {
+            "name": "clang",
+            "hidden": true,
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "/usr/bin/clang",
                 "CMAKE_CXX_COMPILER": "/usr/bin/clang++"
             }
         },
         {
+            "name": "gcc",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "/usr/bin/gcc",
+                "CMAKE_CXX_COMPILER": "/usr/bin/g++"
+            }
+        },
+        {
             "name": "debug",
             "description": "debug build",
-            "inherits": "base",
+            "inherits": [
+                "base",
+                "gcc"
+            ],
             "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
