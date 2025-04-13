@@ -32,7 +32,7 @@
             "description": "debug build",
             "inherits": [
                 "base",
-                "gcc"
+                "clang"
             ],
             "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {
