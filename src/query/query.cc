@@ -191,11 +191,25 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
     SPDLOG_INFO("input batch: {}", in_batch->ToString());
 
     // get result schema
+    std::vector<std::shared_ptr<gandiva::Expression>> expressions;
     auto column_ref = select_stmt->target_list[0]->res_target->val->column_ref;
     for (int i = 0; i < column_ref->n_fields; i++) {
         auto field = column_ref->fields[i];
-        // if (field->node_case)
-        SPDLOG_INFO("field type: {}", magic_enum::enum_name(field->node_case));
+        switch (field->node_case) {
+            case PG_QUERY__NODE__NODE_A_STAR:
+                for (auto field : input_schema->fields()) {
+                    auto column_ref =
+                        gandiva::TreeExprBuilder::MakeField(field);
+                    auto expression = gandiva::TreeExprBuilder::MakeExpression(
+                        column_ref, field);
+                    SPDLOG_INFO("expression: {}", expression->ToString());
+                    expressions.push_back(expression);
+                }
+                break;
+            default:
+                SPDLOG_ERROR("unsupported field type");
+                return arrow::Status::Invalid("unsupported field type");
+        }
     }
 
     return arrow::Status::OK();
@@ -208,8 +222,8 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
 
     std::shared_ptr<gandiva::Projector> projector;
     arrow::Status status;
-    std::vector<std::shared_ptr<gandiva::Expression>> expressions = {
-        expression};
+    // std::vector<std::shared_ptr<gandiva::Expression>> expressions = {
+        // expression};
     status = gandiva::Projector::Make(input_schema, expressions, &projector);
 
     // TODO
