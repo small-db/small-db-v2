@@ -14,8 +14,14 @@ block()
   set(ARROW_COMPUTE ON)
   set(ARROW_BUILD_TESTS OFF)
 
-  set(ARROW_GANDIVA ON CACHE BOOL "build the gandiva library")
+  # Set to ON to handle dependent libraries automatically. This option is set automatically
+  # when build in the Arrow source tree.
+  # 
+  # source:
+  # https://github.com/apache/arrow/blob/6fee049c816fc772baee9e4f3771e592bcb87c46/cpp/cmake_modules/DefineOptions.cmake#L142
   set(ARROW_DEFINE_OPTIONS ON)
+
+  set(ARROW_GANDIVA ON CACHE BOOL "build the gandiva library")
 
   # set(ARROW_WITH_BROTLI ON CACHE BOOL "build with brotli support")
   # set(ARROW_WITH_BZ2 ON CACHE BOOL "build with bzip2 support")
@@ -25,14 +31,14 @@ block()
   # set(ARROW_WITH_UTF8PROC ON CACHE BOOL "build with utf8proc support")
   # set(ARROW_WITH_ZLIB ON CACHE BOOL "build with zlib support")
   # set(ARROW_WITH_ZSTD ON CACHE BOOL "build with zstd support")
-        # "ARROW_WITH_BROTLI": "ON",
-        # "ARROW_WITH_BZ2": "ON",
-        # "ARROW_WITH_LZ4": "ON",
-        # "ARROW_WITH_RE2": "ON",
-        # "ARROW_WITH_SNAPPY": "ON",
-        # "ARROW_WITH_UTF8PROC": "ON",
-        # "ARROW_WITH_ZLIB": "ON",
-        # "ARROW_WITH_ZSTD": "ON"
+  # "ARROW_WITH_BROTLI": "ON",
+  # "ARROW_WITH_BZ2": "ON",
+  # "ARROW_WITH_LZ4": "ON",
+  # "ARROW_WITH_RE2": "ON",
+  # "ARROW_WITH_SNAPPY": "ON",
+  # "ARROW_WITH_UTF8PROC": "ON",
+  # "ARROW_WITH_ZLIB": "ON",
+  # "ARROW_WITH_ZSTD": "ON"
 
   # due to a problem compiling on clang++ 18.1.3 we need to disable deprecated
   # declaration errors
