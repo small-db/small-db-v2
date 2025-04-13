@@ -198,10 +198,14 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
         switch (field->node_case) {
             case PG_QUERY__NODE__NODE_A_STAR:
                 for (auto field : input_schema->fields()) {
-                    std::shared_ptr<arrow::Field> field_x_raw =
+                    gandiva::FieldPtr field_x_raw =
                         arrow::field("x", arrow::int32());
-                    std::shared_ptr<gandiva::Node> field_x =
-                        gandiva::TreeExprBuilder::MakeField(field_x_raw);
+                    gandiva::TreeExprBuilder::MakeField(field_x_raw);
+
+                    // std::shared_ptr<arrow::Field> field_x_raw =
+                    //     arrow::field("x", arrow::int32());
+                    // std::shared_ptr<gandiva::Node> field_x =
+                    //     gandiva::TreeExprBuilder::MakeField(field_x_raw);
 
                     // auto column_ref =
                     //     gandiva::TreeExprBuilder::MakeField(field);

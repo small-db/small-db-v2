@@ -67,6 +67,7 @@ block()
     arrow_dataset_static
     arrow_acero_static
     parquet_static
+    gandiva_static
   )
 
   target_include_directories(
