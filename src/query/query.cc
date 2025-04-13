@@ -190,12 +190,7 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
 
     SPDLOG_INFO("input batch: {}", in_batch->ToString());
 
-    // TODO
-
     std::vector<std::shared_ptr<arrow::Field>> output_fields;
-    gandiva::SchemaPtr output_schema = arrow::schema(output_fields);
-    // std::shared_ptr<arrow::Schema> output_schema =
-    // arrow::schema({field_result});
 
     // get result schema
     std::vector<std::shared_ptr<gandiva::Expression>> expressions;
@@ -211,6 +206,8 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
                         column_ref, field);
                     SPDLOG_INFO("expression: {}", expression->ToString());
                     expressions.push_back(expression);
+
+                    output_fields.push_back(field);
                 }
                 break;
             default:
@@ -219,7 +216,8 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
         }
     }
 
-    return arrow::Status::OK();
+    gandiva::SchemaPtr output_schema = arrow::schema(output_fields);
+    SPDLOG_INFO("output schema: {}", output_schema->ToString());
 
     std::shared_ptr<gandiva::Projector> projector;
     arrow::Status status;
