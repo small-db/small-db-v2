@@ -340,6 +340,10 @@ class DataRowResponse : public Message {
 
         // number of columns
         append_int16(buffer, 0);
+
+        SPDLOG_DEBUG(
+            "package: {}",
+            spdlog::to_hex(buffer.data(), buffer.data() + buffer.size()));
     }
 };
 
