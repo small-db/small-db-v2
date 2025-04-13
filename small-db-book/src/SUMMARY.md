@@ -11,9 +11,7 @@
 
 - [Store Data](./single_server/store_data.md)
 
-# XiaoDB
-
-- [Store Data](./single_server/store_data.md)
+# Partitioning & Sharding
 
 # Appendix
 
