@@ -142,14 +142,24 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
 
 // Test case to execute simple SQL commands
 TEST_F(SQLTest, ExecuteSimpleSQL) {
-    EXPECT_NO_THROW({
+    try {
         auto status = run_sql_test("test/integration_test/test.sqltest");
         if (!status.ok()) {
             SPDLOG_ERROR("Test failed with status: {}", status.ToString());
         }
 
         ASSERT_TRUE(status.ok());
-    });
+    } catch (const pqxx::sql_error& e) {
+        SPDLOG_ERROR("SQL error: {}", e.what());
+        FAIL() << "SQL error: " << e.what();
+    } catch (const std::exception& e) {
+        SPDLOG_ERROR("Exception type: {}", typeid(e).name());
+        SPDLOG_ERROR("Exception: {}", e.what());
+        FAIL() << "Exception: " << e.what();
+    } catch (...) {
+        SPDLOG_ERROR("Unknown error");
+        FAIL() << "Unknown error";
+    }
 }
 
 int main(int argc, char** argv) {
