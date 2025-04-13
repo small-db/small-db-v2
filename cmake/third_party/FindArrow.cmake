@@ -15,6 +15,7 @@ block()
   set(ARROW_BUILD_TESTS OFF)
 
   set(ARROW_GANDIVA ON CACHE BOOL "build the gandiva library")
+  set(ARROW_WITH_ZSTD ON CACHE BOOL "build with zstd support")
   # set(ARROW_ZSTD_USE_SHARED OFF CACHE BOOL "use shared zstd")
 
   # due to a problem compiling on clang++ 18.1.3 we need to disable deprecated
