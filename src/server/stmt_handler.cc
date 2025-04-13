@@ -16,6 +16,7 @@
 // c++ std
 // =====================================================================
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -174,15 +175,19 @@ absl::Status handle_add_constraint(PgQuery__AlterTableStmt* alter_stmt) {
                                             std::make_pair(lexpr, rexpr));
 }
 
+std::shared_ptr<arrow::RecordBatch> EmptyBatch() {
+    auto schema = arrow::schema({});
+    arrow::ArrayVector outputs;
+    auto empty_batch = arrow::RecordBatch::Make(schema, 0, outputs);
+    return empty_batch;
+}
+
 absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> WrapEmptyStatus(
     const std::function<absl::Status()>& func) {
     absl::Status status = func();
 
     if (status.ok()) {
-        auto schema = arrow::schema({});
-        arrow::ArrayVector outputs;
-        auto empty_batch = arrow::RecordBatch::Make(schema, 0, outputs);
-        return empty_batch;
+        return EmptyBatch();
     } else {
         return status;
     }
@@ -238,9 +243,7 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> handle_stmt(
             break;
     }
 
-    return absl::InvalidArgumentError(
-        "unknown statement, node_case: {}" +
-        std::string(magic_enum::enum_name(stmt->node_case)));
+    return EmptyBatch();
 }
 
 }  // namespace stmt_handler
