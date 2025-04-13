@@ -11,4 +11,11 @@
 
 - [Store Data](./single_server/store_data.md)
 
-# Partitioning & Sharding
+# XiaoDB
+
+- [Store Data](./single_server/store_data.md)
+
+# Appendix
+
+- [Programming Language & Build System](./appendix/programming_language_and_build_system.md)
+  - [Rust v.s. C++](./appendix/rust_vs_cpp.md)
