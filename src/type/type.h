@@ -27,7 +27,7 @@
 // absl
 #include "absl/status/statusor.h"
 
-// // arrow gandiva
+// arrow gandiva
 #include "gandiva/arrow.h"
 
 namespace type {
