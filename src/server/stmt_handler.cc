@@ -179,7 +179,10 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> WrapEmptyStatus(
     absl::Status status = func();
 
     if (status.ok()) {
-        return absl::Status(absl::StatusCode::kOk, "");
+        auto schema = arrow::schema({});
+        arrow::ArrayVector outputs;
+        auto empty_batch = arrow::RecordBatch::Make(schema, 0, outputs);
+        return empty_batch;
     } else {
         return status;
     }
