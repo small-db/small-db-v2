@@ -22,9 +22,7 @@
             "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "CMAKE_FILEAPI_FILE": "${sourceDir}/build/debug/cmake-api.json",
-                "CMAKE_FILEAPI_ALLOW_RECURSIVE": "ON"
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
             }
         }
     ]
