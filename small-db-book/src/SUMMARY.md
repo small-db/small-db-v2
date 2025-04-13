@@ -17,3 +17,4 @@
 
 - [Programming Language & Build System](./appendix/programming_language_and_build_system.md)
   - [Rust v.s. C++](./appendix/rust_vs_cpp.md)
+  - [Bazel v.s. CMake](./appendix/bazel_vs_cmake.md)
