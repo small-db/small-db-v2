@@ -13,6 +13,7 @@ target_link_libraries(
     parser_lib
 )
 
+target_compile_definitions(sql_test PRIVATE GTEST_HAS_CXXABI_H_=0)
 
 include(GoogleTest)
 gtest_discover_tests(sql_test)
