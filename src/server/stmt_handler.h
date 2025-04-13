@@ -16,6 +16,7 @@
 
 namespace stmt_handler {
 
-absl::Status handle_stmt(PgQuery__Node* stmt);
+absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> handle_stmt(
+    PgQuery__Node* stmt);
 
 }  // namespace stmt_handler

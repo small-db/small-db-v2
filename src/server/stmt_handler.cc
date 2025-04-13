@@ -171,7 +171,8 @@ absl::Status handle_add_constraint(PgQuery__AlterTableStmt* alter_stmt) {
                                             std::make_pair(lexpr, rexpr));
 }
 
-absl::Status handle_stmt(PgQuery__Node* stmt) {
+absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> handle_stmt(
+    PgQuery__Node* stmt) {
     switch (stmt->node_case) {
         case PG_QUERY__NODE__NODE_CREATE_STMT: {
             auto create_stmt = stmt->create_stmt;
@@ -195,7 +196,7 @@ absl::Status handle_stmt(PgQuery__Node* stmt) {
             break;
         }
         case PG_QUERY__NODE__NODE_SELECT_STMT: {
-            query::query(stmt->select_stmt);
+            return query::query(stmt->select_stmt);
             break;
         }
         case PG_QUERY__NODE__NODE_INSERT_STMT: {

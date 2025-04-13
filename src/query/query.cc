@@ -122,9 +122,8 @@ std::vector<std::shared_ptr<arrow::ArrayBuilder>> get_builders(
     return builders;
 }
 
-absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> query2(
+absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> query(
     PgQuery__SelectStmt* select_stmt) {
-    SPDLOG_ERROR("query");
 
     auto schemaname = select_stmt->from_clause[0]->range_var->schemaname;
     auto relname = select_stmt->from_clause[0]->range_var->relname;
@@ -265,86 +264,6 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> query2(
     SPDLOG_INFO("project result: {}", result->ToString());
 
     return result;
-}
-
-arrow::Status query3(PgQuery__SelectStmt* select_stmt) {
-    // std::shared_ptr<arrow::Field> field_table_name =
-    //     arrow::field("table_name", arrow::utf8());
-    // std::shared_ptr<arrow::Field> field_columns =
-    //     arrow::field("columns", arrow::utf8());
-    // std::shared_ptr<arrow::Schema> input_schema =
-    //     arrow::schema({field_table_name, field_columns});
-
-    // auto in_batch =
-    //     arrow::RecordBatch::Make(input_schema, num_records, {array});
-
-    return arrow::Status::OK();
-
-    // arrow::StringBuilder pk_builder;
-
-    // ARROW_ASSIGN_OR_RAISE(std::shared_ptr<arrow::Array> array,
-    //                       pk_builder.Finish());
-
-    // std::shared_ptr<arrow::Field> field_table_name =
-    //     arrow::field("table_name", arrow::utf8());
-    // std::shared_ptr<arrow::Field> field_columns =
-    //     arrow::field("columns", arrow::utf8());
-    // std::shared_ptr<arrow::Schema> input_schema =
-    //     arrow::schema({field_table_name, field_columns});
-
-    // int num_records = kv_pairs.size();
-
-    // auto in_batch =
-    //     arrow::RecordBatch::Make(input_schema, num_records, {array});
-
-    return arrow::Status::OK();
-
-    std::shared_ptr<arrow::Field> field_result =
-        arrow::field("table_name", arrow::utf8());
-
-    std::shared_ptr<arrow::Schema> output_schema =
-        arrow::schema({field_result});
-
-    std::shared_ptr<gandiva::Projector> projector;
-
-    std::shared_ptr<arrow::Field> field_table_name =
-        arrow::field("table_name", arrow::utf8());
-    std::shared_ptr<arrow::Field> field_columns =
-        arrow::field("columns", arrow::utf8());
-    std::shared_ptr<arrow::Schema> input_schema =
-        arrow::schema({field_table_name, field_columns});
-
-    int num_records = 1;
-
-    arrow::Int32Builder builder;
-    int32_t values[4] = {1, 2, 3, 4};
-    ARROW_RETURN_NOT_OK(builder.AppendValues(values, 4));
-    ARROW_ASSIGN_OR_RAISE(std::shared_ptr<arrow::Array> array,
-                          builder.Finish());
-
-    auto in_batch =
-        arrow::RecordBatch::Make(input_schema, num_records, {array});
-
-    auto pool = arrow::default_memory_pool();
-
-    arrow::ArrayVector outputs;
-    arrow::Status status;
-    status = projector->Evaluate(*in_batch, pool, &outputs);
-
-    std::shared_ptr<arrow::RecordBatch> result =
-        arrow::RecordBatch::Make(output_schema, outputs[0]->length(), outputs);
-
-    return arrow::Status::OK();
-}
-
-void query(PgQuery__SelectStmt* select_stmt) {
-    auto status = query2(select_stmt);
-    if (!status.ok()) {
-        SPDLOG_ERROR("query failed: {}", status.status().ToString());
-    }
-
-    auto batch = status.value();
-    SPDLOG_INFO("batch: {}", batch->ToString());
 }
 
 }  // namespace query

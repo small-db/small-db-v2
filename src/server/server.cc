@@ -49,8 +49,8 @@
 #include "pg_query.pb-c.h"
 
 // spdlog
-#include "spdlog/spdlog.h"
 #include "spdlog/fmt/bin_to_hex.h"  // spdlog::to_hex (doesn't work in C++20 and later version)
+#include "spdlog/spdlog.h"
 
 // =====================================================================
 // local libraries
@@ -460,11 +460,15 @@ void handle_query(std::string& query, int sockfd) {
     auto node_case = unpacked->stmts[0]->stmt->node_case;
 
     for (int i = 0; i < unpacked->n_stmts; i++) {
-        auto status = stmt_handler::handle_stmt(unpacked->stmts[i]->stmt);
-        if (!status.ok()) {
-            SPDLOG_ERROR("error handling statement: {}", status.ToString());
+        auto result = stmt_handler::handle_stmt(unpacked->stmts[i]->stmt);
+        if (!result.ok()) {
+            SPDLOG_ERROR("error handling statement: {}",
+                         result.status().ToString());
             break;
         }
+
+        auto record_batch = result.value();
+        SPDLOG_INFO("record_batch: {}", record_batch->ToString());
     }
 
     sendEmptyResult(sockfd);

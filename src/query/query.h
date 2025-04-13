@@ -22,8 +22,15 @@
 #include "pg_query.h"
 #include "pg_query.pb-c.h"
 
+// absl
+#include "absl/status/statusor.h"
+
+// arrow
+#include "arrow/api.h"
+
 namespace query {
 
-void query(PgQuery__SelectStmt* select_stmt);
+absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> query(
+    PgQuery__SelectStmt* select_stmt);
 
 }
