@@ -239,8 +239,8 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> handle_stmt(
     }
 
     return absl::InvalidArgumentError(
-        fmt::format("unknown statement, node_case: {}",
-                    magic_enum::enum_name(stmt->node_case)));
+        "unknown statement, node_case: {}" +
+        std::string(magic_enum::enum_name(stmt->node_case)));
 }
 
 }  // namespace stmt_handler
