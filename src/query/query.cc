@@ -198,12 +198,18 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
         switch (field->node_case) {
             case PG_QUERY__NODE__NODE_A_STAR:
                 for (auto field : input_schema->fields()) {
-                    auto column_ref =
-                        gandiva::TreeExprBuilder::MakeField(field);
-                    auto expression = gandiva::TreeExprBuilder::MakeExpression(
-                        column_ref, field);
-                    SPDLOG_INFO("expression: {}", expression->ToString());
-                    expressions.push_back(expression);
+                    std::shared_ptr<arrow::Field> field_x_raw =
+                        arrow::field("x", arrow::int32());
+                    std::shared_ptr<gandiva::Node> field_x =
+                        gandiva::TreeExprBuilder::MakeField(field_x_raw);
+
+                    // auto column_ref =
+                    //     gandiva::TreeExprBuilder::MakeField(field);
+                    // auto expression =
+                    // gandiva::TreeExprBuilder::MakeExpression(
+                    //     column_ref, field);
+                    // SPDLOG_INFO("expression: {}", expression->ToString());
+                    // expressions.push_back(expression);
                 }
                 break;
             default:
@@ -223,7 +229,7 @@ arrow::Status query2(PgQuery__SelectStmt* select_stmt) {
     std::shared_ptr<gandiva::Projector> projector;
     arrow::Status status;
     // std::vector<std::shared_ptr<gandiva::Expression>> expressions = {
-        // expression};
+    // expression};
     status = gandiva::Projector::Make(input_schema, expressions, &projector);
 
     // TODO
