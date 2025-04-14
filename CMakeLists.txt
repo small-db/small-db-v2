@@ -26,8 +26,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/third_part
 # step 2: include FetchContent module
 include(FetchContent)
 
-add_compile_options(-Werror)
-
 # step 3: include third-party packages
 find_package(Arrow REQUIRED)
 find_package(Spdlog REQUIRED)
