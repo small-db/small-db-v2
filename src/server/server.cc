@@ -344,31 +344,13 @@ class DataRowResponse : public Message {
             append_int16(buffer, batch->num_columns());
 
             for (int j = 0; j < batch->num_columns(); ++j) {
-                auto column = batch->column(j);
-                auto v = column->Slice(i, 1);
-
-                auto array = column->Slice(i, 1);
-                auto data = array->data();
-
-                auto bytes = data->buffers[1]->data();
-                SPDLOG_DEBUG(
-                    "bytes: {}",
-                    spdlog::to_hex(bytes, bytes + data->buffers[1]->size()));
-
-                // v->
-                auto column_2 = std::static_pointer_cast<arrow::StringArray>(
-                    batch->column(j));
-                auto data_2 = column_2->GetString(i);
-                SPDLOG_DEBUG("data_2: {}", data_2);
-
-                if (data->null_count > 0) {
-                    append_int32(buffer, -1);
-                } else {
-                    append_int32(buffer, data->buffers[1]->size());
-                    buffer.insert(
-                        buffer.end(), data->buffers[1]->data(),
-                        data->buffers[1]->data() + data->buffers[1]->size());
-                }
+                auto string_column =
+                    std::static_pointer_cast<arrow::StringArray>(
+                        batch->column(j));
+                auto cell = string_column->GetString(i);
+                append_int32(buffer, cell.size());
+                buffer.insert(buffer.end(), cell.data(),
+                              cell.data() + cell.size());
             }
 
             // update the message length
