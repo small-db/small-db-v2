@@ -586,7 +586,7 @@ void handle_query(std::string& query, int sockfd) {
         sendError(sockfd, result.error->message);
         return;
     }
-    SPDLOG_INFO("parse_tree: {}", result.parse_tree);
+    SPDLOG_INFO("ast: {}", result.parse_tree);
     pg_query_free_parse_result(result);
 
     PgQueryProtobufParseResult pgquery_pbparse_result =
@@ -609,15 +609,10 @@ void handle_query(std::string& query, int sockfd) {
         auto record_batch = result.value();
 
         if (record_batch->num_rows() == 0) {
-            SPDLOG_INFO("empty result");
             sendEmptyResult(sockfd);
             return;
         } else {
-            SPDLOG_INFO("record_batch: {}", record_batch->ToString());
-            SPDLOG_INFO("result rows: {}", record_batch->num_rows());
-            SPDLOG_INFO("result columns: {}", record_batch->num_columns());
-            SPDLOG_INFO("result schema: {}",
-                        record_batch->schema()->ToString());
+            SPDLOG_INFO("result batch: {}", record_batch->ToString());
             sendBatch(sockfd, record_batch);
             return;
         }

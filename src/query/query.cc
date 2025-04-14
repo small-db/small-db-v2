@@ -223,7 +223,6 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> query(
                         gandiva::TreeExprBuilder::MakeField(field);
                     auto expression = gandiva::TreeExprBuilder::MakeExpression(
                         column_ref, field);
-                    SPDLOG_INFO("expression: {}", expression->ToString());
                     expressions.push_back(expression);
 
                     output_fields.push_back(field);
