@@ -36,6 +36,7 @@
             ],
             "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {
+                "CMAKE_MESSAGE_LOG_LEVEL": "DEBUG",
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
             }
