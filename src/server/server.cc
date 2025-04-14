@@ -348,6 +348,11 @@ class DataRowResponse : public Message {
                 auto array = column->Slice(i, 1);
                 auto data = array->data();
 
+                auto bytes = data->buffers[1]->data();
+                SPDLOG_DEBUG(
+                    "bytes: {}",
+                    spdlog::to_hex(bytes, bytes + data->buffers[1]->size()));
+
                 if (data->null_count > 0) {
                     append_int32(buffer, -1);
                 } else {
