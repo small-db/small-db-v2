@@ -216,7 +216,7 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> handle_stmt(
             break;
         }
         case PG_QUERY__NODE__NODE_TRANSACTION_STMT: {
-            SPDLOG_ERROR("transaction statement");
+            SPDLOG_INFO("transaction statement");
             break;
         }
         case PG_QUERY__NODE__NODE_ALTER_TABLE_STMT: {
