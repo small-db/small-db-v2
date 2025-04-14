@@ -244,7 +244,7 @@ class Catalog {
         for (const auto& [table_name, table] : tables) {
             if (auto* listP = std::get_if<ListPartition>(&table->partition)) {
                 listP->partitions[partition_name] =
-                    ListPartition::SingleParition{values, {}};
+                    ListPartition::SinglePartition{values, {}};
                 write_partition(table);
                 return absl::OkStatus();
             }

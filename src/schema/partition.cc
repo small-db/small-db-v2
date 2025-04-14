@@ -26,14 +26,14 @@
 
 namespace schema {
 
-void to_json(nlohmann::json& j, const ListPartition::SingleParition& p) {
+void to_json(nlohmann::json& j, const ListPartition::SinglePartition& p) {
     j = nlohmann::json{
         {"values", p.values},
         {"constraints", p.constraints},
     };
 }
 
-void from_json(const nlohmann::json& j, ListPartition::SingleParition& p) {
+void from_json(const nlohmann::json& j, ListPartition::SinglePartition& p) {
     j.at("values").get_to(p.values);
     j.at("constraints").get_to(p.constraints);
 }
@@ -73,6 +73,17 @@ void from_json(const nlohmann::json& j, partition_t& p) {
         throw std::runtime_error("Unknown partition type in from_json: " +
                                  type);
     }
+}
+
+std::optional<ListPartition::SinglePartition> ListPartition::lookup(
+    std::string value) {
+    for (auto& [name, partition] : partitions) {
+        if (std::find(partition.values.begin(), partition.values.end(),
+                      value) != partition.values.end()) {
+            return partition;
+        }
+    }
+    return std::nullopt;
 }
 
 }  // namespace schema

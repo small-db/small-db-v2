@@ -18,11 +18,11 @@
 // c++ std
 // =====================================================================
 
+#include <map>
 #include <string>
 #include <unordered_map>
 #include <variant>
 #include <vector>
-#include <map>
 
 // =====================================================================
 // third-party libraries
@@ -40,14 +40,19 @@ class ListPartition {
     // the partition column
     std::string column_name;
 
-    class SingleParition {
+    class SinglePartition {
        public:
         std::vector<std::string> values;
         std::unordered_map<std::string, std::string> constraints;
     };
 
+    // key: partition name
+    // value: partition values
+    //
     // use ordered map to keep a consistent order on disk
-    std::map<std::string, SingleParition> partitions;
+    std::map<std::string, SinglePartition> partitions;
+
+    std::optional<SinglePartition> lookup(std::string value);
 };
 
 using partition_t = std::variant<NullPartition, ListPartition>;
