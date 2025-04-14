@@ -53,6 +53,7 @@
 
 #include "src/insert/insert.h"
 #include "src/schema/schema.h"
+#include "src/server_reg/server_reg.h"
 
 namespace insert {
 
@@ -102,6 +103,13 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> insert(
 
             for (const auto& [key, value] : partition->constraints) {
                 SPDLOG_INFO("partition constraint: {} = {}", key, value);
+            }
+
+            // search a server for the partition
+            auto servers = server_reg::get_servers(partition->constraints);
+            if (servers.empty()) {
+                return absl::InvalidArgumentError(fmt::format(
+                    "no server found for partition {}", partition_value));
             }
         }
     }
