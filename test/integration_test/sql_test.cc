@@ -126,21 +126,25 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
         } else if (auto query = std::get_if<parser::SQLTestUnit::Query>(
                        &unit.expected_behavior)) {
             SPDLOG_INFO("SQL: {}", unit.sql);
-            for (const auto& column_name : query->column_names) {
-                SPDLOG_INFO("Column Name: {}", column_name);
-            }
+            // for (const auto& column_name : query->column_names) {
+            //     SPDLOG_INFO("Column Name: {}", column_name);
+            // }
             pqxx::work tx(conn);
             pqxx::result r = tx.exec(unit.sql);
 
+            for (int i = 0; i < r.columns(); ++i) {
+                SPDLOG_INFO("column Name: {}", r.column_name(i));
+            }
+
             // Print the query result
-            SPDLOG_INFO("Query Result:");
+            SPDLOG_INFO("query Result:");
             for (const auto& row : r) {
                 std::string row_data;
                 for (const auto& field : row) {
                     row_data += field.c_str();  // Convert field to string
                     row_data += " | ";          // Add a separator
                 }
-                SPDLOG_INFO("Row: {}", row_data);
+                SPDLOG_INFO("row: {}", row_data);
             }
 
             SPDLOG_INFO("result rows: {}", r.size());

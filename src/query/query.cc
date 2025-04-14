@@ -157,8 +157,6 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> query(
     }
 
     for (const auto& kv : kv_pairs) {
-        SPDLOG_INFO("key: {}, value: {}", kv.first, kv.second);
-
         auto [_, _, column_id] = parse_key(kv.first);
 
         // append to builder
@@ -206,8 +204,6 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> query(
 
     auto in_batch =
         arrow::RecordBatch::Make(input_schema, num_records, columns);
-
-    SPDLOG_INFO("input batch: {}", in_batch->ToString());
 
     std::vector<std::shared_ptr<arrow::Field>> output_fields;
 
