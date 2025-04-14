@@ -347,6 +347,28 @@ class DataRowResponse : public Message {
     }
 };
 
+class CommandCompleteResponse : public Message {
+   public:
+    CommandCompleteResponse() = default;
+
+    void encode(std::vector<char>& buffer) {
+        // DataRow (B)
+
+        // identifier
+        append_char(buffer, 'C');
+
+        // length of message
+        int pre_bytes = buffer.size();
+        append_int32(buffer, 0);
+
+        // command tag
+        append_cstring(buffer, "SELECT 0");
+
+        int32_t message_length = buffer.size() - pre_bytes;
+        write_int32(buffer, message_length, pre_bytes);
+    }
+};
+
 class ErrorResponse : public Message {
     enum class Severity {
         ERROR,
@@ -527,6 +549,7 @@ void sendBatch(int sockfd, const std::shared_ptr<arrow::RecordBatch>& batch) {
     NetworkPackage* network_package = new NetworkPackage();
     network_package->add_message(new RowDescriptionResponse(batch->schema()));
     network_package->add_message(new DataRowResponse());
+    network_package->add_message(new CommandCompleteResponse());
     network_package->add_message(new ReadyForQuery());
     network_package->send_all(sockfd);
 }
