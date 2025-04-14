@@ -52,11 +52,48 @@
 // =====================================================================
 
 #include "src/insert/insert.h"
+#include "src/schema/schema.h"
 
 namespace insert {
 
 absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> insert(
     PgQuery__InsertStmt* insert_stmt) {
+    auto table_name = insert_stmt->relation->relname;
+    auto result = schema::get_table(table_name);
+    if (!result) {
+        return absl::InvalidArgumentError(
+            fmt::format("table {} not found", table_name));
+    }
+
+    auto table = result.value();
+    if (auto* listP = std::get_if<schema::ListPartition>(&table->partition)) {
+        auto partition_column = listP->column_name;
+
+        // get column id of the partition column
+        int partition_column_id = -1;
+        for (int i = 0; i < insert_stmt->n_cols; i++) {
+            if (insert_stmt->cols[i]->res_target->name == partition_column) {
+                partition_column_id = i;
+                break;
+            }
+        }
+
+        if (partition_column_id == -1) {
+            return absl::InvalidArgumentError(
+                fmt::format("partition column {} not found", partition_column));
+        }
+
+        int row_count = insert_stmt->select_stmt->select_stmt->n_values_lists;
+        for (int row_id = 0; row_id < row_count; row_id++) {
+            auto row =
+                insert_stmt->select_stmt->select_stmt->values_lists[row_id];
+
+            auto partition_value =
+                row->list->items[partition_column_id]->a_const->sval->sval;
+            SPDLOG_INFO("partition value: {}", partition_value);
+        }
+    }
+
     return absl::InvalidArgumentError("insert statement is not supported yet");
 }
 
