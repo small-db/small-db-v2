@@ -43,6 +43,7 @@
 // =====================================================================
 
 #include "src/query/query.h"
+#include "src/insert/insert.h"
 #include "src/schema/schema.h"
 #include "src/semantics/check.h"
 
