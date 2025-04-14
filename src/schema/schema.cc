@@ -127,7 +127,7 @@ class Catalog {
         columns.emplace_back("table_name", type::Type::String);
         columns.emplace_back("partition_name", type::Type::String, true);
         columns.emplace_back("constraint", type::Type::String);
-        columns.emplace_back("column_names", type::Type::String);
+        columns.emplace_back("column_name", type::Type::String);
         columns.emplace_back("partition_value", type::Type::String);
         this->tables["system.partitions"] =
             std::make_shared<Table>("system.partitions", columns);
