@@ -128,53 +128,80 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
             pqxx::work tx(conn);
             pqxx::result r = tx.exec(unit.sql);
 
-            // check column count
-            if (r.columns() != query->column_names.size()) {
-                return absl::InvalidArgumentError(absl::StrFormat(
-                    "column count mismatch: expected %d, got %d",
-                    query->column_names.size(), r.columns()));
-            }
-
-            // check column names
-            for (int i = 0; i < r.columns(); ++i) {
-                if (r.column_name(i) != query->column_names[i]) {
+            // check schema (row description)
+            {
+                // check column count
+                if (r.columns() != query->column_names.size()) {
                     return absl::InvalidArgumentError(absl::StrFormat(
-                        "column name mismatch: expected %s, got %s",
-                        query->column_names[i], r.column_name(i)));
+                        "column count mismatch: expected %d, got %d",
+                        query->column_names.size(), r.columns()));
+                }
+
+                // check column names
+                for (int i = 0; i < r.columns(); ++i) {
+                    if (r.column_name(i) != query->column_names[i]) {
+                        return absl::InvalidArgumentError(absl::StrFormat(
+                            "column name mismatch: expected %s, got %s",
+                            query->column_names[i], r.column_name(i)));
+                    }
+                }
+
+                // check column types
+                for (int i = 0; i < r.columns(); ++i) {
+                    if (type::from_pgwire_oid(r.column_type(i)).value() !=
+                        query->column_types[i]) {
+                        return absl::InvalidArgumentError(absl::StrFormat(
+                            "column type mismatch: expected %s, got %s",
+                            typeid(query->column_types[i]).name(),
+                            typeid(r.column_type(i)).name()));
+                    }
                 }
             }
 
-            // check column types
-            for (int i = 0; i < r.columns(); ++i) {
-                if (type::from_pgwire_oid(r.column_type(i)).value() !=
-                    query->column_types[i]) {
+            // check data
+            {
+                // check row count
+                if (r.size() != query->expected_output.size()) {
                     return absl::InvalidArgumentError(absl::StrFormat(
-                        "column type mismatch: expected %s, got %s",
-                        typeid(query->column_types[i]).name(),
-                        typeid(r.column_type(i)).name()));
+                        "row count mismatch: expected %d, got %d",
+                        query->expected_output.size(), r.size()));
+                }
+
+                // check data
+                for (int i = 0; i < r.size(); ++i) {
+                    for (int j = 0; j < r.columns(); ++j) {
+                        if (r[i][j].c_str() != query->expected_output[i][j]) {
+                            return absl::InvalidArgumentError(absl::StrFormat(
+                                "data mismatch at row %d, column %d: "
+                                "expected %s, got %s",
+                                i, j, query->expected_output[i][j],
+                                r[i][j].c_str()));
+                        }
+                    }
                 }
             }
 
-            query->column_names.size();
-            r.columns();
+            // query->column_names.size();
+            // r.columns();
 
-            for (int i = 0; i < r.columns(); ++i) {
-                SPDLOG_INFO("column Name: {}", r.column_name(i));
-            }
+            // for (int i = 0; i < r.columns(); ++i) {
+            //     SPDLOG_INFO("column Name: {}", r.column_name(i));
+            // }
 
-            // Print the query result
-            SPDLOG_INFO("query Result:");
-            for (const auto& row : r) {
-                std::string row_data;
-                for (const auto& field : row) {
-                    row_data += field.c_str();  // Convert field to string
-                    row_data += " | ";          // Add a separator
-                }
-                SPDLOG_INFO("row: {}", row_data);
-            }
+            // // Print the query result
+            // SPDLOG_INFO("query Result:");
+            // for (const auto& row : r) {
+            //     std::string row_data;
+            //     for (const auto& field : row) {
+            //         row_data += field.c_str();  // Convert field to string
+            //         row_data += " | ";          // Add a separator
+            //     }
+            //     SPDLOG_INFO("row: {}", row_data);
+            // }
 
             SPDLOG_INFO("result rows: {}", r.size());
             SPDLOG_INFO("result columns: {}", r.columns());
+
             tx.commit();
         }
     }
