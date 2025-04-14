@@ -345,6 +345,8 @@ class DataRowResponse : public Message {
 
             for (int j = 0; j < batch->num_columns(); ++j) {
                 auto column = batch->column(j);
+                auto v = column->Slice(i, 1);
+
                 auto array = column->Slice(i, 1);
                 auto data = array->data();
 
@@ -352,6 +354,12 @@ class DataRowResponse : public Message {
                 SPDLOG_DEBUG(
                     "bytes: {}",
                     spdlog::to_hex(bytes, bytes + data->buffers[1]->size()));
+
+                // v->
+                auto column_2 = std::static_pointer_cast<arrow::StringArray>(
+                    batch->column(j));
+                auto data_2 = column_2->GetString(i);
+                SPDLOG_DEBUG("data_2: {}", data_2);
 
                 if (data->null_count > 0) {
                     append_int32(buffer, -1);
