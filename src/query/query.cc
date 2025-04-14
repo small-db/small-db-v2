@@ -124,7 +124,6 @@ std::vector<std::shared_ptr<arrow::ArrayBuilder>> get_builders(
 
 absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> query(
     PgQuery__SelectStmt* select_stmt) {
-
     auto schemaname = select_stmt->from_clause[0]->range_var->schemaname;
     auto relname = select_stmt->from_clause[0]->range_var->relname;
 
@@ -156,17 +155,17 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> query(
                             "primary key not found");
     }
 
-    for (const auto& kv : kv_pairs) {
-        SPDLOG_INFO("key: {}, value: {}", kv.first, kv.second);
+    for (const auto& [key, value] : kv_pairs) {
+        SPDLOG_INFO("key: {}, value: {}", key, value);
 
-        auto [_, _, column_id] = parse_key(kv.first);
+        auto [_, _, column_id] = parse_key(key);
 
         // append to builder
         auto& builder = builders[column_id];
         if (auto int_builder =
                 std::dynamic_pointer_cast<arrow::Int64Builder>(builder)) {
-            int64_t value = std::stoll(kv.second);  // Convert string to int64_t
-            auto result = int_builder->Append(value);
+            int64_t int_value = std::stoll(value);
+            auto result = int_builder->Append(int_value);
             if (!result.ok()) {
                 SPDLOG_ERROR("Failed to append value: {}", result.ToString());
                 return absl::Status(absl::StatusCode::kInternal,
@@ -175,7 +174,7 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> query(
         } else if (auto string_builder =
                        std::dynamic_pointer_cast<arrow::StringBuilder>(
                            builder)) {
-            auto result = string_builder->Append(kv.second);
+            auto result = string_builder->Append(value);
             if (!result.ok()) {
                 SPDLOG_ERROR("Failed to append value: {}", result.ToString());
                 return absl::Status(absl::StatusCode::kInternal,

@@ -231,7 +231,7 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> handle_stmt(
             break;
         }
         case PG_QUERY__NODE__NODE_INSERT_STMT: {
-            SPDLOG_ERROR("insert statement");
+            return insert::insert(stmt->insert_stmt);
             break;
         }
         default:
