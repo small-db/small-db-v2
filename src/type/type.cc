@@ -39,6 +39,18 @@
 
 namespace type {
 
+std::string to_string(Type type) {
+    switch (type) {
+        case Type::Int64:
+            return "int4";
+        case Type::String:
+            return "string";
+        default:
+            throw std::runtime_error("unknown type" +
+                                     std::string(magic_enum::enum_name(type)));
+    }
+}
+
 absl::StatusOr<Type> from_string(const std::string& type_name) {
     if (type_name == "int4") {
         return Type::Int64;
@@ -49,15 +61,27 @@ absl::StatusOr<Type> from_string(const std::string& type_name) {
     }
 }
 
-std::string to_string(Type type) {
+pqxx::oid to_pgwire_oid(Type type) {
     switch (type) {
         case Type::Int64:
-            return "int4";
+            return 20;  // int8
         case Type::String:
-            return "string";
+            return 25;  // text
         default:
             throw std::runtime_error("unknown type" +
                                      std::string(magic_enum::enum_name(type)));
+    }
+}
+
+absl::StatusOr<Type> from_pgwire_oid(pqxx::oid oid) {
+    switch (oid) {
+        case 20:  // int8
+            return Type::Int64;
+        case 25:  // text
+            return Type::String;
+        default:
+            return absl::InvalidArgumentError("unknown oid: " +
+                                              std::to_string(oid));
     }
 }
 

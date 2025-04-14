@@ -8,4 +8,5 @@ target_link_libraries(type_lib
     absl::statusor
     arrow_lib
     magic_enum
+    pqxx
 )

@@ -288,6 +288,9 @@ class RowDescriptionResponse : public Message {
         for (int i = 0; i < num_fields; ++i) {
             const auto& field = schema->field(i);
 
+            auto data_type =
+                type::from_string(field->type()->ToString().c_str()).value();
+
             // The field name.
             append_cstring(buffer, field->name());
 
@@ -298,15 +301,10 @@ class RowDescriptionResponse : public Message {
             append_int16(buffer, 0);
 
             // The field's data type OID.
-            append_int32(buffer, 0);
+            append_int32(buffer, type::to_pgwire_oid(data_type));
 
             // The data type size.
-            auto type =
-                type::from_string(field->type()->ToString().c_str()).value();
-            int16_t type_size = type::get_pgwire_size(type);
-            // SPDLOG_DEBUG("type: {}, size: {}", type::to_string(type),
-            //              type_size);
-            append_int16(buffer, type_size);
+            append_int16(buffer, type::get_pgwire_size(data_type));
 
             // The type modifier.
             append_int32(buffer, 0);

@@ -128,6 +128,36 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
             pqxx::work tx(conn);
             pqxx::result r = tx.exec(unit.sql);
 
+            // check column count
+            if (r.columns() != query->column_names.size()) {
+                return absl::InvalidArgumentError(absl::StrFormat(
+                    "column count mismatch: expected %d, got %d",
+                    query->column_names.size(), r.columns()));
+            }
+
+            // check column names
+            for (int i = 0; i < r.columns(); ++i) {
+                if (r.column_name(i) != query->column_names[i]) {
+                    return absl::InvalidArgumentError(absl::StrFormat(
+                        "column name mismatch: expected %s, got %s",
+                        query->column_names[i], r.column_name(i)));
+                }
+            }
+
+            // check column types
+            for (int i = 0; i < r.columns(); ++i) {
+                if (type::from_pgwire_oid(r.column_type(i)).value() !=
+                    query->column_types[i]) {
+                    return absl::InvalidArgumentError(absl::StrFormat(
+                        "column type mismatch: expected %s, got %s",
+                        typeid(query->column_types[i]).name(),
+                        typeid(r.column_type(i)).name()));
+                }
+            }
+
+            query->column_names.size();
+            r.columns();
+
             for (int i = 0; i < r.columns(); ++i) {
                 SPDLOG_INFO("column Name: {}", r.column_name(i));
             }
@@ -154,24 +184,14 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
 
 // Test case to execute simple SQL commands
 TEST_F(SQLTest, ExecuteSimpleSQL) {
-    try {
+    ASSERT_NO_THROW({
         auto status = run_sql_test("test/integration_test/test.sqltest");
         if (!status.ok()) {
             SPDLOG_ERROR("Test failed with status: {}", status.ToString());
         }
 
         ASSERT_TRUE(status.ok());
-    } catch (const pqxx::sql_error& e) {
-        SPDLOG_ERROR("SQL error: {}", e.what());
-        FAIL() << "SQL error: " << e.what();
-    } catch (const std::exception& e) {
-        SPDLOG_ERROR("Exception type: {}", typeid(e).name());
-        SPDLOG_ERROR("Exception: {}", e.what());
-        FAIL() << "Exception: " << e.what();
-    } catch (...) {
-        SPDLOG_ERROR("Unknown error");
-        FAIL() << "Unknown error";
-    }
+    });
 }
 
 int main(int argc, char** argv) {
