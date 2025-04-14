@@ -14,12 +14,20 @@
 
 #pragma once
 
+// =====================================================================
+// c++ std
+// =====================================================================
+
+#include <string>
+
 namespace server {
 class ServerArgs {
    public:
     int port;
 
-    explicit ServerArgs(int port);
+    std::string region;
+
+    ServerArgs(int port, std::string region) : port(port), region(region) {}
 };
 
 // extern ServerArgs DefaultArgs;

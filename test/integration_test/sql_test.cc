@@ -78,16 +78,22 @@ class SQLTest : public ::testing::Test {
    protected:
     static void SetUpTestSuite() {
         SPDLOG_INFO("starting the server");
-        StartServerThread();
+        StartServers();
         WaitServer();
     }
 
-    static std::thread server_thread;
+    static std::vector<std::thread> server_threads;
 
-    static void StartServerThread() {
+    static void StartServers() {
         SPDLOG_INFO("starting the server thread");
-        server::ServerArgs args = server::ServerArgs(5432);
-        server_thread = std::thread(server::RunServer, args);
+
+        std::vector<int> ports = {5432, 5433, 5434};
+        std::vector<std::string> regions = {"asia", "eu", "us"};
+
+        for (size_t i = 0; i < ports.size(); ++i) {
+            server::ServerArgs args = server::ServerArgs(ports[i], regions[i]);
+            server_threads.emplace_back(server::RunServer, args);
+        }
     }
 
     // wait for the server to ready
@@ -102,11 +108,16 @@ class SQLTest : public ::testing::Test {
     static void TearDownTestSuite() {
         SPDLOG_INFO("stopping the server");
         server::StopServer();
-        server_thread.join();
+
+        for (auto& server_thread : server_threads) {
+            if (server_thread.joinable()) {
+                server_thread.join();
+            }
+        }
     }
 };
 
-std::thread SQLTest::server_thread;
+std::vector<std::thread> SQLTest::server_threads;
 
 absl::Status run_sql_test(const std::string& sqltest_file) {
     auto sql_units = parser::read_sql_test(sqltest_file);

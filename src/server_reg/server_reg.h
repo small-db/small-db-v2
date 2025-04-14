@@ -23,6 +23,13 @@
 #include <unordered_map>
 #include <vector>
 
+// =====================================================================
+// third-party libraries
+// =====================================================================
+
+// absl
+#include "absl/status/status.h"
+
 namespace server_reg {
 
 class Server {};
@@ -31,5 +38,7 @@ class Server {};
 // all servers
 std::vector<std::shared_ptr<Server>> get_servers(
     std::unordered_map<std::string, std::string>& constraints);
+
+// absl::Status add_server(std::shared_ptr<Server> server);
 
 }  // namespace server_reg

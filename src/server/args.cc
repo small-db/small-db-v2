@@ -14,8 +14,4 @@
 
 #include <src/server/args.h>
 
-namespace server {
-
-ServerArgs::ServerArgs(int port) : port(port) {}
-
-}  // namespace server
+namespace server {}  // namespace server
