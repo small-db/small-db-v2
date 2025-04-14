@@ -277,15 +277,14 @@ class RowDescriptionResponse : public Message {
     void encode(std::vector<char>& buffer) {
         append_char(buffer, 'T');
 
-        // TODO: Length of message contents in bytes, including self.
+        // message length (placeholder)
         int pre_bytes = buffer.size();
         append_int32(buffer, 0);
 
         int16_t num_fields = schema->num_fields();
-        // append_int16(buffer, num_fields);
-        append_int16(buffer, 0);
+        append_int16(buffer, num_fields);
 
-        for (int i = 0; i < 0; ++i) {
+        for (int i = 0; i < num_fields; ++i) {
             const auto& field = schema->field(i);
 
             // The field name.
@@ -304,8 +303,8 @@ class RowDescriptionResponse : public Message {
             auto type =
                 type::from_string(field->type()->ToString().c_str()).value();
             int16_t type_size = type::get_pgwire_size(type);
-            SPDLOG_DEBUG("type: {}, size: {}", type::to_string(type),
-                         type_size);
+            // SPDLOG_DEBUG("type: {}, size: {}", type::to_string(type),
+            //              type_size);
             append_int16(buffer, type_size);
 
             // The type modifier.
@@ -315,35 +314,31 @@ class RowDescriptionResponse : public Message {
             append_int16(buffer, 0);
         }
 
-        // Update the length of the message
+        // update the message length
         int32_t message_length = buffer.size() - pre_bytes;
         write_int32(buffer, message_length, pre_bytes);
-
-        SPDLOG_DEBUG(
-            "package: {}",
-            spdlog::to_hex(buffer.data(), buffer.data() + buffer.size()));
     }
 };
 
+// DataRow (B)
 class DataRowResponse : public Message {
    public:
     DataRowResponse() = default;
 
     void encode(std::vector<char>& buffer) {
-        // DataRow (B)
-
         // identifier
         append_char(buffer, 'D');
 
-        // length of message
-        append_int32(buffer, 6);
+        // message length (placeholder)
+        int pre_bytes = buffer.size();
+        append_int32(buffer, 0);
 
         // number of columns
         append_int16(buffer, 0);
 
-        SPDLOG_DEBUG(
-            "package: {}",
-            spdlog::to_hex(buffer.data(), buffer.data() + buffer.size()));
+        // update the message length
+        int32_t message_length = buffer.size() - pre_bytes;
+        write_int32(buffer, message_length, pre_bytes);
     }
 };
 
@@ -357,13 +352,14 @@ class CommandCompleteResponse : public Message {
         // identifier
         append_char(buffer, 'C');
 
-        // length of message
+        // message length (placeholder)
         int pre_bytes = buffer.size();
         append_int32(buffer, 0);
 
         // command tag
         append_cstring(buffer, "SELECT 0");
 
+        // update the message length
         int32_t message_length = buffer.size() - pre_bytes;
         write_int32(buffer, message_length, pre_bytes);
     }
