@@ -267,9 +267,10 @@ class EmptyQueryResponse : public Message {
 };
 
 class RowDescriptionResponse : public Message {
-   public:
+   private:
     const std::shared_ptr<arrow::Schema>& schema;
 
+   public:
     explicit RowDescriptionResponse(
         const std::shared_ptr<arrow::Schema>& schema)
         : schema(schema) {}
@@ -322,23 +323,45 @@ class RowDescriptionResponse : public Message {
 
 // DataRow (B)
 class DataRowResponse : public Message {
+   private:
+    const std::shared_ptr<arrow::RecordBatch>& batch;
+
    public:
-    DataRowResponse() = default;
+    explicit DataRowResponse(const std::shared_ptr<arrow::RecordBatch>& batch)
+        : batch(batch) {}
 
     void encode(std::vector<char>& buffer) {
-        // identifier
-        append_char(buffer, 'D');
+        int num_rows = batch->num_rows();
 
-        // message length (placeholder)
-        int pre_bytes = buffer.size();
-        append_int32(buffer, 0);
+        for (int i = 0; i < num_rows; ++i) {
+            append_char(buffer, 'D');
 
-        // number of columns
-        append_int16(buffer, 0);
+            // message length (placeholder)
+            int pre_bytes = buffer.size();
+            append_int32(buffer, 0);
 
-        // update the message length
-        int32_t message_length = buffer.size() - pre_bytes;
-        write_int32(buffer, message_length, pre_bytes);
+            // number of columns
+            append_int16(buffer, batch->num_columns());
+
+            for (int j = 0; j < batch->num_columns(); ++j) {
+                auto column = batch->column(j);
+                auto array = column->Slice(i, 1);
+                auto data = array->data();
+
+                if (data->null_count > 0) {
+                    append_int32(buffer, -1);
+                } else {
+                    append_int32(buffer, data->buffers[1]->size());
+                    buffer.insert(
+                        buffer.end(), data->buffers[1]->data(),
+                        data->buffers[1]->data() + data->buffers[1]->size());
+                }
+            }
+
+            // update the message length
+            int32_t message_length = buffer.size() - pre_bytes;
+            write_int32(buffer, message_length, pre_bytes);
+        }
     }
 };
 
@@ -544,7 +567,7 @@ void sendEmptyResult(int sockfd) {
 void sendBatch(int sockfd, const std::shared_ptr<arrow::RecordBatch>& batch) {
     NetworkPackage* network_package = new NetworkPackage();
     network_package->add_message(new RowDescriptionResponse(batch->schema()));
-    network_package->add_message(new DataRowResponse());
+    network_package->add_message(new DataRowResponse(batch));
     network_package->add_message(new CommandCompleteResponse());
     network_package->add_message(new ReadyForQuery());
     network_package->send_all(sockfd);
