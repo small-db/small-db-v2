@@ -192,27 +192,6 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
                 }
             }
 
-            // query->column_names.size();
-            // r.columns();
-
-            // for (int i = 0; i < r.columns(); ++i) {
-            //     SPDLOG_INFO("column Name: {}", r.column_name(i));
-            // }
-
-            // // Print the query result
-            // SPDLOG_INFO("query Result:");
-            // for (const auto& row : r) {
-            //     std::string row_data;
-            //     for (const auto& field : row) {
-            //         row_data += field.c_str();  // Convert field to string
-            //         row_data += " | ";          // Add a separator
-            //     }
-            //     SPDLOG_INFO("row: {}", row_data);
-            // }
-
-            SPDLOG_INFO("result rows: {}", r.size());
-            SPDLOG_INFO("result columns: {}", r.columns());
-
             tx.commit();
         }
     }
