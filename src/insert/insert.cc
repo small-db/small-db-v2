@@ -100,8 +100,9 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> insert(
                     "partition not found for value {}", partition_value));
             }
 
-            // partition->constraints;
-            SPDLOG_INFO("partition constraints: {}", partition->constraints);
+            for (const auto& [key, value] : partition->constraints) {
+                SPDLOG_INFO("partition constraint: {} = {}", key, value);
+            }
         }
     }
 
