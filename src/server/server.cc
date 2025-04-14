@@ -601,7 +601,8 @@ void handle_query(std::string& query, int sockfd) {
         if (!result.ok()) {
             SPDLOG_ERROR("error handling statement: {}",
                          result.status().ToString());
-            break;
+            sendError(sockfd, result.status().ToString());
+            return;
         }
 
         auto record_batch = result.value();
