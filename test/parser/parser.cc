@@ -40,6 +40,30 @@
 
 namespace parser {
 
+// ref:
+// https://github.com/cockroachdb/cockroach/blob/1b0a374fd2a101cebcfb24cff4b3b57795ad1df6/pkg/sql/logictest/logic.go#L278
+type::Type from_sqltest(char c) {
+    switch (c) {
+        case 'T':
+            return type::Type::String;
+        case 'I':
+            return type::Type::Int64;
+        default:
+            SPDLOG_ERROR("unknown type: {}", c);
+            return type::Type::Int64;
+    }
+}
+
+std::vector<std::string> split_and_trim(const std::string& input,
+                                        char delimiter) {
+    std::vector<std::string> result;
+    for (absl::string_view part : absl::StrSplit(input, delimiter)) {
+        // Trim leading and trailing spaces
+        result.push_back(std::string(absl::StripAsciiWhitespace(part)));
+    }
+    return result;
+}
+
 SQLTestUnit::SQLTestUnit(std::vector<std::string> labels, std::string sql,
                          std::string raw_expected,
                          behaviour_t expected_behavior)
@@ -71,27 +95,45 @@ static absl::StatusOr<std::unique_ptr<SQLTestUnit>> init(
             "a sql unit must have exactly 2 tags");
     }
 
-    // statement ok
     SQLTestUnit::behaviour_t behavior;
     if (tags[0] == "statement" && tags[1] == "ok") {
+        // statement ok
         behavior = SQLTestUnit::StatementOK();
     } else if (tags[0] == "query") {
         // query
         auto query = SQLTestUnit::Query();
-        auto column_names = absl::StrSplit(lines[0], ' ');
-        for (const auto& name : column_names) {
-            query.column_names.push_back(name.data());
+
+        // column types
+        for (char c : tags[1]) {
+            query.column_types.push_back(from_sqltest(c));
         }
-        for (int row = 2; row < lines.size(); row++) {
+
+        int reply_row_id = -1;
+        for (int row = 0; row < lines.size(); row++) {
             if (lines[row] == "----") {
-                break;
+                reply_row_id = 0;
+                continue;
             }
-            auto values = absl::StrSplit(lines[row], ' ');
-            std::vector<std::string> value;
-            for (const auto& v : values) {
-                value.push_back(v.data());
+
+            if (reply_row_id < 0) {
+                continue;
             }
-            query.expected_output.push_back(value);
+
+            switch (reply_row_id) {
+                case 0:
+                    // column names
+                    query.column_names = split_and_trim(lines[row], '|');
+                    break;
+                case 1:
+                    // break line
+                    break;
+                default:
+                    query.expected_output.push_back(
+                        split_and_trim(lines[row], '|'));
+                    break;
+            }
+
+            reply_row_id++;
         }
         behavior = query;
     } else {

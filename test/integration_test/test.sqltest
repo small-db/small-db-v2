@@ -33,7 +33,7 @@ ALTER TABLE users_us ADD CONSTRAINT check_region CHECK (region = 'us');
 statement ok
 ALTER TABLE users_asia ADD CONSTRAINT check_region CHECK (region = 'asia');
 
-query TTTTT
+query TT
 SELECT * FROM system.tables;
 ----
  table_name | columns 
