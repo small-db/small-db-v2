@@ -131,6 +131,18 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
             }
             pqxx::work tx(conn);
             pqxx::result r = tx.exec(unit.sql);
+
+            // Print the query result
+            SPDLOG_INFO("Query Result:");
+            for (const auto& row : r) {
+                std::string row_data;
+                for (const auto& field : row) {
+                    row_data += field.c_str();  // Convert field to string
+                    row_data += " | ";          // Add a separator
+                }
+                SPDLOG_INFO("Row: {}", row_data);
+            }
+
             SPDLOG_INFO("result rows: {}", r.size());
             SPDLOG_INFO("result columns: {}", r.columns());
             tx.commit();
