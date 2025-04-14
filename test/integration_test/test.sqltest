@@ -38,7 +38,7 @@ SELECT * FROM system.tables;
 ----
  table_name | columns 
 ------------+--------
- users      | {id(PK, INT), name(STRING), balance(INT), country(STRING)}
+ users      | id(PK, INT), name(STRING), balance(INT), country(STRING)
 
 
 query TTTTT
