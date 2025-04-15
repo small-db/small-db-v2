@@ -35,7 +35,7 @@ find_package(Abseil REQUIRED)
 find_package(RocksDB REQUIRED)
 find_package(Json REQUIRED)
 find_package(MagicEnum REQUIRED)
-# find_package(Grpc REQUIRED)
+find_package(Grpc REQUIRED)
 
 # ============================================================================== #
 # source code

@@ -7,6 +7,7 @@ FetchContent_Declare(
 
 get_all_targets(. BEFORE_TARGETS)
 
+set(FETCHCONTENT_QUIET OFF)
 FetchContent_MakeAvailable(grpc)
 
 get_all_targets(. AFTER_TARGETS)
