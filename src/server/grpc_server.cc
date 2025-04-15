@@ -28,7 +28,16 @@
 namespace server {
 
 void RunGrpcServer(int port) {
-    SPDLOG_INFO("Starting gRPC server on port {}", port);
+    std::thread grpc_server_thread([port]() {
+        SPDLOG_INFO("Starting gRPC server on port {}", port);
+    });
+    grpc_server_thread.detach();
 }
 
-}  // namespace
+void RunGrpcServer2(int port) {
+    SPDLOG_INFO("Starting gRPC server on port {}", port);
+
+    // Create a gRPC server in a thread
+}
+
+}  // namespace server
