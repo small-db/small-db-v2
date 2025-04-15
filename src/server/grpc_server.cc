@@ -30,12 +30,36 @@
 #include "grpcpp/server_builder.h"
 
 // =====================================================================
+// local libraries
+// =====================================================================
+
+#include "src/server/server_reg.grpc.pb.h"
+// #include "src/server/server_reg.pb.h"
+
+// =====================================================================
 // self header
 // =====================================================================
 
 #include "src/server/grpc_server.h"
 
 namespace server {
+
+class AddressBookService final : public helloworld::Greeter::Service {
+   public:
+    // virtual ::grpc::Status GetAddress(::grpc::ServerContext* context,
+    //                                   const ::helloworld::NameQuerry*
+    //                                   request,
+    //                                   ::expcmake::Address* response) {
+    //     std::cout << "Server: GetAddress for \"" << request->name() << "\"."
+    //               << std::endl;
+
+    //     response->set_name("Peter Peterson");
+    //     response->set_zip("12345");
+    //     response->set_country("Superland");
+
+    //     return grpc::Status::OK;
+    // }
+};
 
 void RunGrpcServer(int port) {
     std::thread grpc_server_thread([port]() {
@@ -45,8 +69,8 @@ void RunGrpcServer(int port) {
         std::string addr = fmt::format("0.0.0.0:{}", port);
         builder.AddListeningPort(addr, grpc::InsecureServerCredentials());
 
-        // AddressBookService my_service;
-        // builder.RegisterService(&my_service);
+        AddressBookService my_service;
+        builder.RegisterService(&my_service);
 
         std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
         server->Wait();
