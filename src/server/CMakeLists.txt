@@ -5,8 +5,6 @@ add_library(server_lib
     args.h
     stmt_handler.cc
     stmt_handler.h
-    grpc_server.cc
-    grpc_server.h
 )
 
 target_link_libraries(server_lib
@@ -19,6 +17,7 @@ target_link_libraries(server_lib
     insert_lib
     absl::status
     grpc++
+    # grpc_server_lib
 )
 
 add_executable(server
@@ -47,11 +46,12 @@ set(PROTO_FILES
 add_library(myproto ${PROTO_FILES})
 target_link_libraries(myproto
     PUBLIC
-        protobuf::libprotobuf
-        gRPC::grpc
-        gRPC::grpc++
+    protobuf::libprotobuf
+    gRPC::grpc
+    gRPC::grpc++
 )
 target_include_directories(myproto PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+message(STATUS "Protobuf include directories: ${CMAKE_CURRENT_BINARY_DIR}")
 
 #
 # Compile protobuf and grpc files in myproto target to cpp
@@ -59,3 +59,14 @@ target_include_directories(myproto PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 get_target_property(grpc_cpp_plugin_location gRPC::grpc_cpp_plugin LOCATION)
 protobuf_generate(TARGET myproto LANGUAGE cpp)
 protobuf_generate(TARGET myproto LANGUAGE grpc GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc PLUGIN "protoc-gen-grpc=${grpc_cpp_plugin_location}")
+
+# add_library(grpc_server_lib
+#     grpc_server.cc
+#     grpc_server.h
+# )
+
+# target_link_libraries(grpc_server_lib
+#     PUBLIC
+#     spdlog
+#     myproto
+# )
