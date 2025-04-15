@@ -87,11 +87,13 @@ class SQLTest : public ::testing::Test {
     static void StartServers() {
         SPDLOG_INFO("starting the server thread");
 
-        std::vector<int> ports = {5432, 5433, 5434};
-        std::vector<std::string> regions = {"asia", "eu", "us"};
+        std::vector<server::ServerArgs> server_args = {
+            {5432, "asia", "", "./data/asia"},
+            {5433, "eu", "127.0.0.1:5432", "./data/eu"},
+            {5434, "us", "127.0.0.1:5432", "./data/us"},
+        };
 
-        for (size_t i = 0; i < ports.size(); ++i) {
-            server::ServerArgs args = server::ServerArgs(ports[i], regions[i]);
+        for (auto& args : server_args) {
             server_threads.emplace_back(server::RunServer, args);
         }
     }
