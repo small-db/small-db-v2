@@ -5,6 +5,8 @@ add_library(server_lib
     args.h
     stmt_handler.cc
     stmt_handler.h
+    grpc_server.cc
+    grpc_server.h
 )
 
 target_link_libraries(server_lib
