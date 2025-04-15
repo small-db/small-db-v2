@@ -34,7 +34,7 @@
 // =====================================================================
 
 #include "src/server/server_reg.grpc.pb.h"
-// #include "src/server/server_reg.pb.h"
+#include "src/server/server_reg.pb.h"
 
 // =====================================================================
 // self header
