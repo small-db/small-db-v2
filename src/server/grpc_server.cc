@@ -13,11 +13,21 @@
 // limitations under the License.
 
 // =====================================================================
+// c++ std
+// =====================================================================
+
+#include <string>
+
+// =====================================================================
 // third-party libraries
 // =====================================================================
 
 // spdlog
 #include "spdlog/spdlog.h"
+
+// grpc
+#include "grpc/grpc.h"
+#include "grpcpp/server_builder.h"
 
 // =====================================================================
 // self header
@@ -30,14 +40,18 @@ namespace server {
 void RunGrpcServer(int port) {
     std::thread grpc_server_thread([port]() {
         SPDLOG_INFO("Starting gRPC server on port {}", port);
+
+        grpc::ServerBuilder builder;
+        std::string addr = fmt::format("0.0.0.0:{}", port);
+        builder.AddListeningPort(addr, grpc::InsecureServerCredentials());
+
+        // AddressBookService my_service;
+        // builder.RegisterService(&my_service);
+
+        std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
+        server->Wait();
     });
     grpc_server_thread.detach();
-}
-
-void RunGrpcServer2(int port) {
-    SPDLOG_INFO("Starting gRPC server on port {}", port);
-
-    // Create a gRPC server in a thread
 }
 
 }  // namespace server
