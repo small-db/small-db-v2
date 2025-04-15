@@ -23,7 +23,7 @@
 namespace server {
 class ServerArgs {
    public:
-    int port;
+    int sql_port;
 
     std::string region;
 
@@ -32,11 +32,14 @@ class ServerArgs {
     std::string data_dir;
 
     ServerArgs()
-        : port(5432), region("default"), join(""), data_dir("./data/default") {}
+        : sql_port(5432),
+          region("default"),
+          join(""),
+          data_dir("./data/default") {}
 
     ServerArgs(int port, std::string region, std::string join = "",
                std::string data_dir = "")
-        : port(port), region(region), join(join), data_dir(data_dir) {}
+        : sql_port(port), region(region), join(join), data_dir(data_dir) {}
 };
 
 // extern ServerArgs DefaultArgs;

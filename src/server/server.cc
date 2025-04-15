@@ -636,7 +636,7 @@ int RunServer(const server::ServerArgs& args) {
     setsockopt(sock_listen_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(args.port);
+    server_addr.sin_port = htons(args.sql_port);
     server_addr.sin_addr.s_addr = INADDR_ANY;
 
     // bind socket and listen for connections
@@ -651,7 +651,7 @@ int RunServer(const server::ServerArgs& args) {
     if (listen(sock_listen_fd, BACKLOG) < 0) {
         SPDLOG_ERROR("error listening: {}", strerror(errno));
     }
-    SPDLOG_INFO("server listening on port: {}", args.port);
+    SPDLOG_INFO("server listening on port: {}", args.sql_port);
 
     struct epoll_event ev, events[MAX_EVENTS];
     int new_events, sock_conn_fd, epollfd;
