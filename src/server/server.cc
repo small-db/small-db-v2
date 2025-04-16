@@ -620,7 +620,7 @@ void handle_query(std::string& query, int sockfd) {
 }
 
 int RunServer(const server::ServerArgs& args) {
-    RunGrpcServer(args.grpc_port);
+    // RunGrpcServer(args.grpc_port);
 
     struct sockaddr_in server_addr{};
     struct sockaddr_in client_addr{};
