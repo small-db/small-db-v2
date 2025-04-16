@@ -25,16 +25,16 @@
 // spdlog
 #include "spdlog/spdlog.h"
 
-// grpc
-#include "grpc/grpc.h"
-#include "grpcpp/server_builder.h"
-
 // =====================================================================
 // local libraries
 // =====================================================================
 
-#include "server_reg.grpc.pb.h"
 #include "server_reg.pb.h"
+#include "server_reg.grpc.pb.h"
+
+// grpc
+#include "grpc/grpc.h"
+#include "grpcpp/server_builder.h"
 
 // =====================================================================
 // self header

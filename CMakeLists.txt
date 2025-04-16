@@ -37,6 +37,8 @@ find_package(Json REQUIRED)
 find_package(MagicEnum REQUIRED)
 # find_package(Grpc REQUIRED)
 
+find_package(absl CONFIG REQUIRED)
+
 # ============================================================================== #
 # source code
 # ============================================================================== #

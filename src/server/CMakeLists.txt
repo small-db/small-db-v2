@@ -5,6 +5,8 @@ add_library(server_lib
     args.h
     stmt_handler.cc
     stmt_handler.h
+    grpc_server.cc
+    grpc_server.h
 )
 
 target_link_libraries(server_lib
@@ -16,7 +18,7 @@ target_link_libraries(server_lib
     query_lib
     insert_lib
     absl::status
-    # grpc_server
+    myproto
 )
 
 add_executable(server
@@ -29,6 +31,12 @@ target_link_libraries(server
 )
 
 add_library(grpc_server
+    server.cc
+    server.h
+    args.cc
+    args.h
+    stmt_handler.cc
+    stmt_handler.h
     grpc_server.cc
     grpc_server.h
 )
@@ -37,6 +45,12 @@ target_link_libraries(grpc_server
     PRIVATE
     myproto
     spdlog
+    schema_lib
+    spdlog
+    libpg_query_lib
+    semantics_lib
+    query_lib
+    insert_lib
     absl::status
 )
 
