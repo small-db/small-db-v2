@@ -31,25 +31,27 @@ find_package(Arrow REQUIRED)
 find_package(Spdlog REQUIRED)
 find_package(PgQuery REQUIRED)
 find_package(GoogleTest REQUIRED)
-find_package(Abseil REQUIRED)
-find_package(RocksDB REQUIRED)
-find_package(Json REQUIRED)
-find_package(MagicEnum REQUIRED)
-# find_package(Protobuf REQUIRED)
-# find_package(Grpc REQUIRED)
+# find_package(Abseil REQUIRED)
+# find_package(RocksDB REQUIRED)
+# find_package(Json REQUIRED)
+# find_package(MagicEnum REQUIRED)
+find_package(Protobuf REQUIRED)
+# # find_package(Grpc REQUIRED)
 
-# find_package(absl CONFIG REQUIRED)
+# # find_package(absl CONFIG REQUIRED)
 
-# ============================================================================== #
-# source code
-# ============================================================================== #
+# # ============================================================================== #
+# # source code
+# # ============================================================================== #
 
-include_directories(
-    ${CMAKE_SOURCE_DIR}
-)
+# include_directories(
+#     ${CMAKE_SOURCE_DIR}
+# )
 
-# define macros
-add_compile_definitions(SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE)
+# # define macros
+# add_compile_definitions(SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE)
 
-add_subdirectory(src)
-add_subdirectory(test)
+# add_subdirectory(src)
+# add_subdirectory(test)
+
+# add_subdirectory(src/fuck_cpp/grpc)
