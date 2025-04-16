@@ -16,7 +16,7 @@ target_link_libraries(server_lib
     query_lib
     insert_lib
     absl::status
-    grpc_server
+    # grpc_server
 )
 
 add_executable(server
