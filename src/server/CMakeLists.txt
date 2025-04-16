@@ -37,6 +37,7 @@ target_link_libraries(grpc_server
     PRIVATE
     myproto
     spdlog
+    absl::status
 )
 
 find_package(Protobuf CONFIG REQUIRED)
