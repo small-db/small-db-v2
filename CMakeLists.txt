@@ -33,26 +33,29 @@ include(FetchContent)
 # find_package(GoogleTest REQUIRED)
 # find_package(Abseil REQUIRED)
 
-FetchContent_Declare(
-    abseil
-    GIT_REPOSITORY "https://github.com/abseil/abseil-cpp.git"
-    GIT_TAG "lts_2025_01_27"
-    GIT_SHALLOW TRUE
-)
-FetchContent_Declare(
-    protobuf
-    GIT_REPOSITORY "https://github.com/protocolbuffers/protobuf.git"
-    GIT_TAG "v30.2"
-    GIT_SHALLOW TRUE
-)
-FetchContent_Declare(
-    grpc
-    GIT_REPOSITORY "https://github.com/grpc/grpc.git"
-    GIT_TAG "v1.71.0"
-    GIT_SHALLOW TRUE
-)
+set(FETCHCONTENT_QUIET OFF)
 
-FetchContent_MakeAvailable(abseil protobuf grpc)
+# FetchContent_Declare(
+#     abseil
+#     GIT_REPOSITORY "https://github.com/abseil/abseil-cpp.git"
+#     GIT_TAG "lts_2025_01_27"
+#     GIT_SHALLOW TRUE
+# )
+# FetchContent_Declare(
+#     protobuf
+#     GIT_REPOSITORY "https://github.com/protocolbuffers/protobuf.git"
+#     GIT_TAG "v30.2"
+#     GIT_SHALLOW TRUE
+# )
+# FetchContent_Declare(
+#     grpc
+#     GIT_REPOSITORY "https://github.com/grpc/grpc.git"
+#     GIT_TAG "v1.71.0"
+#     GIT_SHALLOW TRUE
+# )
+
+# FetchContent_MakeAvailable(abseil protobuf grpc)
+# FetchContent_MakeAvailable(abseil grpc)
 
 # get_target_property(tmp absl::strings INTERFACE_LINK_LIBRARIES)
 # message(STATUS "Abseil strings dependencies: ${tmp}")
