@@ -34,7 +34,7 @@ add_library(grpc_server
 )
 
 target_link_libraries(grpc_server
-    PUBLIC
+    PRIVATE
     myproto
     spdlog
 )
