@@ -74,7 +74,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 #
 # Target
 #
-add_executable(fuck_grpc_server ${SOURCES})
+add_library(fuck_grpc_server ${SOURCES})
 target_link_libraries(fuck_grpc_server
     PRIVATE
     myproto
