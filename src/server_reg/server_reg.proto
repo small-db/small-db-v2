@@ -1,22 +1,17 @@
 syntax = "proto3";
 
-package helloworld;
+package small.server_reg;
 
-service Greeter {
-  rpc SayHello (HelloRequest) returns (HelloReply);
+service ServerReg {
+  rpc Register(ServerRegRequest) returns (ServerRegReply) {}
 }
 
-message HelloRequest {
-  string name = 1;
+message ServerRegRequest {
+  string sql_address = 1;
+  string rpc_address = 2;
+  string region = 3;
 }
 
-message HelloReply {
-  string message = 1;
+message ServerRegReply {
+  bool success = 1;
 }
-
-// protoc -I=. --grpc_out=. --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` helloworld.proto
-// protoc -I=. --cpp_out=. helloworld.proto
-// protoc --cpp_out=. --grpc_out=. --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` ./src/server_reg/calculator.proto
-// protoc -I=./src/server_reg --cpp_out=./src/server_reg --grpc_out=./src/server_reg --plugin=protoc-gen-grpc=`which grpc_cpp_plugin`
-// protoc --cpp_out=. --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` ./src/server_reg/server_reg.proto
-

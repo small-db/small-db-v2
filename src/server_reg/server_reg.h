@@ -30,7 +30,7 @@
 // absl
 #include "absl/status/status.h"
 
-namespace server_reg {
+namespace small::server_reg {
 
 class Server {};
 
@@ -41,4 +41,4 @@ std::vector<std::shared_ptr<Server>> get_servers(
 
 // absl::Status add_server(std::shared_ptr<Server> server);
 
-}  // namespace server_reg
+}  // namespace small::server_reg

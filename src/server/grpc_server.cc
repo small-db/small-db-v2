@@ -32,7 +32,7 @@
 #include "spdlog/spdlog.h"
 
 // =====================================================================
-// local libraries
+// protobuf generated files
 // =====================================================================
 
 #include "hello.grpc.pb.h"

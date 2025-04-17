@@ -22,16 +22,31 @@
 #include <vector>
 
 // =====================================================================
+// protobuf generated files
+// =====================================================================
+
+#include "server_reg.grpc.pb.h"
+#include "server_reg.pb.h"
+
+// =====================================================================
 // self header
 // =====================================================================
 
 #include "src/server_reg/server_reg.h"
 
-namespace server_reg {
+namespace small::server_reg {
+
+class ServerRegService final : public small::server_reg::ServerReg::Service {
+   public:
+    virtual ::grpc::Status Register(
+        ::grpc::ServerContext* context,
+        const ::small::server_reg::ServerRegRequest* request,
+        ::small::server_reg::ServerRegReply* response) {}
+};
 
 std::vector<std::shared_ptr<Server>> get_servers(
     std::unordered_map<std::string, std::string>& constraints) {
     return std::vector<std::shared_ptr<Server>>();
 }
 
-}  // namespace server_reg
+}  // namespace small::server_reg
