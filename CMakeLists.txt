@@ -36,6 +36,8 @@ find_package(gRPC CONFIG REQUIRED)
 
 find_package(absl CONFIG REQUIRED)
 
+find_package(re2 CONFIG REQUIRED)
+
 # ======================================================================== #
 # third-party packages (local)
 # ======================================================================== #

@@ -12,15 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <iostream>
+// =====================================================================
+// c++ std
+// =====================================================================
 
-#include <grpc/grpc.h>
-#include <grpcpp/server_builder.h>
-#include <hello.grpc.pb.h>
-#include <hello.pb.h>
+#include <iostream>
+#include <memory>
+#include <string>
+
+// =====================================================================
+// third-party libraries
+// =====================================================================
+
+// grpc
+#include "grpc/grpc.h"
+#include "grpcpp/server_builder.h"
 
 // spdlog
 #include "spdlog/spdlog.h"
+
+// =====================================================================
+// local libraries
+// =====================================================================
+
+#include "hello.grpc.pb.h"
+#include "hello.pb.h"
+
+// =====================================================================
+// self header
+// =====================================================================
+
+#include "src/server/grpc_server.h"
 
 namespace small::grpc_server {
 
@@ -46,12 +68,12 @@ void start_server(int port) {
     builder.RegisterService(&my_service);
 
     std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
-    server->Wait();
+
+    // Run the server in a separate thread
+    std::thread server_thread([&server]() { server->Wait(); });
+
+    // Detach the thread to allow it to run independently
+    server_thread.detach();
 }
 
 }  // namespace small::grpc_server
-
-int main(int argc, char* argv[]) {
-    small::grpc_server::start_server(50051);
-    return 0;
-}
