@@ -20,22 +20,34 @@ add_subdirectory(cmake/helper)
 # third-party packages (system wide)
 # ======================================================================== #
 
-# "gRPC" is installed on system wide since it's too large.
+# "grpc" is installed on system wide since it's too large.
 # 
-# "Protobuf" and "absl" are bundled with gRPC.
+# process of installing "grpc":
+# > gcl --depth 1 git@github.com:grpc/grpc.git
+# > cd grpc
+# > cmake -S . -B ./cmake/build -DCMAKE_CXX_STANDARD=17 -DgRPC_INSTALL=ON -DCMAKE_INSTALL_PREFIX=~/local/cpplib -G Ninja
+# > cmake --build ./cmake/build --target install
 # 
-# If we include them locally (e.g. via FetchContent) as well, it will violate the
-# "one definition rule" (ODR) and cause linking errors. See:
-# 
-# https://github.com/abseil/abseil-cpp/blob/master/FAQ.md#what-is-abi-and-why-dont-you-recommend-using-a-pre-compiled-version-of-abseil
+# "grpc" bundles following packages:
+# - "absl" (<CMAKE_INSTALL_PREFIX>/lib/cmake/absl/abslConfig.cmake)
+# - "c-ares" (<CMAKE_INSTALL_PREFIX>/lib/cmake/c-ares/c-aresConfig.cmake)
+# - "gRPC" (<CMAKE_INSTALL_PREFIX>/lib/cmake/grpc/gRPCConfig.cmake)
+# - "protobuf" (<CMAKE_INSTALL_PREFIX>/lib/cmake/protobuf/protobuf-config.cmake)
+# - "re2" (<CMAKE_INSTALL_PREFIX>/lib/cmake/re2/re2Config.cmake)
+# - "utf_range" (<CMAKE_INSTALL_PREFIX>/lib/cmake/utf_range/utf_range-config.cmake)
 
 find_package(Protobuf CONFIG REQUIRED)
 
-# "gRPC" must comes after "Protobuf" since it depends on it.
+# "gRPC" must comes after "Protobuf" since it depends on "Protobuf"
 find_package(gRPC CONFIG REQUIRED)
 
+# Some packages are imported via "find_package" command. If we include them locally
+# (e.g. via FetchContent) instead, we will violate the "one definition rule" (ODR)
+# and cause linking errors.
+# 
+# Some explanations about ODR:
+# - https://github.com/abseil/abseil-cpp/blob/master/FAQ.md#what-is-abi-and-why-dont-you-recommend-using-a-pre-compiled-version-of-abseil
 find_package(absl CONFIG REQUIRED)
-
 find_package(re2 CONFIG REQUIRED)
 
 # ======================================================================== #
