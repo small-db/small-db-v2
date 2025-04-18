@@ -87,11 +87,11 @@ void start_server(int port) {
 
 absl::Status join(std::string peer_addr, std::string self_region) {
     if (peer_addr.empty()) {
-        std::this_thread::sleep_for(std::chrono::seconds(100));
+        std::this_thread::sleep_for(std::chrono::seconds(1000));
         return absl::OkStatus();
     }
 
-    std::this_thread::sleep_for(std::chrono::seconds(1000));
+    std::this_thread::sleep_for(std::chrono::seconds(2000));
 
     SPDLOG_INFO("join peer addr: {}", peer_addr);
 
