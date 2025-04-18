@@ -25,4 +25,5 @@ add_executable(server
 target_link_libraries(server
     PRIVATE
     server_lib
+    CLI11::CLI11
 )

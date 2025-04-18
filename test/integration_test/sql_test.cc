@@ -83,6 +83,7 @@ class SQLTest : public ::testing::Test {
             {5002, 50002, "eu", "127.0.0.1:50001", "./data/eu"},
             {5003, 50003, "us", "127.0.0.1:50001", "./data/us"},
         };
+
         StartServers(server_args);
 
         WaitServer();

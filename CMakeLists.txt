@@ -69,6 +69,7 @@ find_package(GoogleTest REQUIRED)
 find_package(RocksDB REQUIRED)
 find_package(Json REQUIRED)
 find_package(MagicEnum REQUIRED)
+find_package(CLI11 REQUIRED)
 
 # ============================================================================== #
 # source code
