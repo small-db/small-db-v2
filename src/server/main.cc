@@ -13,6 +13,12 @@
 // limitations under the License.
 
 // =====================================================================
+// c++ std
+// =====================================================================
+
+#include <string>
+
+// =====================================================================
 // third-party libraries
 // =====================================================================
 
@@ -28,15 +34,34 @@
 
 #include "src/server/server.h"
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     spdlog::set_level(spdlog::level::debug);
     spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] [%@] %v");
 
-    if (argc < 2) {
-        SPDLOG_INFO("Please give a port number: ./epoll_echo_server [port]\n");
-        exit(0);
+    CLI::App app{"small-db"};
+
+    int sql_port = 0;
+    app.add_option("--sql-port", sql_port, "SQL port number")
+        ->required()
+        ->check(CLI::Range(0, 65535));
+
+    int grpc_port = 0;
+    app.add_option("--grpc-port", grpc_port, "gRPC port number")
+        ->required()
+        ->check(CLI::Range(0, 65535));
+
+    std::string region;
+    app.add_option("--region", region, "Region name");
+
+    std::string join;
+    app.add_option("--join", join, "Join server address");
+
+    try {
+        app.parse(argc, argv);
+    } catch (const CLI::ParseError &e) {
+        return app.exit(e);
     }
 
-    int portno = strtol(argv[1], NULL, 10);
-    return server::RunServer(small::server_base::ServerArgs());
+    return server::RunServer(
+        small::server_base::ServerArgs{sql_port, grpc_port, region, join});
 }

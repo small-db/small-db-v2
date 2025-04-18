@@ -55,7 +55,8 @@
 
 namespace small::server_registry {
 
-absl::Status ServerRegister::RegisterServer(const small::server_base::ServerArgs& args) {
+absl::Status ServerRegister::RegisterServer(
+    const small::server_base::ServerArgs& args) {
     SPDLOG_INFO("register server: sql_address: {}, rpc_address: {}, region: {}",
                 args.sql_port, args.grpc_port, args.region);
     return absl::OkStatus();
