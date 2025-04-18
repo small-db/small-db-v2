@@ -90,7 +90,7 @@ absl::Status join(std::string peer_addr, std::string self_region) {
         return absl::OkStatus();
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::seconds(10));
 
     SPDLOG_INFO("join peer addr: {}", peer_addr);
 
