@@ -27,5 +27,7 @@
 #include <string>
 
 namespace small::util::ip {
-struct sockaddr_in str_to_sockaddr(const std::string& sql_addr);
+
+sockaddr_in str_to_sockaddr(const std::string& sql_addr);
+
 }  // namespace small::util::ip
