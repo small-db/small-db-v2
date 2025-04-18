@@ -58,7 +58,8 @@ namespace small::server_registry {
 absl::Status ServerRegister::RegisterServer(
     const small::server_base::ServerArgs& args) {
     SPDLOG_INFO(
-        "[callee] register server: sql_address: {}, rpc_address: {}, region: "
+        "[server status] register server: sql_address: {}, rpc_address: {}, "
+        "region: "
         "{}",
         args.sql_addr, args.grpc_addr, args.region);
     this->servers.push_back(args);
@@ -75,13 +76,14 @@ class RegistryService final
         const ::small::server_registry::RegistryRequest* request,
         ::small::server_registry::RegistryReply* response) {
         SPDLOG_INFO(
-            "register server: sql_address: {}, rpc_address: {}, region: {}",
+            "[server] register server: sql_address: {}, rpc_address: {}, "
+            "region: {}",
             request->sql_address(), request->rpc_address(), request->region());
 
         auto status = small::server_registry::ServerRegister::GetInstance()
                           ->RegisterServer(small::server_base::ServerArgs(
                               request->sql_address(), request->rpc_address(),
-                              request->region(), "", ""));
+                              "", request->region(), ""));
 
         if (!status.ok()) {
             SPDLOG_ERROR("failed to register server: {}", status.ToString());
@@ -141,7 +143,8 @@ void start_server(std::string addr) {
     }).detach();
 }
 
-absl::Status join(const small::server_base::ServerArgs& args) {
+// absl::Status join(const small::server_base::ServerArgs& args) {
+absl::Status join(small::server_base::ServerArgs args) {
     if (args.join.empty()) {
         return absl::OkStatus();
     }
@@ -153,7 +156,7 @@ absl::Status join(const small::server_base::ServerArgs& args) {
     request.set_rpc_address(args.grpc_addr);
     request.set_region(args.region);
     SPDLOG_INFO(
-        "[caller] register server: sql_address: {}, rpc_address: {}, region: "
+        "[client] register server: sql_address: {}, rpc_address: {}, region: "
         "{}",
         request.sql_address(), request.rpc_address(), request.region());
 

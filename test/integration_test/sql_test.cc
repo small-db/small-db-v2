@@ -114,7 +114,7 @@ class SQLTest : public ::testing::Test {
 
     // wait for the server to ready
     static void WaitServer() {
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::this_thread::sleep_for(std::chrono::seconds(1000));
 
         pqxx::connection conn = pqxx::connection{CONNECTION_STRING.data()};
         auto version = conn.server_version();

@@ -56,3 +56,9 @@ ctest --test-dir build
 
 
 > A database may only be opened by one process at a time. - https://github.com/facebook/rocksdb/wiki/basic-operations#concurrency
+
+
+## TODO - CI
+
+- valgrind
+- sanitizer (address, memory, undefined)
