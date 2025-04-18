@@ -625,7 +625,7 @@ void handle_query(std::string& query, int sockfd) {
     }
 }
 
-int RunServer(const small::server_base::ServerArgs& args) {
+int RunServer(small::server_base::ServerArgs args) {
     auto status = small::server_base::init(args);
     if (!status.ok()) {
         SPDLOG_ERROR("failed to init server: {}", status.ToString());

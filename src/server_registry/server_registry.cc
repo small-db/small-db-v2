@@ -63,9 +63,7 @@ absl::Status ServerRegister::RegisterServer(
     return absl::OkStatus();
 }
 
-ServerRegister* ServerRegister::GetInstance() {
-    return instance;
-}
+ServerRegister* ServerRegister::GetInstance() { return instance; }
 
 class RegistryService final
     : public small::server_registry::ServerRegistry::Service {
@@ -161,10 +159,11 @@ absl::Status join(const small::server_base::ServerArgs& args) {
     small::server_registry::RegistryReply result;
     grpc::Status status = stub->Register(&context, request, &result);
     if (!status.ok()) {
-        SPDLOG_ERROR("failed to join peer: {}", status.error_message());
+        SPDLOG_ERROR("failed to join peer: {}, error: {}", args.join,
+                     status.error_message());
         return absl::InternalError(status.error_message());
     }
-    SPDLOG_INFO("joined peer: {}", result.success());
+    SPDLOG_INFO("joined peer: {}, result: {}", args.join, result.success());
     return absl::OkStatus();
 }
 

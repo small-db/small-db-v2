@@ -97,7 +97,7 @@ class SQLTest : public ::testing::Test {
         const std::vector<small::server_base::ServerArgs>& args) {
         const std::string server_path = "./build/debug/src/server/server";
 
-        for (auto& arg : args) {
+        for (auto arg : args) {
             pid_t pid = fork();
             if (pid == 0) {
                 // In child process
