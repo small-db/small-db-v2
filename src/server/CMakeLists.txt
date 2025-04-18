@@ -15,7 +15,7 @@ target_link_libraries(server_lib
     insert_lib
     ssl
     crypto
-    server_arg_lib
+    server_base_lib
 )
 
 add_executable(server

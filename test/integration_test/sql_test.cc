@@ -78,7 +78,7 @@ constexpr std::string_view CONNECTION_STRING =
 class SQLTest : public ::testing::Test {
    protected:
     static void SetUpTestSuite() {
-        std::vector<server::ServerArgs> server_args = {
+        std::vector<small::server_base::ServerArgs> server_args = {
             {5001, 50001, "asia", "", "./data/asia"},
             {5002, 50002, "eu", "127.0.0.1:50001", "./data/eu"},
             {5003, 50003, "us", "127.0.0.1:50001", "./data/us"},
@@ -90,7 +90,7 @@ class SQLTest : public ::testing::Test {
 
     static std::vector<int> server_pids;
 
-    static void StartServers(const std::vector<server::ServerArgs>& args) {
+    static void StartServers(const std::vector<small::server_base::ServerArgs>& args) {
         for (auto& arg : args) {
             std::string command =
                 fmt::format("./small-db --port {} --rpc_port {} --data_dir {}",

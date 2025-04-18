@@ -8,7 +8,7 @@ target_link_libraries(server_registry
     spdlog
     absl::status
     server_registry_proto
-    server_arg_lib
+    server_base_lib
 )
 
 # ======================================================================== #

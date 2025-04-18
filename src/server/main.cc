@@ -35,5 +35,5 @@ int main(int argc, char* argv[]) {
     }
 
     int portno = strtol(argv[1], NULL, 10);
-    return server::RunServer(server::ServerArgs());
+    return server::RunServer(small::server_base::ServerArgs());
 }

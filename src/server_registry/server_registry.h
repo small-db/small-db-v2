@@ -50,7 +50,7 @@ class ServerRegister {
     // singleton instance - destructor protector
     ~ServerRegister();
 
-    absl::Status RegisterServer(const server::ServerArgs& args);
+    absl::Status RegisterServer(const small::server_base::ServerArgs& args);
 
    public:
     // singleton instance - copy blocker
@@ -73,6 +73,6 @@ void start_server(int port);
 std::vector<std::shared_ptr<Server>> get_servers(
     std::unordered_map<std::string, std::string>& constraints);
 
-absl::Status join(const server::ServerArgs& args);
+absl::Status join(const small::server_base::ServerArgs& args);
 
 }  // namespace small::server_registry

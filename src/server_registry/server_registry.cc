@@ -45,7 +45,7 @@
 // local libraries
 // =====================================================================
 
-#include "src/server/args.h"
+#include "src/server_base/args.h"
 
 // =====================================================================
 // self header
@@ -55,7 +55,7 @@
 
 namespace small::server_registry {
 
-absl::Status ServerRegister::RegisterServer(const server::ServerArgs& args) {
+absl::Status ServerRegister::RegisterServer(const small::server_base::ServerArgs& args) {
     SPDLOG_INFO("register server: sql_address: {}, rpc_address: {}, region: {}",
                 args.sql_port, args.grpc_port, args.region);
     return absl::OkStatus();
@@ -97,7 +97,7 @@ void start_server(int port) {
     }).detach();
 }
 
-absl::Status join(const server::ServerArgs& args) {
+absl::Status join(const small::server_base::ServerArgs& args) {
     if (args.join.empty()) {
         return absl::OkStatus();
     }

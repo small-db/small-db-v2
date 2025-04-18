@@ -16,11 +16,11 @@
 
 #include <chrono>
 
-#include "src/server/args.h"
+#include "src/server_base/args.h"
 
 namespace server {
 
-int RunServer(const server::ServerArgs& args);
+int RunServer(const small::server_base::ServerArgs& args);
 
 void StopServer();
 

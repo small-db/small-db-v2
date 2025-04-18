@@ -59,7 +59,7 @@
 
 #include "src/schema/schema.h"
 #include "src/semantics/check.h"
-#include "src/server/args.h"
+#include "src/server_base/args.h"
 #include "src/server/stmt_handler.h"
 #include "src/server_registry/server_registry.h"
 
@@ -624,7 +624,7 @@ void handle_query(std::string& query, int sockfd) {
     }
 }
 
-int RunServer(const server::ServerArgs& args) {
+int RunServer(const small::server_base::ServerArgs& args) {
     small::server_registry::start_server(args.grpc_port);
 
     auto status = small::server_registry::join(args);
