@@ -93,10 +93,12 @@ class SQLTest : public ::testing::Test {
 
     static void StartServers(
         const std::vector<small::server_base::ServerArgs>& args) {
+        const std::string server_path = "./build/debug/src/server/server";
+
         for (auto& arg : args) {
-            std::string command =
-                fmt::format("./small-db --port {} --rpc_port {} --data_dir {}",
-                            arg.sql_port, arg.grpc_port, arg.data_dir);
+            std::string command = fmt::format(
+                "{} --port {} --rpc_port {} --data_dir {}", server_path,
+                arg.sql_port, arg.grpc_port, arg.data_dir);
             SPDLOG_INFO("starting server with command: {}", command);
 
             // Start the server as a separate process
