@@ -92,17 +92,14 @@ std::vector<small::server_base::ServerArgs> get_servers(
         small::server_registry::ServerRegister::GetInstance()->servers;
     for (const auto& server : servers) {
         bool match = true;
-        for (const auto& constraint : constraints) {
-            if (constraint.first == "sql_address" &&
-                server.sql_addr != constraint.second) {
+        for (const auto& [k, v] : constraints) {
+            if (k == "sql_address" && server.sql_addr != v) {
                 match = false;
                 break;
-            } else if (constraint.first == "rpc_address" &&
-                       server.grpc_addr != constraint.second) {
+            } else if (k == "rpc_address" && server.grpc_addr != v) {
                 match = false;
                 break;
-            } else if (constraint.first == "region" &&
-                       server.region != constraint.second) {
+            } else if (k == "region" && server.region != v) {
                 match = false;
                 break;
             }
