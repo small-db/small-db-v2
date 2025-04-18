@@ -79,9 +79,9 @@ class SQLTest : public ::testing::Test {
    protected:
     static void SetUpTestSuite() {
         std::vector<small::server_base::ServerArgs> server_args = {
-            {5001, 50001, "asia", "", "./data/asia"},
-            {5002, 50002, "eu", "127.0.0.1:50001", "./data/eu"},
-            {5003, 50003, "us", "127.0.0.1:50001", "./data/us"},
+            {"5001", "50001", "asia", "", "./data/asia"},
+            {"5002", "50002", "eu", "127.0.0.1:50001", "./data/eu"},
+            {"5003", "50003", "us", "127.0.0.1:50001", "./data/us"},
         };
 
         StartServers(server_args);

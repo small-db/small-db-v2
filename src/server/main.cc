@@ -65,6 +65,9 @@ int main(int argc, char *argv[]) {
         return app.exit(e);
     }
 
-    return server::RunServer(small::server_base::ServerArgs{
-        sql_port, grpc_port, region, join, data_dir});
+    std::string sql_addr = fmt::format("0.0.0.0:{}", sql_port);
+    std::string grpc_addr = fmt::format("0.0.0.0:{}", grpc_addr);
+
+    return server::RunServer(small::server_base::ServerArgs(
+        sql_addr, grpc_addr, region, join, data_dir));
 }

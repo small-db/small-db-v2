@@ -90,6 +90,7 @@ std::vector<small::server_base::ServerArgs> get_servers(
     std::vector<small::server_base::ServerArgs> result;
     auto servers =
         small::server_registry::ServerRegister::GetInstance()->servers;
+    SPDLOG_INFO("get servers: {}", servers.size());
     for (const auto& server : servers) {
         SPDLOG_INFO("server: sql_address: {}, rpc_address: {}, region: {}",
                     server.sql_addr, server.grpc_addr, server.region);
