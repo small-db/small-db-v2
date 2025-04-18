@@ -33,6 +33,12 @@
 // grpc
 #include "grpcpp/server_builder.h"
 
+// =====================================================================
+// local libraries
+// =====================================================================
+
+#include "src/server/args.h"
+
 namespace small::server_registry {
 
 class Server {};
@@ -43,6 +49,8 @@ class ServerRegister {
     ServerRegister();
     // singleton instance - destructor protector
     ~ServerRegister();
+
+    absl::Status RegisterServer(const server::ServerArgs& args);
 
    public:
     // singleton instance - copy blocker

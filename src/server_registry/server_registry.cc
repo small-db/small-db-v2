@@ -42,12 +42,24 @@
 #include "server_registry.pb.h"
 
 // =====================================================================
+// local libraries
+// =====================================================================
+
+#include "src/server/args.h"
+
+// =====================================================================
 // self header
 // =====================================================================
 
 #include "src/server_registry/server_registry.h"
 
 namespace small::server_registry {
+
+absl::Status ServerRegister::RegisterServer(const server::ServerArgs& args) {
+    SPDLOG_INFO("register server: sql_address: {}, rpc_address: {}, region: {}",
+                args.sql_port, args.grpc_port, args.region);
+    return absl::OkStatus();
+}
 
 class RegistryService final
     : public small::server_registry::ServerRegistry::Service {
@@ -87,11 +99,8 @@ void start_server(int port) {
 
 absl::Status join(std::string peer_addr, std::string self_region) {
     if (peer_addr.empty()) {
-        // std::this_thread::sleep_for(std::chrono::seconds(1000));
         return absl::OkStatus();
     }
-
-    std::this_thread::sleep_for(std::chrono::seconds(2));
 
     SPDLOG_INFO("join peer addr: {}", peer_addr);
 
