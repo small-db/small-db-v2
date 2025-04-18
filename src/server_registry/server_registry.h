@@ -50,8 +50,6 @@ class ServerRegister {
     // singleton instance - destructor protector
     ~ServerRegister();
 
-    std::vector<small::server_base::ServerArgs> servers;
-
    public:
     // singleton instance - copy blocker
     ServerRegister(const ServerRegister&) = delete;
@@ -64,6 +62,8 @@ class ServerRegister {
         static ServerRegister instance;
         return &instance;
     }
+
+    std::vector<small::server_base::ServerArgs> servers;
 
     absl::Status RegisterServer(const small::server_base::ServerArgs& args);
 };

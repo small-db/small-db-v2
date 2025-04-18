@@ -59,6 +59,7 @@ absl::Status ServerRegister::RegisterServer(
     const small::server_base::ServerArgs& args) {
     SPDLOG_INFO("register server: sql_address: {}, rpc_address: {}, region: {}",
                 args.sql_addr, args.grpc_addr, args.region);
+    this->servers.push_back(args);
     return absl::OkStatus();
 }
 
@@ -73,7 +74,6 @@ class RegistryService final
             "register server: sql_address: {}, rpc_address: {}, region: {}",
             request->sql_address(), request->rpc_address(), request->region());
 
-        // Register the server
         small::server_registry::ServerRegister::GetInstance()->RegisterServer(
             small::server_base::ServerArgs(request->sql_address(),
                                            request->rpc_address(),
@@ -87,7 +87,31 @@ class RegistryService final
 
 std::vector<small::server_base::ServerArgs> get_servers(
     std::unordered_map<std::string, std::string>& constraints) {
-    return std::vector<small::server_base::ServerArgs>();
+    std::vector<small::server_base::ServerArgs> result;
+    auto servers =
+        small::server_registry::ServerRegister::GetInstance()->servers;
+    for (const auto& server : servers) {
+        bool match = true;
+        for (const auto& constraint : constraints) {
+            if (constraint.first == "sql_address" &&
+                server.sql_addr != constraint.second) {
+                match = false;
+                break;
+            } else if (constraint.first == "rpc_address" &&
+                       server.grpc_addr != constraint.second) {
+                match = false;
+                break;
+            } else if (constraint.first == "region" &&
+                       server.region != constraint.second) {
+                match = false;
+                break;
+            }
+        }
+        if (match) {
+            result.push_back(server);
+        }
+    }
+    return result;
 }
 
 void start_server(std::string addr) {
