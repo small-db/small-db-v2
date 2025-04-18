@@ -626,9 +626,13 @@ void handle_query(std::string& query, int sockfd) {
 }
 
 int RunServer(const server::ServerArgs& args) {
-    small::grpc_server::start_server(args.grpc_port);
+    small::server_registry::start_server(args.grpc_port);
 
-    small::server_registry::join(args.join);
+    auto status = small::server_registry::join(args.join);
+    if (!status.ok()) {
+        SPDLOG_ERROR("failed to join peer: {}", status.ToString());
+        return EXIT_FAILURE;
+    }
 
     struct sockaddr_in server_addr{};
     struct sockaddr_in client_addr{};

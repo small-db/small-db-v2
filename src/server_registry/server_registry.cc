@@ -78,6 +78,7 @@ void start_server(int port) {
 
     RegistryService service;
     builder.RegisterService(&service);
+    SPDLOG_INFO("grpc server listening on {}", addr);
 
     std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
     std::thread server_thread([&server]() { server->Wait(); });

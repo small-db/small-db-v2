@@ -55,6 +55,8 @@ class ServerRegister {
     }
 };
 
+void start_server(int port);
+
 // get servers according to the constraints, pass an empty constraints to get
 // all servers
 std::vector<std::shared_ptr<Server>> get_servers(
