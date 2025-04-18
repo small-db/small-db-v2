@@ -97,28 +97,27 @@ void start_server(int port) {
     }).detach();
 }
 
-absl::Status join(std::string peer_addr, std::string self_region) {
-    if (peer_addr.empty()) {
+absl::Status join(const server::ServerArgs& args) {
+    if (args.join.empty()) {
         return absl::OkStatus();
     }
 
-    SPDLOG_INFO("join peer addr: {}", peer_addr);
+    SPDLOG_INFO("join peer addr: {}", args.join);
 
     small::server_registry::RegistryRequest request;
-    request.set_sql_address("a");
-    request.set_rpc_address("b");
-    request.set_region("c");
+    request.set_sql_address(std::to_string(args.sql_port));
+    request.set_rpc_address(std::to_string(args.grpc_port));
+    request.set_region(args.region);
 
     auto channel =
-        grpc::CreateChannel(peer_addr, grpc::InsecureChannelCredentials());
+        grpc::CreateChannel(args.join, grpc::InsecureChannelCredentials());
     std::unique_ptr<small::server_registry::ServerRegistry::Stub> stub =
         small::server_registry::ServerRegistry::NewStub(channel);
     grpc::ClientContext context;
     small::server_registry::RegistryReply result;
     grpc::Status status = stub->Register(&context, request, &result);
     if (!status.ok()) {
-        SPDLOG_ERROR("failed to join peer: {}, self: {}",
-                     status.error_message(), self_region);
+        SPDLOG_ERROR("failed to join peer: {}", status.error_message());
         return absl::InternalError(status.error_message());
     }
     SPDLOG_INFO("joined peer: {}", result.success());

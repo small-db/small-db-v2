@@ -73,6 +73,6 @@ void start_server(int port);
 std::vector<std::shared_ptr<Server>> get_servers(
     std::unordered_map<std::string, std::string>& constraints);
 
-absl::Status join(std::string peer_addr, std::string self_region);
+absl::Status join(const server::ServerArgs& args);
 
 }  // namespace small::server_registry
