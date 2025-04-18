@@ -52,6 +52,8 @@ class ServerInfo {
     // singleton instance - destructor protector
     ~ServerInfo();
 
+    static ServerInfo* instance;
+
    public:
     // singleton instance - copy blocker
     ServerInfo(const ServerInfo&) = delete;
@@ -61,13 +63,13 @@ class ServerInfo {
 
     std::string db_path;
 
-    static ServerInfo* instance;
-
-    static void Init(const ServerArgs& args);
+    static absl::Status Init(const ServerArgs& args);
 
     // singleton instance - get instance
     static absl::StatusOr<ServerInfo*> GetInstance();
 };
+
+absl::Status init(const ServerArgs& args);
 
 absl::StatusOr<ServerInfo*> get_info();
 

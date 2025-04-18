@@ -47,11 +47,13 @@ ServerArgs::ServerArgs(int sql_port, int grpc_port, std::string region,
 ServerInfo::ServerInfo() = default;
 ServerInfo::~ServerInfo() = default;
 
-void ServerInfo::Init(const ServerArgs& args) {
+absl::Status ServerInfo::Init(const ServerArgs& args) {
     if (instance == nullptr) {
         instance = new ServerInfo();
         instance->db_path = args.data_dir;
+        return absl::OkStatus();
     }
+    return absl::InternalError("ServerInfo instance is already initialized");
 }
 
 absl::StatusOr<ServerInfo*> ServerInfo::GetInstance() {
@@ -61,7 +63,11 @@ absl::StatusOr<ServerInfo*> ServerInfo::GetInstance() {
     return instance;
 }
 
-// Now this definition is in only one place
+absl::Status init(const ServerArgs& args) {
+    ServerInfo::Init(args);
+    return absl::OkStatus();
+}
+
 absl::StatusOr<ServerInfo*> get_info() { return ServerInfo::GetInstance(); }
 
 }  // namespace small::server_base

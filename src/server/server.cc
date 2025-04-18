@@ -59,8 +59,8 @@
 
 #include "src/schema/schema.h"
 #include "src/semantics/check.h"
-#include "src/server_base/args.h"
 #include "src/server/stmt_handler.h"
+#include "src/server_base/args.h"
 #include "src/server_registry/server_registry.h"
 
 // =====================================================================
@@ -625,9 +625,15 @@ void handle_query(std::string& query, int sockfd) {
 }
 
 int RunServer(const small::server_base::ServerArgs& args) {
+    auto status = small::server_base::init(args);
+    if (!status.ok()) {
+        SPDLOG_ERROR("failed to init server: {}", status.ToString());
+        return EXIT_FAILURE;
+    }
+
     small::server_registry::start_server(args.grpc_port);
 
-    auto status = small::server_registry::join(args);
+    status = small::server_registry::join(args);
     if (!status.ok()) {
         SPDLOG_ERROR("failed to join peer: {}", status.ToString());
         return EXIT_FAILURE;
