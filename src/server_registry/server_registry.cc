@@ -57,8 +57,10 @@ namespace small::server_registry {
 
 absl::Status ServerRegister::RegisterServer(
     const small::server_base::ServerArgs& args) {
-    SPDLOG_INFO("register server: sql_address: {}, rpc_address: {}, region: {}",
-                args.sql_addr, args.grpc_addr, args.region);
+    SPDLOG_INFO(
+        "[callee] register server: sql_address: {}, rpc_address: {}, region: "
+        "{}",
+        args.sql_addr, args.grpc_addr, args.region);
     this->servers.push_back(args);
     return absl::OkStatus();
 }
@@ -150,8 +152,10 @@ absl::Status join(const small::server_base::ServerArgs& args) {
     request.set_sql_address(args.sql_addr);
     request.set_rpc_address(args.grpc_addr);
     request.set_region(args.region);
-    SPDLOG_INFO("register server: sql_address: {}, rpc_address: {}, region: {}",
-                request.sql_address(), request.rpc_address(), request.region());
+    SPDLOG_INFO(
+        "[caller] register server: sql_address: {}, rpc_address: {}, region: "
+        "{}",
+        request.sql_address(), request.rpc_address(), request.region());
 
     auto channel =
         grpc::CreateChannel(args.join, grpc::InsecureChannelCredentials());
