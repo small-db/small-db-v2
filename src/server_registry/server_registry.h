@@ -34,6 +34,27 @@ namespace small::server_reg {
 
 class Server {};
 
+class ServerRegister {
+   private:
+    // singleton instance - constructor protector
+    ServerRegister();
+    // singleton instance - destructor protector
+    ~ServerRegister();
+
+   public:
+    // singleton instance - copy blocker
+    ServerRegister(const ServerRegister&) = delete;
+
+    // singleton instance - assignment blocker
+    void operator=(const ServerRegister&) = delete;
+
+    // singleton instance - get instance
+    static ServerRegister* GetInstance() {
+        static ServerRegister instance;
+        return &instance;
+    }
+};
+
 // get servers according to the constraints, pass an empty constraints to get
 // all servers
 std::vector<std::shared_ptr<Server>> get_servers(

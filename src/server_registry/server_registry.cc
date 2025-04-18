@@ -22,6 +22,17 @@
 #include <vector>
 
 // =====================================================================
+// third-party libraries
+// =====================================================================
+
+// grpc
+#include "grpc/grpc.h"
+#include "grpcpp/server_builder.h"
+
+// spdlog
+#include "spdlog/spdlog.h"
+
+// =====================================================================
 // protobuf generated files
 // =====================================================================
 
@@ -47,6 +58,19 @@ class ServerRegService final : public small::server_reg::ServerReg::Service {
 std::vector<std::shared_ptr<Server>> get_servers(
     std::unordered_map<std::string, std::string>& constraints) {
     return std::vector<std::shared_ptr<Server>>();
+}
+
+void start_server(int port) {
+    grpc::ServerBuilder builder;
+    std::string addr = fmt::format("0.0.0.0:{}", port);
+    builder.AddListeningPort(addr, grpc::InsecureServerCredentials());
+
+    ServerRegService service;
+    builder.RegisterService(&service);
+
+    std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
+    std::thread server_thread([&server]() { server->Wait(); });
+    server_thread.detach();
 }
 
 }  // namespace small::server_reg

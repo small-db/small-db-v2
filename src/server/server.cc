@@ -50,7 +50,7 @@
 #include "pg_query.pb-c.h"
 
 // spdlog
-#include "spdlog/fmt/bin_to_hex.h"  // spdlog::to_hex (doesn't work in C++20 and later version)
+#include "spdlog/fmt/bin_to_hex.h"
 #include "spdlog/spdlog.h"
 
 // =====================================================================
@@ -62,6 +62,7 @@
 #include "src/server/args.h"
 #include "src/server/grpc_server.h"
 #include "src/server/stmt_handler.h"
+#include "src/server_registry/server_registry.h"
 
 // =====================================================================
 // self header
@@ -626,6 +627,8 @@ void handle_query(std::string& query, int sockfd) {
 
 int RunServer(const server::ServerArgs& args) {
     small::grpc_server::start_server(args.grpc_port);
+
+    small::server_registry::join(args.join);
 
     struct sockaddr_in server_addr{};
     struct sockaddr_in client_addr{};
