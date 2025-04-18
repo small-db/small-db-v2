@@ -41,14 +41,14 @@
 
 namespace small::server_registry {
 
-// class Server {};
-
 class ServerRegister {
    private:
     // singleton instance - constructor protector
     ServerRegister();
     // singleton instance - destructor protector
     ~ServerRegister();
+
+    inline static ServerRegister* instance = nullptr;
 
    public:
     // singleton instance - copy blocker
@@ -58,10 +58,7 @@ class ServerRegister {
     void operator=(const ServerRegister&) = delete;
 
     // singleton instance - get instance
-    static ServerRegister* GetInstance() {
-        static ServerRegister instance;
-        return &instance;
-    }
+    static ServerRegister* GetInstance();
 
     std::vector<small::server_base::ServerArgs> servers;
 
