@@ -64,7 +64,7 @@ absl::Status ServerRegister::RegisterServer(
 }
 
 ServerRegister* ServerRegister::GetInstance() {
-    return ServerRegister::instance;
+    return instance;
 }
 
 class RegistryService final

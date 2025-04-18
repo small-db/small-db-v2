@@ -48,7 +48,7 @@ class ServerRegister {
     // singleton instance - destructor protector
     ~ServerRegister();
 
-    inline static ServerRegister* instance = nullptr;
+    inline static ServerRegister* instance;
 
    public:
     // singleton instance - copy blocker
