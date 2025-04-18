@@ -91,6 +91,12 @@ std::vector<small::server_base::ServerArgs> get_servers(
     auto servers =
         small::server_registry::ServerRegister::GetInstance()->servers;
     for (const auto& server : servers) {
+        SPDLOG_INFO("server: sql_address: {}, rpc_address: {}, region: {}",
+                    server.sql_addr, server.grpc_addr, server.region);
+        SPDLOG_INFO("constraints: ");
+        for (const auto& [k, v] : constraints) {
+            SPDLOG_INFO("key: {}, value: {}", k, v);
+        }
         bool match = true;
         for (const auto& [k, v] : constraints) {
             if (k == "sql_address" && server.sql_addr != v) {
