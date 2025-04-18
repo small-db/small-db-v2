@@ -96,22 +96,16 @@ class SQLTest : public ::testing::Test {
         const std::string server_path = "./build/debug/src/server/server";
 
         for (auto& arg : args) {
-            std::string command = fmt::format(
-                "{} --sql-port {} --grpc-port {} --data-dir {} --region "
-                "{}",
-                server_path, arg.sql_port, arg.grpc_port, arg.data_dir,
-                arg.region);
-            if (!arg.join.empty()) {
-                command += fmt::format(" --join {}", arg.join);
-            }
-            SPDLOG_INFO("starting server with command: {}", command);
-
-            // Start the server as a separate process
-            int pid = std::system(command.c_str());
-            if (pid == -1) {
-                SPDLOG_ERROR("Failed to start server process.");
-            } else {
+            pid_t pid = fork();
+            if (pid == 0) {
+                // In child process
+                server::RunServer(arg);
+                std::exit(1);  // Only reached if exec fails
+            } else if (pid > 0) {
+                // Parent process
                 server_pids.push_back(pid);
+            } else {
+                SPDLOG_ERROR("Failed to fork()");
             }
         }
     }
