@@ -60,7 +60,6 @@
 #include "src/schema/schema.h"
 #include "src/semantics/check.h"
 #include "src/server/args.h"
-#include "src/server/grpc_server.h"
 #include "src/server/stmt_handler.h"
 #include "src/server_registry/server_registry.h"
 
