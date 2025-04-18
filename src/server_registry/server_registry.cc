@@ -19,6 +19,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 // =====================================================================
@@ -39,7 +40,6 @@
 
 #include "server_registry.grpc.pb.h"
 #include "server_registry.pb.h"
-// #include "server_registry.h"
 
 // =====================================================================
 // self header
@@ -71,21 +71,18 @@ std::vector<std::shared_ptr<Server>> get_servers(
     return std::vector<std::shared_ptr<Server>>();
 }
 
-std::unique_ptr<grpc::Server> start_server(int port) {
+void start_server(int port) {
     grpc::ServerBuilder builder;
     std::string addr = fmt::format("0.0.0.0:{}", port);
     builder.AddListeningPort(addr, grpc::InsecureServerCredentials());
 
-    auto service = small::server_registry::RegistryService();
-    builder.RegisterService(&service);
-    SPDLOG_INFO("grpc server listening on {}", addr);
+    auto service = std::make_shared<small::server_registry::RegistryService>();
+    builder.RegisterService(service.get());
 
-    std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
-    std::thread server_thread([&server]() { server->Wait(); });
-    server_thread.detach();
-
-    // return the server to keep it alive
-    return server;
+    auto server = builder.BuildAndStart();
+    std::thread([server = std::move(server), service]() mutable {
+        server->Wait();  // blocks forever
+    }).detach();
 }
 
 absl::Status join(std::string peer_addr, std::string self_region) {

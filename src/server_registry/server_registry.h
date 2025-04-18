@@ -58,7 +58,7 @@ class ServerRegister {
     }
 };
 
-std::unique_ptr<grpc::Server> start_server(int port);
+void start_server(int port);
 
 // get servers according to the constraints, pass an empty constraints to get
 // all servers
