@@ -1,3 +1,4 @@
+add_subdirectory(util)
 add_subdirectory(server_base)
 add_subdirectory(id)
 add_subdirectory(encode)

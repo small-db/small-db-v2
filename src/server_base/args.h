@@ -30,19 +30,15 @@
 namespace small::server_base {
 class ServerArgs {
    public:
-    int sql_port;
-    int grpc_port;
-
+    std::string sql_addr;
+    std::string grpc_addr;
+    std::string data_dir;
     std::string region;
-
     std::string join;
 
-    std::string data_dir;
-
-    ServerArgs();
-
-    ServerArgs(int sql_port, int grpc_port, std::string region,
-               std::string join = "", std::string data_dir = "");
+    ServerArgs(const std::string& sql_addr, const std::string& grpc_addr,
+              const std::string& data_dir, const std::string& region,
+              const std::string& join);
 };
 
 class ServerInfo {

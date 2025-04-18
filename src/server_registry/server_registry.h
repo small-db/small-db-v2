@@ -41,7 +41,7 @@
 
 namespace small::server_registry {
 
-class Server {};
+// class Server {};
 
 class ServerRegister {
    private:
@@ -50,7 +50,7 @@ class ServerRegister {
     // singleton instance - destructor protector
     ~ServerRegister();
 
-    absl::Status RegisterServer(const small::server_base::ServerArgs& args);
+    std::vector<small::server_base::ServerArgs> servers;
 
    public:
     // singleton instance - copy blocker
@@ -64,13 +64,15 @@ class ServerRegister {
         static ServerRegister instance;
         return &instance;
     }
+
+    absl::Status RegisterServer(const small::server_base::ServerArgs& args);
 };
 
-void start_server(int port);
+void start_server(std::string addr);
 
 // get servers according to the constraints, pass an empty constraints to get
 // all servers
-std::vector<std::shared_ptr<Server>> get_servers(
+std::vector<small::server_base::ServerArgs> get_servers(
     std::unordered_map<std::string, std::string>& constraints);
 
 absl::Status join(const small::server_base::ServerArgs& args);

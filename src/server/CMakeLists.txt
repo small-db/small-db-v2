@@ -16,6 +16,7 @@ target_link_libraries(server_lib
     ssl
     crypto
     server_base_lib
+    small::util::ip
 )
 
 add_executable(server

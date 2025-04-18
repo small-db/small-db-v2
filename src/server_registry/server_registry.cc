@@ -58,7 +58,7 @@ namespace small::server_registry {
 absl::Status ServerRegister::RegisterServer(
     const small::server_base::ServerArgs& args) {
     SPDLOG_INFO("register server: sql_address: {}, rpc_address: {}, region: {}",
-                args.sql_port, args.grpc_port, args.region);
+                args.sql_addr, args.grpc_addr, args.region);
     return absl::OkStatus();
 }
 
@@ -73,20 +73,25 @@ class RegistryService final
             "register server: sql_address: {}, rpc_address: {}, region: {}",
             request->sql_address(), request->rpc_address(), request->region());
 
+        // Register the server
+        small::server_registry::ServerRegister::GetInstance()->RegisterServer(
+            small::server_base::ServerArgs(request->sql_address(),
+                                           request->rpc_address(),
+                                           request->region(), "", ""));
+
         response->set_success(true);
 
         return grpc::Status::OK;
     }
 };
 
-std::vector<std::shared_ptr<Server>> get_servers(
+std::vector<small::server_base::ServerArgs> get_servers(
     std::unordered_map<std::string, std::string>& constraints) {
-    return std::vector<std::shared_ptr<Server>>();
+    return std::vector<small::server_base::ServerArgs>();
 }
 
-void start_server(int port) {
+void start_server(std::string addr) {
     grpc::ServerBuilder builder;
-    std::string addr = fmt::format("0.0.0.0:{}", port);
     builder.AddListeningPort(addr, grpc::InsecureServerCredentials());
 
     auto service = std::make_shared<small::server_registry::RegistryService>();
@@ -94,7 +99,7 @@ void start_server(int port) {
 
     auto server = builder.BuildAndStart();
     std::thread([server = std::move(server), service]() mutable {
-        server->Wait();  // blocks forever
+        server->Wait();
     }).detach();
 }
 
@@ -106,8 +111,8 @@ absl::Status join(const small::server_base::ServerArgs& args) {
     SPDLOG_INFO("join peer addr: {}", args.join);
 
     small::server_registry::RegistryRequest request;
-    request.set_sql_address(std::to_string(args.sql_port));
-    request.set_rpc_address(std::to_string(args.grpc_port));
+    request.set_sql_address(args.sql_addr);
+    request.set_rpc_address(args.grpc_addr);
     request.set_region(args.region);
 
     auto channel =

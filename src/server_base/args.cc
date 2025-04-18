@@ -29,20 +29,15 @@ namespace small::server_base {
 // Static instance pointer definition (must be outside class)
 ServerInfo* ServerInfo::instance = nullptr;
 
-ServerArgs::ServerArgs()
-    : sql_port(5432),
-      grpc_port(50051),
-      region("default"),
-      join(""),
-      data_dir("./data/default") {}
-
-ServerArgs::ServerArgs(int sql_port, int grpc_port, std::string region,
-                       std::string join, std::string data_dir)
-    : sql_port(sql_port),
-      grpc_port(grpc_port),
-      region(std::move(region)),
-      join(std::move(join)),
-      data_dir(std::move(data_dir)) {}
+ServerArgs::ServerArgs(const std::string& sql_addr,
+                       const std::string& grpc_addr,
+                       const std::string& data_dir, const std::string& region,
+                       const std::string& join)
+    : sql_addr(sql_addr),
+      grpc_addr(grpc_addr),
+      data_dir(data_dir),
+      region(region),
+      join(join) {}
 
 ServerInfo::ServerInfo() = default;
 ServerInfo::~ServerInfo() = default;
@@ -63,10 +58,7 @@ absl::StatusOr<ServerInfo*> ServerInfo::GetInstance() {
     return instance;
 }
 
-absl::Status init(const ServerArgs& args) {
-    ServerInfo::Init(args);
-    return absl::OkStatus();
-}
+absl::Status init(const ServerArgs& args) { return ServerInfo::Init(args); }
 
 absl::StatusOr<ServerInfo*> get_info() { return ServerInfo::GetInstance(); }
 

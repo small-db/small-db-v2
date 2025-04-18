@@ -62,6 +62,7 @@
 #include "src/server/stmt_handler.h"
 #include "src/server_base/args.h"
 #include "src/server_registry/server_registry.h"
+#include "src/util/ip/ip.h"
 
 // =====================================================================
 // self header
@@ -631,7 +632,7 @@ int RunServer(const small::server_base::ServerArgs& args) {
         return EXIT_FAILURE;
     }
 
-    small::server_registry::start_server(args.grpc_port);
+    small::server_registry::start_server(args.grpc_addr);
 
     status = small::server_registry::join(args);
     if (!status.ok()) {
@@ -639,7 +640,6 @@ int RunServer(const small::server_base::ServerArgs& args) {
         return EXIT_FAILURE;
     }
 
-    struct sockaddr_in server_addr{};
     struct sockaddr_in client_addr{};
     socklen_t client_len = sizeof(client_addr);
 
@@ -654,9 +654,7 @@ int RunServer(const small::server_base::ServerArgs& args) {
     int opt = 1;
     setsockopt(sock_listen_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(args.sql_port);
-    server_addr.sin_addr.s_addr = INADDR_ANY;
+    auto server_addr = small::util::ip::str_to_sockaddr(args.sql_addr);
 
     // bind socket and listen for connections
     if (bind(sock_listen_fd, (struct sockaddr*)&server_addr,
@@ -670,7 +668,7 @@ int RunServer(const small::server_base::ServerArgs& args) {
     if (listen(sock_listen_fd, BACKLOG) < 0) {
         SPDLOG_ERROR("error listening: {}", strerror(errno));
     }
-    SPDLOG_INFO("server listening on port: {}", args.sql_port);
+    SPDLOG_INFO("server listening on addr: {}", args.sql_addr);
 
     struct epoll_event ev, events[MAX_EVENTS];
     int new_events, sock_conn_fd, epollfd;
