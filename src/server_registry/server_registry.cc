@@ -71,18 +71,21 @@ std::vector<std::shared_ptr<Server>> get_servers(
     return std::vector<std::shared_ptr<Server>>();
 }
 
-void start_server(int port) {
+std::unique_ptr<grpc::Server> start_server(int port) {
     grpc::ServerBuilder builder;
     std::string addr = fmt::format("0.0.0.0:{}", port);
     builder.AddListeningPort(addr, grpc::InsecureServerCredentials());
 
-    RegistryService service;
+    auto service = small::server_registry::RegistryService();
     builder.RegisterService(&service);
     SPDLOG_INFO("grpc server listening on {}", addr);
 
     std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
     std::thread server_thread([&server]() { server->Wait(); });
     server_thread.detach();
+
+    // return the server to keep it alive
+    return server;
 }
 
 absl::Status join(std::string peer_addr, std::string self_region) {

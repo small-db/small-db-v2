@@ -30,6 +30,9 @@
 // absl
 #include "absl/status/status.h"
 
+// grpc
+#include "grpcpp/server_builder.h"
+
 namespace small::server_registry {
 
 class Server {};
@@ -55,7 +58,7 @@ class ServerRegister {
     }
 };
 
-void start_server(int port);
+std::unique_ptr<grpc::Server> start_server(int port);
 
 // get servers according to the constraints, pass an empty constraints to get
 // all servers

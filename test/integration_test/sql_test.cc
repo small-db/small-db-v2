@@ -89,13 +89,15 @@ class SQLTest : public ::testing::Test {
 
         std::vector<server::ServerArgs> server_args = {
             {5001, 50001, "asia", "", "./data/asia"},
-            {5002, 50002, "eu", "127.0.0.1:50001", "./data/eu"},
-            {5003, 50003, "us", "127.0.0.1:50001", "./data/us"},
+            // {5002, 50002, "eu", "127.0.0.1:50001", "./data/eu"},
+            // {5003, 50003, "us", "127.0.0.1:50001", "./data/us"},
         };
 
-        for (auto& args : server_args) {
-            server_threads.emplace_back(server::RunServer, args);
-        }
+        server::RunServer(server_args[0]);
+
+        // for (auto& args : server_args) {
+        //     server_threads.emplace_back(server::RunServer, args);
+        // }
     }
 
     // wait for the server to ready
