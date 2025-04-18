@@ -79,11 +79,11 @@ class SQLTest : public ::testing::Test {
    protected:
     static void SetUpTestSuite() {
         std::vector<small::server_base::ServerArgs> server_args = {
-            {"0.0.0.0:5001", "0.0.0.0:50001", "asia", "", "./data/asia"},
-            {"0.0.0.0:5002", "0.0.0.0:50002", "eu", "127.0.0.1:50001",
-             "./data/eu"},
-            {"0.0.0.0:5003", "0.0.0.0:50003", "us", "127.0.0.1:50001",
-             "./data/us"},
+            {"0.0.0.0:5001", "0.0.0.0:50001", "./data/us", "us", ""},
+            {"0.0.0.0:5002", "0.0.0.0:50002", "./data/eu", "eu",
+             "127.0.0.1:50001"},
+            {"0.0.0.0:5003", "0.0.0.0:50003", "./data/asia", "asia",
+             "127.0.0.1:50001"},
         };
 
         StartServers(server_args);
