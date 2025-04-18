@@ -97,10 +97,13 @@ class SQLTest : public ::testing::Test {
 
         for (auto& arg : args) {
             std::string command = fmt::format(
-                "{} --sql_port {} --grpc_port {} --data_dir {} --region {} "
-                "--join {}",
+                "{} --sql-port {} --grpc-port {} --data-dir {} --region "
+                "{}",
                 server_path, arg.sql_port, arg.grpc_port, arg.data_dir,
-                arg.region, arg.join);
+                arg.region);
+            if (!arg.join.empty()) {
+                command += fmt::format(" --join {}", arg.join);
+            }
             SPDLOG_INFO("starting server with command: {}", command);
 
             // Start the server as a separate process
