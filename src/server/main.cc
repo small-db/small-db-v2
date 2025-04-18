@@ -50,6 +50,9 @@ int main(int argc, char *argv[]) {
         ->required()
         ->check(CLI::Range(0, 65535));
 
+    std::string data_dir;
+    app.add_option("--data-dir", data_dir, "Data directory")->required();
+
     std::string region;
     app.add_option("--region", region, "Region name");
 
@@ -62,6 +65,6 @@ int main(int argc, char *argv[]) {
         return app.exit(e);
     }
 
-    return server::RunServer(
-        small::server_base::ServerArgs{sql_port, grpc_port, region, join});
+    return server::RunServer(small::server_base::ServerArgs{
+        sql_port, grpc_port, region, join, data_dir});
 }
