@@ -85,10 +85,12 @@ void start_server(int port) {
     server_thread.detach();
 }
 
-absl::Status join(std::string peer_addr) {
+absl::Status join(std::string peer_addr, std::string self_region) {
     if (peer_addr.empty()) {
         return absl::OkStatus();
     }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
     SPDLOG_INFO("join peer addr: {}", peer_addr);
 
@@ -105,7 +107,8 @@ absl::Status join(std::string peer_addr) {
     small::server_registry::RegistryReply result;
     grpc::Status status = stub->Register(&context, request, &result);
     if (!status.ok()) {
-        SPDLOG_ERROR("failed to join peer: {}", status.error_message());
+        SPDLOG_ERROR("failed to join peer: {}, self: {}",
+                     status.error_message(), self_region);
         return absl::InternalError(status.error_message());
     }
     SPDLOG_INFO("joined peer: {}", result.success());

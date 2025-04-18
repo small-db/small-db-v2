@@ -628,7 +628,7 @@ void handle_query(std::string& query, int sockfd) {
 int RunServer(const server::ServerArgs& args) {
     small::server_registry::start_server(args.grpc_port);
 
-    auto status = small::server_registry::join(args.join);
+    auto status = small::server_registry::join(args.join, args.region);
     if (!status.ok()) {
         SPDLOG_ERROR("failed to join peer: {}", status.ToString());
         return EXIT_FAILURE;
