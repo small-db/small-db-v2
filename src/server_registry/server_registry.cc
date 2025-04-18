@@ -36,16 +36,17 @@
 // protobuf generated files
 // =====================================================================
 
-#include "server_reg.grpc.pb.h"
-#include "server_reg.pb.h"
+#include "server_registry.grpc.pb.h"
+#include "server_registry.pb.h"
+// #include "server_registry.h"
 
 // =====================================================================
 // self header
 // =====================================================================
 
-#include "src/server_reg/server_reg.h"
+#include "src/server_registry/server_registry.h"
 
-namespace small::server_reg {
+namespace small::server_registry {
 
 class ServerRegService final : public small::server_reg::ServerReg::Service {
    public:
@@ -73,4 +74,9 @@ void start_server(int port) {
     server_thread.detach();
 }
 
-}  // namespace small::server_reg
+absl::Status join(std::string peer_addr) {
+    SPDLOG_INFO("join peer addr: {}", peer_addr);
+    return absl::OkStatus();
+}
+
+}  // namespace small::server_registry

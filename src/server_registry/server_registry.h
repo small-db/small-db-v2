@@ -30,7 +30,7 @@
 // absl
 #include "absl/status/status.h"
 
-namespace small::server_reg {
+namespace small::server_registry {
 
 class Server {};
 
@@ -60,6 +60,6 @@ class ServerRegister {
 std::vector<std::shared_ptr<Server>> get_servers(
     std::unordered_map<std::string, std::string>& constraints);
 
-// absl::Status add_server(std::shared_ptr<Server> server);
+absl::Status join(std::string peer_addr);
 
-}  // namespace small::server_reg
+}  // namespace small::server_registry

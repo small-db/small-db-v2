@@ -7,7 +7,7 @@ target_link_libraries(server_registry
     PUBLIC
     spdlog
     absl::status
-    server_reg_proto
+    server_registry_proto
 )
 
 # ======================================================================== #

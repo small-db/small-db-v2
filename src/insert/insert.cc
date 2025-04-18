@@ -53,7 +53,7 @@
 
 #include "src/insert/insert.h"
 #include "src/schema/schema.h"
-#include "src/server_reg/server_reg.h"
+#include "src/server_registry/server_registry.h"
 
 namespace insert {
 
