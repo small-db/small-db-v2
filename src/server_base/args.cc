@@ -18,4 +18,43 @@
 
 #include <src/server_base/args.h>
 
-namespace small::server_base {}  // namespace small::server_base
+namespace small::server_base {
+// Static instance pointer definition (must be outside class)
+ServerInfo* ServerInfo::instance = nullptr;
+
+ServerArgs::ServerArgs()
+    : sql_port(5432),
+      grpc_port(50051),
+      region("default"),
+      join(""),
+      data_dir("./data/default") {}
+
+ServerArgs::ServerArgs(int sql_port, int grpc_port, std::string region,
+                       std::string join, std::string data_dir)
+    : sql_port(sql_port),
+      grpc_port(grpc_port),
+      region(std::move(region)),
+      join(std::move(join)),
+      data_dir(std::move(data_dir)) {}
+
+ServerInfo::ServerInfo() = default;
+ServerInfo::~ServerInfo() = default;
+
+void ServerInfo::Init(const ServerArgs& args) {
+    if (instance == nullptr) {
+        instance = new ServerInfo();
+        instance->db_path = args.data_dir;
+    }
+}
+
+absl::StatusOr<ServerInfo*> ServerInfo::GetInstance() {
+    if (!instance) {
+        return absl::InternalError("ServerInfo instance is not initialized");
+    }
+    return instance;
+}
+
+// Now this definition is in only one place
+absl::StatusOr<ServerInfo*> get_info() { return ServerInfo::GetInstance(); }
+
+}  // namespace small::server_base

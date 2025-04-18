@@ -39,20 +39,10 @@ class ServerArgs {
 
     std::string data_dir;
 
-    ServerArgs()
-        : sql_port(5432),
-          grpc_port(50051),
-          region("default"),
-          join(""),
-          data_dir("./data/default") {}
+    ServerArgs();
 
     ServerArgs(int sql_port, int grpc_port, std::string region,
-               std::string join = "", std::string data_dir = "")
-        : sql_port(sql_port),
-          grpc_port(grpc_port),
-          region(region),
-          join(join),
-          data_dir(data_dir) {}
+               std::string join = "", std::string data_dir = "");
 };
 
 class ServerInfo {
@@ -73,25 +63,12 @@ class ServerInfo {
 
     static ServerInfo* instance;
 
-    static void Init(const ServerArgs& args) {
-        if (instance == nullptr) {
-            instance = new ServerInfo();
-            instance->db_path = args.data_dir;
-        }
-    }
+    static void Init(const ServerArgs& args);
 
     // singleton instance - get instance
-    static absl::StatusOr<ServerInfo*> GetInstance() {
-        if (!instance) {
-            return absl::InternalError(
-                "ServerInfo instance is not initialized");
-        }
-        return instance;
-    }
+    static absl::StatusOr<ServerInfo*> GetInstance();
 };
 
-static ServerInfo* instance = nullptr;
-
-absl::StatusOr<ServerInfo*> get_info() { return ServerInfo::GetInstance(); }
+absl::StatusOr<ServerInfo*> get_info();
 
 }  // namespace small::server_base

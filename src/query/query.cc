@@ -146,7 +146,11 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> query(
     SPDLOG_INFO("schema: {}", input_schema->ToString());
 
     // read kv pairs from rocksdb
-    std::string db_path = small::server_base::get_info().db_path;
+    auto info = small::server_base::get_info();
+    if (!info.ok())
+        return absl::Status(absl::StatusCode::kInternal,
+                            "failed to get server info");
+    std::string db_path = info.value()->db_path;
     auto db = rocks_wrapper::RocksDBWrapper::GetInstance(db_path, {});
     auto scan_preix = "/" + table_name + "/";
     auto kv_pairs = db->GetAll(scan_preix);

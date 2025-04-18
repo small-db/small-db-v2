@@ -88,9 +88,10 @@ class SQLTest : public ::testing::Test {
         WaitServer();
     }
 
-    static std::vector<int> server_pids;
+    inline static std::vector<int> server_pids = {};
 
-    static void StartServers(const std::vector<small::server_base::ServerArgs>& args) {
+    static void StartServers(
+        const std::vector<small::server_base::ServerArgs>& args) {
         for (auto& arg : args) {
             std::string command =
                 fmt::format("./small-db --port {} --rpc_port {} --data_dir {}",
@@ -146,6 +147,8 @@ class SQLTest : public ::testing::Test {
         }
     }
 };
+
+// std::vector<int> SQLTest::server_pids;
 
 absl::Status run_sql_test(const std::string& sqltest_file) {
     auto sql_units = parser::read_sql_test(sqltest_file);

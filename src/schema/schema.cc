@@ -45,18 +45,19 @@
 // local libraries
 // =====================================================================
 
+#include "src/encode/encode.h"
 #include "src/id/generator.h"
 #include "src/rocks/wrapper.h"
 #include "src/schema/const.h"
+#include "src/schema/partition.h"
+#include "src/server_base/args.h"
+#include "src/type/type.h"
 
 // =====================================================================
 // self header
 // =====================================================================
 
-#include "src/encode/encode.h"
-#include "src/schema/partition.h"
 #include "src/schema/schema.h"
-#include "src/type/type.h"
 
 namespace schema {
 
@@ -133,7 +134,12 @@ class Catalog {
             std::make_shared<Table>("system.partitions", columns);
         this->system_partitions = this->tables["system.partitions"];
 
-        std::string db_path = DATA_DIR;
+        auto info = small::server_base::get_info();
+        if (!info.ok()) {
+            SPDLOG_ERROR("failed to get server info");
+            return;
+        }
+        std::string db_path = info.value()->db_path;
         this->db = rocks_wrapper::RocksDBWrapper::GetInstance(
             db_path, {"TablesCF", "PartitionCF"});
     }
