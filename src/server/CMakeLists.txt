@@ -17,7 +17,6 @@ target_link_libraries(server_lib
     insert_lib
     ssl
     crypto
-    fuck_grpc_server
 )
 
 add_executable(server

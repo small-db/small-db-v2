@@ -107,7 +107,7 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> insert(
 
             // search a server for the partition
             auto servers =
-            small::server_reg::get_servers(partition->constraints);
+            small::server_registry::get_servers(partition->constraints);
             if (servers.empty()) {
                 return absl::InvalidArgumentError(fmt::format(
                     "no server found for partition {}", partition_value));

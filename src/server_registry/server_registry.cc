@@ -48,12 +48,13 @@
 
 namespace small::server_registry {
 
-class ServerRegService final : public small::server_reg::ServerReg::Service {
+class ServerRegService final
+    : public small::server_registry::ServerRegistry::Service {
    public:
     virtual ::grpc::Status Register(
         ::grpc::ServerContext* context,
-        const ::small::server_reg::ServerRegRequest* request,
-        ::small::server_reg::ServerRegReply* response) {}
+        const ::small::server_registry::RegistryRequest* request,
+        ::small::server_registry::RegistryReply* response) {}
 };
 
 std::vector<std::shared_ptr<Server>> get_servers(
