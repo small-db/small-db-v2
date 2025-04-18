@@ -20,8 +20,7 @@
 
 namespace server {
 
-// int RunServer(const small::server_base::ServerArgs& args);
-int RunServer(small::server_base::ServerArgs args);
+int RunServer(const small::server_base::ServerArgs& args);
 
 void StopServer();
 

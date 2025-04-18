@@ -20,6 +20,13 @@
 #include <utility>
 
 // =====================================================================
+// third-party libraries
+// =====================================================================
+
+// spdlog
+#include "spdlog/spdlog.h"
+
+// =====================================================================
 // self header
 // =====================================================================
 
@@ -48,6 +55,7 @@ absl::Status ServerInfo::Init(const ServerArgs& args) {
         instance->db_path = args.data_dir;
         return absl::OkStatus();
     }
+    SPDLOG_ERROR("ServerInfo instance is already initialized");
     return absl::InternalError("ServerInfo instance is already initialized");
 }
 

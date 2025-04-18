@@ -625,12 +625,17 @@ void handle_query(std::string& query, int sockfd) {
     }
 }
 
-int RunServer(small::server_base::ServerArgs args) {
+int RunServer(const small::server_base::ServerArgs& args) {
     auto status = small::server_base::init(args);
     if (!status.ok()) {
         SPDLOG_ERROR("failed to init server: {}", status.ToString());
         return EXIT_FAILURE;
     }
+
+    SPDLOG_INFO(
+        "start server: sql_address: {}, rpc_address: {}, region: {}"
+        " data_dir: {}",
+        args.sql_addr, args.grpc_addr, args.region, args.data_dir);
 
     small::server_registry::start_server(args.grpc_addr);
 
