@@ -37,7 +37,7 @@
 // local libraries
 // =====================================================================
 
-#include "src/server/args.h"
+#include "src/server_base/args.h"
 
 namespace small::server_registry {
 

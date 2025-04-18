@@ -20,7 +20,14 @@
 
 #include <string>
 
-namespace server {
+// =====================================================================
+// third-party libraries
+// =====================================================================
+
+// absl
+#include "absl/status/statusor.h"
+
+namespace small::server_base {
 class ServerArgs {
    public:
     int sql_port;
@@ -48,6 +55,43 @@ class ServerArgs {
           data_dir(data_dir) {}
 };
 
-// extern ServerArgs DefaultArgs;
+class ServerInfo {
+   private:
+    // singleton instance - constructor protector
+    ServerInfo();
+    // singleton instance - destructor protector
+    ~ServerInfo();
 
-}  // namespace server
+   public:
+    // singleton instance - copy blocker
+    ServerInfo(const ServerInfo&) = delete;
+
+    // singleton instance - assignment blocker
+    void operator=(const ServerInfo&) = delete;
+
+    std::string db_path;
+
+    static ServerInfo* instance;
+
+    static void Init(const ServerArgs& args) {
+        if (instance == nullptr) {
+            instance = new ServerInfo();
+            instance->db_path = args.data_dir;
+        }
+    }
+
+    // singleton instance - get instance
+    static absl::StatusOr<ServerInfo*> GetInstance() {
+        if (!instance) {
+            return absl::InternalError(
+                "ServerInfo instance is not initialized");
+        }
+        return instance;
+    }
+};
+
+static ServerInfo* instance = nullptr;
+
+absl::StatusOr<ServerInfo*> get_info() { return ServerInfo::GetInstance(); }
+
+}  // namespace small::server_base

@@ -48,13 +48,19 @@
 #include "magic_enum/magic_enum.hpp"
 
 // =====================================================================
+// local libraries
+// =====================================================================
+
+#include "src/rocks/wrapper.h"
+#include "src/schema/const.h"
+#include "src/schema/schema.h"
+#include "src/server_base/args.h"
+
+// =====================================================================
 // self header
 // =====================================================================
 
 #include "src/query/query.h"
-#include "src/rocks/wrapper.h"
-#include "src/schema/const.h"
-#include "src/schema/schema.h"
 
 namespace query {
 
@@ -140,7 +146,7 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> query(
     SPDLOG_INFO("schema: {}", input_schema->ToString());
 
     // read kv pairs from rocksdb
-    std::string db_path = schema::DATA_DIR;
+    std::string db_path = small::server_base::get_info().db_path;
     auto db = rocks_wrapper::RocksDBWrapper::GetInstance(db_path, {});
     auto scan_preix = "/" + table_name + "/";
     auto kv_pairs = db->GetAll(scan_preix);

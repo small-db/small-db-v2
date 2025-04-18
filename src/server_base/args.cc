@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <src/server/args.h>
+// =====================================================================
+// self header
+// =====================================================================
 
-namespace server {}  // namespace server
+#include <src/server_base/args.h>
+
+namespace small::server_base {}  // namespace small::server_base

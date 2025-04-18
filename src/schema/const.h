@@ -21,10 +21,4 @@
 #include <cstdint>
 #include <string>
 
-namespace schema {
-
-constexpr uint8_t TYPE_STRING = 20;
-
-constexpr std::string DATA_DIR = "data";
-
-}  // namespace schema
+namespace schema {}  // namespace schema

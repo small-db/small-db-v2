@@ -16,6 +16,7 @@
 // c++ std
 // =====================================================================
 
+#include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
@@ -77,24 +78,32 @@ constexpr std::string_view CONNECTION_STRING =
 class SQLTest : public ::testing::Test {
    protected:
     static void SetUpTestSuite() {
-        SPDLOG_INFO("starting the server");
-        StartServers();
-        WaitServer();
-    }
-
-    static std::vector<std::thread> server_threads;
-
-    static void StartServers() {
-        SPDLOG_INFO("starting the server thread");
-
         std::vector<server::ServerArgs> server_args = {
             {5001, 50001, "asia", "", "./data/asia"},
             {5002, 50002, "eu", "127.0.0.1:50001", "./data/eu"},
             {5003, 50003, "us", "127.0.0.1:50001", "./data/us"},
         };
+        StartServers(server_args);
 
-        for (auto& args : server_args) {
-            server_threads.emplace_back(server::RunServer, args);
+        WaitServer();
+    }
+
+    static std::vector<int> server_pids;
+
+    static void StartServers(const std::vector<server::ServerArgs>& args) {
+        for (auto& arg : args) {
+            std::string command =
+                fmt::format("./small-db --port {} --rpc_port {} --data_dir {}",
+                            arg.sql_port, arg.grpc_port, arg.data_dir);
+            SPDLOG_INFO("starting server with command: {}", command);
+
+            // Start the server as a separate process
+            int pid = std::system(command.c_str());
+            if (pid == -1) {
+                SPDLOG_ERROR("Failed to start server process.");
+            } else {
+                server_pids.push_back(pid);
+            }
         }
     }
 
@@ -108,18 +117,35 @@ class SQLTest : public ::testing::Test {
     }
 
     static void TearDownTestSuite() {
-        SPDLOG_INFO("stopping the server");
-        server::StopServer();
+        SPDLOG_INFO("Stopping the server");
 
-        for (auto& server_thread : server_threads) {
-            if (server_thread.joinable()) {
-                server_thread.join();
+        // Stop all the server processes
+        for (int pid : server_pids) {
+            StopServer(pid);
+        }
+
+        // Wait for processes to terminate
+        for (int pid : server_pids) {
+            int status;
+            waitpid(pid, &status, 0);  // Ensure the process has terminated
+        }
+
+        server_pids.clear();  // Clean up stored process IDs
+    }
+
+    static void StopServer(int pid) {
+        if (pid != -1) {
+            int result = kill(pid, SIGTERM);
+            if (result == 0) {
+                SPDLOG_INFO("Successfully sent SIGTERM to server process {}",
+                            pid);
+            } else {
+                SPDLOG_ERROR("Failed to send SIGTERM to server process {}",
+                             pid);
             }
         }
     }
 };
-
-std::vector<std::thread> SQLTest::server_threads;
 
 absl::Status run_sql_test(const std::string& sqltest_file) {
     auto sql_units = parser::read_sql_test(sqltest_file);

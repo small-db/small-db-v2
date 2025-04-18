@@ -1,8 +1,3 @@
-add_library(server_arg_lib
-    args.cc
-    args.h
-)
-
 add_library(server_lib
     server.cc
     server.h
