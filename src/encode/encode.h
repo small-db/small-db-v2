@@ -28,8 +28,8 @@
 
 namespace encode {
 
-std::string encode(const small::typeDatum& datum);
+std::string encode(const small::type::Datum& datum);
 
-small::typeDatum decode(const std::string& str, small::typeType type);
+small::type::Datum decode(const std::string& str, small::type::Type type);
 
 }  // namespace encode

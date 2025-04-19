@@ -86,7 +86,7 @@ void from_json(const nlohmann::json& j, Table& t) {
 
 void write_row(rocks_wrapper::RocksDBWrapper* db,
                const std::shared_ptr<Table>& table,
-               const std::vector<small::typeDatum>& values) {
+               const std::vector<small::type::Datum>& values) {
     int pk_index = -1;
     for (int i = 0; i < table->columns.size(); ++i) {
         if (table->columns[i].is_primary_key) {
@@ -118,18 +118,18 @@ class Catalog {
     // private Constructor
     Catalog() {
         std::vector<Column> columns;
-        columns.emplace_back("table_name", small::typeType::String, true);
-        columns.emplace_back("columns", small::typeType::String);
+        columns.emplace_back("table_name", small::type::Type::String, true);
+        columns.emplace_back("columns", small::type::Type::String);
         this->tables["system.tables"] =
             std::make_shared<Table>("system.tables", columns);
         this->system_tables = this->tables["system.tables"];
 
         columns.clear();
-        columns.emplace_back("table_name", small::typeType::String);
-        columns.emplace_back("partition_name", small::typeType::String, true);
-        columns.emplace_back("constraint", small::typeType::String);
-        columns.emplace_back("column_name", small::typeType::String);
-        columns.emplace_back("partition_value", small::typeType::String);
+        columns.emplace_back("table_name", small::type::Type::String);
+        columns.emplace_back("partition_name", small::type::Type::String, true);
+        columns.emplace_back("constraint", small::type::Type::String);
+        columns.emplace_back("column_name", small::type::Type::String);
+        columns.emplace_back("partition_value", small::type::Type::String);
         this->tables["system.partitions"] =
             std::make_shared<Table>("system.partitions", columns);
         this->system_partitions = this->tables["system.partitions"];
@@ -202,7 +202,7 @@ class Catalog {
         tables[table_name] = new_table;
 
         // write to disk
-        std::vector<small::typeDatum> row;
+        std::vector<small::type::Datum> row;
         row.emplace_back(table_name);
         row.emplace_back(nlohmann::json(columns).dump());
         write_row(db, this->system_tables, row);
@@ -263,7 +263,7 @@ class Catalog {
         // auto key = absl::StrFormat("P:%d", table->id);
         // db->Put("PartitionCF", key, j.dump());
 
-        // std::vector<small::typeDatum> row;
+        // std::vector<small::type::Datum> row;
         // row.emplace_back(id::generate_id());
         // row.emplace_back(table_name);
         // row.emplace_back(nlohmann::json(columns).dump());
@@ -276,7 +276,7 @@ class Catalog {
 
                 if constexpr (std::is_same_v<T, ListPartition>) {
                     for (auto& [p_name, p] : partition.partitions) {
-                        std::vector<small::typeDatum> row;
+                        std::vector<small::type::Datum> row;
                         row.emplace_back(table->name);
                         row.emplace_back(p_name);
                         row.emplace_back(nlohmann::json(p.constraints).dump());
@@ -303,7 +303,7 @@ std::mutex Catalog::mtx;
 // (https://github.com/nlohmann/json)
 Column::Column() = default;
 
-Column::Column(const std::string& name, const small::typeType& type,
+Column::Column(const std::string& name, const small::type::Type& type,
                bool is_primary_key)
     : name(name), type(type), is_primary_key(is_primary_key) {}
 

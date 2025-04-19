@@ -42,15 +42,15 @@ namespace parser {
 
 // ref:
 // https://github.com/cockroachdb/cockroach/blob/1b0a374fd2a101cebcfb24cff4b3b57795ad1df6/pkg/sql/logictest/logic.go#L278
-small::typeType from_sqltest(char c) {
+small::type::Type from_sqltest(char c) {
     switch (c) {
         case 'T':
-            return small::typeType::String;
+            return small::type::Type::String;
         case 'I':
-            return small::typeType::Int64;
+            return small::type::Type::Int64;
         default:
             SPDLOG_ERROR("unknown type: {}", c);
-            return small::typeType::Int64;
+            return small::type::Type::Int64;
     }
 }
 
