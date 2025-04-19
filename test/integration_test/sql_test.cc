@@ -194,8 +194,8 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
 
                 // check column types
                 for (int i = 0; i < r.columns(); ++i) {
-                    if (small::type::from_pgwire_oid(r.column_type(i)).value() !=
-                        query->column_types[i]) {
+                    if (small::type::from_pgwire_oid(r.column_type(i))
+                            .value() != query->column_types[i]) {
                         return absl::InternalError(absl::StrFormat(
                             "column type mismatch: expected %s, got %s",
                             typeid(query->column_types[i]).name(),
