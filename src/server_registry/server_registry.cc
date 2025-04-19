@@ -46,6 +46,7 @@
 // =====================================================================
 
 #include "src/server_base/args.h"
+#include "src/util/ip/ip.h"
 
 // =====================================================================
 // self header
@@ -153,13 +154,14 @@ void start_server(std::string addr) {
     }).detach();
 }
 
-// absl::Status join(const small::server_base::ServerArgs& args) {
-absl::Status join(small::server_base::ServerArgs args) {
-    if (args.join.empty()) {
-        return absl::OkStatus();
+absl::Status join(const small::server_base::ServerArgs& args) {
+    std::string peer_addr = args.join;
+    if (peer_addr.empty()) {
+        auto addr = small::util::ip::str_to_sockaddr(args.grpc_addr);
+        peer_addr = fmt::format("127.0.0.1:{}", addr.sin_port);
     }
 
-    SPDLOG_INFO("join peer addr: {}", args.join);
+    SPDLOG_INFO("join peer addr: {}", peer_addr);
 
     small::server_registry::RegistryRequest request;
     request.set_sql_address(args.sql_addr);
@@ -171,18 +173,18 @@ absl::Status join(small::server_base::ServerArgs args) {
         request.sql_address(), request.rpc_address(), request.region());
 
     auto channel =
-        grpc::CreateChannel(args.join, grpc::InsecureChannelCredentials());
+        grpc::CreateChannel(peer_addr, grpc::InsecureChannelCredentials());
     std::unique_ptr<small::server_registry::ServerRegistry::Stub> stub =
         small::server_registry::ServerRegistry::NewStub(channel);
     grpc::ClientContext context;
     small::server_registry::RegistryReply result;
     grpc::Status status = stub->Register(&context, request, &result);
     if (!status.ok()) {
-        SPDLOG_ERROR("failed to join peer: {}, error: {}", args.join,
+        SPDLOG_ERROR("failed to join peer: {}, error: {}", peer_addr,
                      status.error_message());
         return absl::InternalError(status.error_message());
     }
-    SPDLOG_INFO("joined peer: {}, result: {}", args.join, result.success());
+    SPDLOG_INFO("joined peer: {}, result: {}", peer_addr, result.success());
     return absl::OkStatus();
 }
 

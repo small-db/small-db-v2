@@ -9,6 +9,7 @@ target_link_libraries(server_registry
     absl::status
     server_registry_proto
     server_base_lib
+    small::util::ip
 )
 
 # ======================================================================== #

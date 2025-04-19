@@ -48,8 +48,6 @@ class ServerRegister {
     // singleton instance - destructor protector
     ~ServerRegister();
 
-    // inline static ServerRegister* instance;
-
     std::mutex mutex_;
 
    public:
@@ -74,7 +72,6 @@ void start_server(std::string addr);
 std::vector<small::server_base::ServerArgs> get_servers(
     std::unordered_map<std::string, std::string>& constraints);
 
-// absl::Status join(const small::server_base::ServerArgs& args);
-absl::Status join(small::server_base::ServerArgs args);
+absl::Status join(const small::server_base::ServerArgs& args);
 
 }  // namespace small::server_registry
