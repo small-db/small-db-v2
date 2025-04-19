@@ -17,10 +17,27 @@
             }
         },
         {
+            "name": "sanitizer-address",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "-fsanitize=address",
+                "CMAKE_C_FLAGS": "-fsanitize=address"
+            }
+        },
+        {
+            "name": "sanitizer-memory",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "-fsanitize=memory",
+                "CMAKE_C_FLAGS": "-fsanitize=memory"
+            }
+        },
+        {
             "name": "debug",
             "description": "debug build",
             "inherits": [
-                "base"
+                "base",
+                "sanitizer-memory"
             ],
             "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {

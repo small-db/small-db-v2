@@ -132,6 +132,15 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> insert(
 
             // insert the row into the server
             auto server = servers[0];
+
+            small::insert::Row request;
+            for (int i = 0; i < insert_stmt->n_cols; i++) {
+                auto column_name = insert_stmt->cols[i]->res_target->name;
+                auto column_value = row->list->items[i]->a_const->sval->sval;
+                request.add_column_names(column_name);
+                request.add_column_values(column_value);
+            }
+            SPDLOG_INFO("insert row: {}", request.DebugString());
         }
     }
 

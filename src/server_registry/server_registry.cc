@@ -178,11 +178,16 @@ absl::Status join(const small::server_base::ServerArgs& args) {
         small::server_registry::ServerRegistry::NewStub(channel);
     grpc::ClientContext context;
     small::server_registry::RegistryReply result;
-    grpc::Status status = stub->Register(&context, request, &result);
-    if (!status.ok()) {
-        SPDLOG_ERROR("failed to join peer: {}, error: {}", peer_addr,
-                     status.error_message());
-        return absl::InternalError(status.error_message());
+
+    const int max_retries = 5;
+    for (int attempt = 1; attempt <= max_retries; ++attempt) {
+        grpc::Status status = stub->Register(&context, request, &result);
+        if (!status.ok() && attempt < max_retries) {
+            SPDLOG_WARN("failed to join peer: {}, retrying...", peer_addr);
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        } else {
+            break;
+        }
     }
     SPDLOG_INFO("joined peer: {}, result: {}", peer_addr, result.success());
     return absl::OkStatus();
