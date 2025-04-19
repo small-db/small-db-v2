@@ -10,7 +10,7 @@ target_link_libraries(server_lib
     schema_lib
     spdlog
     libpg_query_lib
-    semantics_lib
+    small::semantics
     query_lib
     insert_lib
     ssl

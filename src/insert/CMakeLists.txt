@@ -14,6 +14,7 @@ target_link_libraries(insert_lib
     server_registry
     magic_enum
     insert_proto
+    small::semantics
 )
 
 # ======================================================================== #

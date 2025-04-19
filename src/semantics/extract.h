@@ -15,6 +15,14 @@
 #pragma once
 
 // =====================================================================
+// third-party libraries
+// =====================================================================
+
+// pg_query
+#include "pg_query.h"
+#include "pg_query.pb-c.h"
+
+// =====================================================================
 // local libraries
 // =====================================================================
 
@@ -22,5 +30,6 @@
 
 namespace small::semantics {
 
+std::optional<small::type::Datum> extract_const(PgQuery__AConst node);
 
 }  // namespace small::semantics

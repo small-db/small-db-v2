@@ -69,15 +69,6 @@ class Column {
     void set_primary_key(bool set);
 };
 
-// class Columns {
-//    public:
-//     std::vector<Column> columns;
-
-//     std::string<
-
-//     Columns(const std::vector<Column>& columns) : columns(columns) {}
-// };
-
 class Table {
    public:
     std::string name;
