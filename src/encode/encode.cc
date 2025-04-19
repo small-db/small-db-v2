@@ -24,7 +24,7 @@
 
 #include "src/encode/encode.h"
 
-namespace encode {
+namespace small::encode {
 
 std::string encode(const small::type::Datum& datum) {
     if (std::holds_alternative<int64_t>(datum)) {
@@ -46,4 +46,4 @@ small::type::Datum decode(const std::string& str, small::type::Type type) {
     }
 }
 
-}  // namespace encode
+}  // namespace small::encode

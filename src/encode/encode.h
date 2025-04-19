@@ -26,10 +26,10 @@
 
 #include "src/type/type.h"
 
-namespace encode {
+namespace small::encode {
 
 std::string encode(const small::type::Datum& datum);
 
 small::type::Datum decode(const std::string& str, small::type::Type type);
 
-}  // namespace encode
+}  // namespace small::encode

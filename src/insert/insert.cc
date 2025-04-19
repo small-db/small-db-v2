@@ -51,9 +51,10 @@
 // local libraries
 // =====================================================================
 
+#include "src/encode/encode.h"
 #include "src/schema/schema.h"
-#include "src/server_registry/server_registry.h"
 #include "src/semantics/extract.h"
+#include "src/server_registry/server_registry.h"
 
 // =====================================================================
 // protobuf generated files
@@ -137,8 +138,13 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> insert(
             small::insert::Row request;
             for (int i = 0; i < insert_stmt->n_cols; i++) {
                 auto column_name = insert_stmt->cols[i]->res_target->name;
-                auto datum = small::semantics::extract_datum(row->list->items[i]->a_const);
-                // auto column_value = row->list->items[i]->a_const->sval->sval;
+                auto datum = small::semantics::extract_const(
+                    row->list->items[i]->a_const);
+                if (!datum.has_value()) {
+                    return absl::InternalError(fmt::format(
+                        "failed to extract const for column {}", column_name));
+                }
+                auto column_value = small::encode::encode(datum.value());
                 request.add_column_names(column_name);
                 request.add_column_values(column_value);
             }

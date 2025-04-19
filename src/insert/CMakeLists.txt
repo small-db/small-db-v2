@@ -4,7 +4,7 @@ add_library(insert_lib
 )
 
 target_link_libraries(insert_lib
-    PUBLIC
+    PRIVATE
     spdlog
     absl_status
     libpg_query_lib
@@ -15,6 +15,7 @@ target_link_libraries(insert_lib
     magic_enum
     insert_proto
     small::semantics
+    small::encode
 )
 
 # ======================================================================== #

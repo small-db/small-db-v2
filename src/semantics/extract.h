@@ -30,6 +30,6 @@
 
 namespace small::semantics {
 
-std::optional<small::type::Datum> extract_const(PgQuery__AConst node);
+std::optional<small::type::Datum> extract_const(PgQuery__AConst* node);
 
 }  // namespace small::semantics
