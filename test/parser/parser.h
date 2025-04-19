@@ -47,7 +47,7 @@ class SQLTestUnit {
     class Query {
        public:
         std::vector<std::string> column_names;
-        std::vector<type::Type> column_types;
+        std::vector<small::typeType> column_types;
         std::vector<std::vector<std::string>> expected_output;
     };
 

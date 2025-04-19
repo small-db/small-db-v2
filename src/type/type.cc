@@ -37,7 +37,7 @@
 
 #include "src/type/type.h"
 
-namespace type {
+namespace small::type {
 
 std::string to_string(Type type) {
     switch (type) {
@@ -114,4 +114,4 @@ int16_t get_pgwire_size(Type type) {
     }
 }
 
-}  // namespace type
+}  // namespace small::type

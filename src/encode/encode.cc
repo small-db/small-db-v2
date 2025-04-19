@@ -26,7 +26,7 @@
 
 namespace encode {
 
-std::string encode(const type::Datum& datum) {
+std::string encode(const small::typeDatum& datum) {
     if (std::holds_alternative<int64_t>(datum)) {
         return std::to_string(std::get<int64_t>(datum));
     } else if (std::holds_alternative<std::string>(datum)) {
@@ -35,11 +35,11 @@ std::string encode(const type::Datum& datum) {
     throw std::runtime_error("Unsupported type for encoding");
 }
 
-type::Datum decode(const std::string& str, type::Type type) {
+small::typeDatum decode(const std::string& str, small::typeType type) {
     switch (type) {
-        case type::Type::Int64:
+        case small::typeType::Int64:
             return std::stoll(str);
-        case type::Type::String:
+        case small::typeType::String:
             return str;
         default:
             throw std::runtime_error("Unsupported type for decoding");

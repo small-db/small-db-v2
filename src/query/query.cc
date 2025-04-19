@@ -103,7 +103,7 @@ std::shared_ptr<arrow::Schema> get_input_schema(const schema::Table& table) {
     arrow::FieldVector fields;
     for (const auto& column : table.columns) {
         fields.push_back(
-            arrow::field(column.name, type::get_gandiva_type(column.type)));
+            arrow::field(column.name, small::typeget_gandiva_type(column.type)));
     }
     return arrow::schema(fields);
 }
@@ -113,15 +113,15 @@ std::vector<std::shared_ptr<arrow::ArrayBuilder>> get_builders(
     std::vector<std::shared_ptr<arrow::ArrayBuilder>> builders;
     for (const auto& column : table.columns) {
         switch (column.type) {
-            case type::Type::Int64:
+            case small::typeType::Int64:
                 builders.push_back(std::make_shared<arrow::Int64Builder>());
                 break;
-            case type::Type::String:
+            case small::typeType::String:
                 builders.push_back(std::make_shared<arrow::StringBuilder>());
                 break;
             default:
                 SPDLOG_ERROR("unsupported type: {}",
-                             type::to_string(column.type));
+                             small::typeto_string(column.type));
                 break;
         }
     }

@@ -6,7 +6,7 @@ add_executable(
 )
 target_link_libraries(
     sql_test
-    type_lib
+    small::type
     GTest::gtest_main
     pqxx
     server_lib

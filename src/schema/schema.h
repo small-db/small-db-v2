@@ -58,12 +58,12 @@ namespace schema {
 class Column {
    public:
     std::string name;
-    type::Type type;
+    small::typeType type;
 
     bool is_primary_key = false;
 
     Column();
-    Column(const std::string& name, const type::Type& type,
+    Column(const std::string& name, const small::typeType& type,
            bool is_primary_key = false);
 
     void set_primary_key(bool set);

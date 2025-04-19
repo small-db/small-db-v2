@@ -15,21 +15,12 @@
 #pragma once
 
 // =====================================================================
-// c++ std
-// =====================================================================
-
-#include <string>
-
-// =====================================================================
 // local libraries
 // =====================================================================
 
 #include "src/type/type.h"
 
-namespace encode {
+namespace small::semantics {
 
-std::string encode(const small::typeDatum& datum);
 
-small::typeDatum decode(const std::string& str, small::typeType type);
-
-}  // namespace encode
+}  // namespace small::semantics

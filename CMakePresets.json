@@ -36,8 +36,7 @@
             "name": "debug",
             "description": "debug build",
             "inherits": [
-                "base",
-                "sanitizer-memory"
+                "base"
             ],
             "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {

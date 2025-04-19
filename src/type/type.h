@@ -33,7 +33,7 @@
 // pqxx
 #include "pqxx/pqxx"
 
-namespace type {
+namespace small::type {
 
 enum class Type {
     Int64 = 10,
@@ -54,4 +54,4 @@ gandiva::DataTypePtr get_gandiva_type(Type type);
 
 int16_t get_pgwire_size(Type type);
 
-}  // namespace type
+}  // namespace small::type
