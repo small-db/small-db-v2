@@ -77,34 +77,30 @@ ServerRegister* ServerRegister::GetInstance() {
     return &instance;
 }
 
-class RegistryService final
-    : public small::server_registry::ServerRegistry::Service {
-   public:
-    virtual ::grpc::Status Register(
-        ::grpc::ServerContext* context,
-        const ::small::server_registry::RegistryRequest* request,
-        ::small::server_registry::RegistryReply* response) {
-        SPDLOG_INFO(
-            "[server] register server: sql_address: {}, rpc_address: {}, "
-            "region: {}",
-            request->sql_address(), request->rpc_address(), request->region());
+grpc::Status RegistryService::Register(grpc::ServerContext* context,
+                                       const RegistryRequest* request,
+                                       RegistryReply* response) {
+    SPDLOG_INFO(
+        "[server] register server: sql_address: {}, rpc_address: {}, "
+        "region: {}",
+        request->sql_address(), request->rpc_address(), request->region());
 
-        auto status = small::server_registry::ServerRegister::GetInstance()
-                          ->RegisterServer(small::server_base::ServerArgs(
-                              request->sql_address(), request->rpc_address(),
-                              "", request->region(), ""));
+    auto status =
+        small::server_registry::ServerRegister::GetInstance()->RegisterServer(
+            small::server_base::ServerArgs(request->sql_address(),
+                                           request->rpc_address(), "",
+                                           request->region(), ""));
 
-        if (!status.ok()) {
-            SPDLOG_ERROR("failed to register server: {}", status.ToString());
-            response->set_success(false);
-            return grpc::Status(grpc::StatusCode::INTERNAL, status.ToString());
-        }
-
-        response->set_success(true);
-
-        return grpc::Status::OK;
+    if (!status.ok()) {
+        SPDLOG_ERROR("failed to register server: {}", status.ToString());
+        response->set_success(false);
+        return grpc::Status(grpc::StatusCode::INTERNAL, status.ToString());
     }
-};
+
+    response->set_success(true);
+
+    return grpc::Status::OK;
+}
 
 std::vector<small::server_base::ServerArgs> get_servers(
     std::unordered_map<std::string, std::string>& constraints) {

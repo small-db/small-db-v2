@@ -74,4 +74,12 @@ std::vector<small::server_base::ServerArgs> get_servers(
 
 absl::Status join(const small::server_base::ServerArgs& args);
 
+class RegistryService final
+    : public small::server_registry::ServerRegistry::Service {
+   public:
+    virtual grpc::Status Register(grpc::ServerContext* context,
+                                  const RegistryRequest* request,
+                                  RegistryReply* response);
+};
+
 }  // namespace small::server_registry

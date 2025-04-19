@@ -47,6 +47,11 @@
 // magic_enum
 #include "magic_enum/magic_enum.hpp"
 
+// grpc
+#include "grpc/grpc.h"
+#include "grpcpp/create_channel.h"
+#include "grpcpp/server_builder.h"
+
 // =====================================================================
 // local libraries
 // =====================================================================
@@ -149,6 +154,18 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> insert(
                 request.add_column_values(column_value);
             }
             SPDLOG_INFO("insert row: {}", request.DebugString());
+
+            auto channel = grpc::CreateChannel(
+                server.grpc_addr, grpc::InsecureChannelCredentials());
+            auto stub = small::insert::InsertService::NewStub(channel);
+            grpc::ClientContext context;
+            small::insert::InsertReply result;
+            grpc::Status status = stub->Insert(&context, request, &result);
+            if (!status.ok()) {
+                return absl::InternalError(
+                    fmt::format("failed to insert row into server {}: {}",
+                                server.grpc_addr, status.error_message()));
+            }
         }
     }
 

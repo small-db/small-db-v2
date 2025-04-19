@@ -36,6 +36,7 @@
 #include <mutex>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 // =====================================================================
@@ -626,6 +627,24 @@ void handle_query(std::string& query, int sockfd) {
     }
 }
 
+void start_grpc_server(
+    const std::string& addr,
+    const std::vector<std::shared_ptr<grpc::Service>>& services) {
+    grpc::ServerBuilder builder;
+    builder.AddListeningPort(addr, grpc::InsecureServerCredentials());
+
+    for (const auto& service : services) {
+        builder.RegisterService(service.get());
+    }
+
+    auto server = builder.BuildAndStart();
+    std::thread([server = std::move(server), addr]() mutable {
+        SPDLOG_INFO("server started, address: {}", addr);
+        server->Wait();
+        SPDLOG_INFO("server stopped, address: {}", addr);
+    }).detach();
+}
+
 int RunServer(const small::server_base::ServerArgs& args) {
     auto status = small::server_base::init(args);
     if (!status.ok()) {
@@ -638,7 +657,9 @@ int RunServer(const small::server_base::ServerArgs& args) {
         " data_dir: {}",
         args.sql_addr, args.grpc_addr, args.region, args.data_dir);
 
-    small::server_registry::start_server(args.grpc_addr);
+    start_grpc_server(
+        args.grpc_addr,
+        {std::make_shared<small::server_registry::RegistryService>()});
 
     status = small::server_registry::join(args);
     if (!status.ok()) {
