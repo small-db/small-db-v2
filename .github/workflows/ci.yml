@@ -16,6 +16,9 @@ jobs:
       - name: Lint
         run: ./scripts/ci/lint
 
+      - name: Install Dependencies
+        run: ./scripts/ci/install-deps
+
       - name: Build
         run: ./scripts/ci/build
 
