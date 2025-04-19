@@ -4,7 +4,7 @@ set -o xtrace
 set -o errexit
 set -o nounset
 
-git clone --recurse-submodules --depth=1 git@github.com:grpc/grpc.git
+git clone --recurse-submodules --depth=1 https://github.com/grpc/grpc.git
 cd grpc
 cmake -S . -B ./cmake/build -DCMAKE_CXX_STANDARD=17 -DgRPC_INSTALL=ON -DCMAKE_INSTALL_PREFIX=~/local/cpplib -G Ninja
 cmake --build ./cmake/build --target install
