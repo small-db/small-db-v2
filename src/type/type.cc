@@ -57,7 +57,7 @@ absl::StatusOr<Type> from_string(const std::string& type_name) {
     } else if (type_name == "string") {
         return Type::String;
     } else {
-        return absl::InvalidArgumentError("unknown type: " + type_name);
+        return absl::InternalError("unknown type: " + type_name);
     }
 }
 
@@ -80,7 +80,7 @@ absl::StatusOr<Type> from_pgwire_oid(pqxx::oid oid) {
         case 25:  // text
             return Type::String;
         default:
-            return absl::InvalidArgumentError("unknown oid: " +
+            return absl::InternalError("unknown oid: " +
                                               std::to_string(oid));
     }
 }

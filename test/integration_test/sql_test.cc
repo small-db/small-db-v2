@@ -178,7 +178,7 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
             {
                 // check column count
                 if (r.columns() != query->column_names.size()) {
-                    return absl::InvalidArgumentError(absl::StrFormat(
+                    return absl::InternalError(absl::StrFormat(
                         "column count mismatch: expected %d, got %d",
                         query->column_names.size(), r.columns()));
                 }
@@ -186,7 +186,7 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
                 // check column names
                 for (int i = 0; i < r.columns(); ++i) {
                     if (r.column_name(i) != query->column_names[i]) {
-                        return absl::InvalidArgumentError(absl::StrFormat(
+                        return absl::InternalError(absl::StrFormat(
                             "column name mismatch: expected %s, got %s",
                             query->column_names[i], r.column_name(i)));
                     }
@@ -196,7 +196,7 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
                 for (int i = 0; i < r.columns(); ++i) {
                     if (type::from_pgwire_oid(r.column_type(i)).value() !=
                         query->column_types[i]) {
-                        return absl::InvalidArgumentError(absl::StrFormat(
+                        return absl::InternalError(absl::StrFormat(
                             "column type mismatch: expected %s, got %s",
                             typeid(query->column_types[i]).name(),
                             typeid(r.column_type(i)).name()));
@@ -208,7 +208,7 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
             {
                 // check row count
                 if (r.size() != query->expected_output.size()) {
-                    return absl::InvalidArgumentError(absl::StrFormat(
+                    return absl::InternalError(absl::StrFormat(
                         "row count mismatch: expected %d, got %d",
                         query->expected_output.size(), r.size()));
                 }
@@ -217,7 +217,7 @@ absl::Status run_sql_test(const std::string& sqltest_file) {
                 for (int i = 0; i < r.size(); ++i) {
                     for (int j = 0; j < r.columns(); ++j) {
                         if (r[i][j].c_str() != query->expected_output[i][j]) {
-                            return absl::InvalidArgumentError(absl::StrFormat(
+                            return absl::InternalError(absl::StrFormat(
                                 "data mismatch at row %d, column %d: "
                                 "expected %s, got %s",
                                 i, j, query->expected_output[i][j],

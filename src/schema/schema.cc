@@ -350,7 +350,7 @@ absl::Status set_partition(const std::string& table_name,
         }
 
         default: {
-            return absl::InvalidArgumentError(
+            return absl::InternalError(
                 "Unsupported partition strategy: " +
                 std::to_string(static_cast<int>(strategy)));
         }

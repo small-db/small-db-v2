@@ -76,7 +76,7 @@ static absl::StatusOr<std::unique_ptr<SQLTestUnit>> init(
     std::vector<std::string> lines) {
     // this first line is tags <tag1> <tag2>
     if (lines.size() < 2) {
-        return absl::InvalidArgumentError(
+        return absl::InternalError(
             "a sql unit must have at least 2 lines");
     }
 
@@ -91,7 +91,7 @@ static absl::StatusOr<std::unique_ptr<SQLTestUnit>> init(
     }
 
     if (tags.size() != 2) {
-        return absl::InvalidArgumentError(
+        return absl::InternalError(
             "a sql unit must have exactly 2 tags");
     }
 
@@ -141,12 +141,12 @@ static absl::StatusOr<std::unique_ptr<SQLTestUnit>> init(
         for (const auto& tag : tags) {
             SPDLOG_DEBUG("tag: ({})", tag);
         }
-        return absl::InvalidArgumentError("unknown sql unit");
+        return absl::InternalError("unknown sql unit");
     }
 
     auto sql_unit = std::make_unique<SQLTestUnit>(tags, sql, "", behavior);
     if (sql_unit->sql.empty()) {
-        return absl::InvalidArgumentError("empty sql");
+        return absl::InternalError("empty sql");
     }
     return sql_unit;
 }

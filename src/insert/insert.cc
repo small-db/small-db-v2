@@ -74,7 +74,7 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> insert(
     auto table_name = insert_stmt->relation->relname;
     auto result = schema::get_table(table_name);
     if (!result) {
-        return absl::InvalidArgumentError(
+        return absl::InternalError(
             fmt::format("table {} not found", table_name));
     }
 
@@ -92,7 +92,7 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> insert(
         }
 
         if (partition_column_id == -1) {
-            return absl::InvalidArgumentError(
+            return absl::InternalError(
                 fmt::format("partition column {} not found", partition_column));
         }
 
@@ -109,7 +109,7 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> insert(
             // get the partition
             auto partition = listP->lookup(partition_value);
             if (!partition) {
-                return absl::InvalidArgumentError(fmt::format(
+                return absl::InternalError(fmt::format(
                     "partition not found for value {}", partition_value));
             }
 
