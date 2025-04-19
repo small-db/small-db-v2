@@ -48,7 +48,7 @@ class ServerRegister {
     // singleton instance - destructor protector
     ~ServerRegister();
 
-    inline static ServerRegister* instance;
+    // inline static ServerRegister* instance;
 
     std::mutex mutex_;
 

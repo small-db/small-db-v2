@@ -68,7 +68,13 @@ absl::Status ServerRegister::RegisterServer(
     return absl::OkStatus();
 }
 
-ServerRegister* ServerRegister::GetInstance() { return instance; }
+ServerRegister::ServerRegister() = default;
+ServerRegister::~ServerRegister() = default;
+
+ServerRegister* ServerRegister::GetInstance() {
+    static ServerRegister instance;
+    return &instance;
+}
 
 class RegistryService final
     : public small::server_registry::ServerRegistry::Service {
