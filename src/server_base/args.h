@@ -37,8 +37,13 @@ class ServerArgs {
     std::string join;
 
     ServerArgs(const std::string& sql_addr, const std::string& grpc_addr,
-              const std::string& data_dir, const std::string& region,
-              const std::string& join);
+               const std::string& data_dir, const std::string& region,
+               const std::string& join);
+
+    ServerArgs(const ServerArgs&) = default;
+    ServerArgs(ServerArgs&&) = default;
+    ServerArgs& operator=(const ServerArgs&) = default;
+    ServerArgs& operator=(ServerArgs&&) = default;
 };
 
 class ServerInfo {

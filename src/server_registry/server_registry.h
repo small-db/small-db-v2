@@ -50,6 +50,8 @@ class ServerRegister {
 
     inline static ServerRegister* instance;
 
+    std::mutex mutex_;
+
    public:
     // singleton instance - copy blocker
     ServerRegister(const ServerRegister&) = delete;

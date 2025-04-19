@@ -57,6 +57,8 @@ namespace small::server_registry {
 
 absl::Status ServerRegister::RegisterServer(
     const small::server_base::ServerArgs& args) {
+    std::lock_guard<std::mutex> lock(this->mutex_);
+
     SPDLOG_INFO(
         "[server status] register server: sql_address: {}, rpc_address: {}, "
         "region: "
@@ -138,8 +140,10 @@ void start_server(std::string addr) {
     builder.RegisterService(service.get());
 
     auto server = builder.BuildAndStart();
-    std::thread([server = std::move(server), service]() mutable {
+    std::thread([server = std::move(server), service, addr]() mutable {
+        SPDLOG_INFO("server started, address: {}", addr);
         server->Wait();
+        SPDLOG_INFO("server stopped, address: {}", addr);
     }).detach();
 }
 
