@@ -35,18 +35,18 @@
 #include "spdlog/spdlog.h"
 
 // =====================================================================
-// protobuf generated files
-// =====================================================================
-
-#include "server_registry.grpc.pb.h"
-#include "server_registry.pb.h"
-
-// =====================================================================
 // local libraries
 // =====================================================================
 
 #include "src/server_base/args.h"
 #include "src/util/ip/ip.h"
+
+// =====================================================================
+// protobuf generated files
+// =====================================================================
+
+#include "server_registry.grpc.pb.h"
+#include "server_registry.pb.h"
 
 // =====================================================================
 // self header
@@ -77,9 +77,9 @@ ServerRegister* ServerRegister::GetInstance() {
     return &instance;
 }
 
-grpc::Status RegistryService::Register(grpc::ServerContext* context,
-                                       const RegistryRequest* request,
-                                       RegistryReply* response) {
+::grpc::Status RegistryService::Register(::grpc::ServerContext* context,
+                                         const RegistryRequest* request,
+                                         RegistryReply* response) {
     SPDLOG_INFO(
         "[server] register server: sql_address: {}, rpc_address: {}, "
         "region: {}",

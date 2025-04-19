@@ -39,6 +39,13 @@
 
 #include "src/server_base/args.h"
 
+// =====================================================================
+// protobuf generated files
+// =====================================================================
+
+#include "server_registry.grpc.pb.h"
+#include "server_registry.pb.h"
+
 namespace small::server_registry {
 
 class ServerRegister {
