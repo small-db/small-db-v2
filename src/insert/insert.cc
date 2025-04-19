@@ -48,12 +48,24 @@
 #include "magic_enum/magic_enum.hpp"
 
 // =====================================================================
+// local libraries
+// =====================================================================
+
+#include "src/schema/schema.h"
+#include "src/server_registry/server_registry.h"
+
+// =====================================================================
+// protobuf generated files
+// =====================================================================
+
+#include "insert.grpc.pb.h"
+#include "insert.pb.h"
+
+// =====================================================================
 // self header
 // =====================================================================
 
 #include "src/insert/insert.h"
-#include "src/schema/schema.h"
-#include "src/server_registry/server_registry.h"
 
 namespace insert {
 
@@ -107,15 +119,23 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> insert(
 
             // search a server for the partition
             auto servers =
-            small::server_registry::get_servers(partition->constraints);
+                small::server_registry::get_servers(partition->constraints);
             if (servers.empty()) {
-                return absl::InvalidArgumentError(fmt::format(
+                return absl::InternalError(fmt::format(
                     "no server found for partition {}", partition_value));
             }
+            if (servers.size() > 1) {
+                return absl::InternalError(
+                    fmt::format("multiple servers found for partition {}",
+                                partition_value));
+            }
+
+            // insert the row into the server
+            auto server = servers[0];
         }
     }
 
-    return absl::InvalidArgumentError("insert statement is not supported yet");
+    return absl::UnimplementedError("insert statement is not supported yet");
 }
 
 }  // namespace insert

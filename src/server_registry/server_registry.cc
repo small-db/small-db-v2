@@ -158,7 +158,7 @@ absl::Status join(const small::server_base::ServerArgs& args) {
     std::string peer_addr = args.join;
     if (peer_addr.empty()) {
         auto addr = small::util::ip::str_to_sockaddr(args.grpc_addr);
-        peer_addr = fmt::format("127.0.0.1:{}", addr.sin_port);
+        peer_addr = fmt::format("127.0.0.1:{}", ntohs(addr.sin_port));
     }
 
     SPDLOG_INFO("join peer addr: {}", peer_addr);
