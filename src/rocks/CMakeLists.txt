@@ -8,7 +8,10 @@ target_link_libraries(small_rocks
     rocksdb
     PRIVATE
     spdlog
-    absl_status
+    absl::status
+    small::type
+    small::encode
+    small::schema
 )
 
 add_library(small::rocks ALIAS small_rocks)

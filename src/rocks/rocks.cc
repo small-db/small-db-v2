@@ -27,11 +27,24 @@
 // third-party libraries
 // =====================================================================
 
+// rocksdb
 #include "rocksdb/db.h"
 #include "rocksdb/filter_policy.h"
 #include "rocksdb/options.h"
 #include "rocksdb/slice_transform.h"
 #include "rocksdb/table.h"
+
+// absl
+#include "absl/strings/str_format.h"
+
+// =====================================================================
+// local libraries
+// =====================================================================
+
+#include "src/encode/encode.h"
+#include "src/rocks/rocks.h"
+#include "src/schema/schema.h"
+#include "src/type/type.h"
 
 // =====================================================================
 // self header
@@ -187,6 +200,24 @@ void RocksDBWrapper::PrintAllKV() {
                       << ", Value: " << it->value().ToString() << std::endl;
         }
         delete it;
+    }
+}
+
+void write_row(small::rocks::RocksDBWrapper* db,
+               const std::shared_ptr<small::schema::Table>& table,
+               const std::vector<small::type::Datum>& values) {
+    int pk_index = -1;
+    for (int i = 0; i < table->columns.size(); ++i) {
+        if (table->columns[i].is_primary_key) {
+            pk_index = i;
+            break;
+        }
+    }
+
+    for (int i = 0; i < table->columns.size(); ++i) {
+        auto key = absl::StrFormat("/%s/%s/column_%d", table->name,
+                                   small::encode::encode(values[pk_index]), i);
+        db->Put(key, small::encode::encode(values[i]));
     }
 }
 

@@ -12,7 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace small::kv_store {
+// =====================================================================
+// c++ std
+// =====================================================================
+
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 // =====================================================================
 // third-party libraries
@@ -35,6 +43,8 @@ namespace small::kv_store {
 // ====================================================================
 
 #include "src/kv_store/kv_store.h"
+
+namespace small::kv_store {
 
 void write_row(small::rocks::RocksDBWrapper* db,
                const std::shared_ptr<small::schema::Table>& table,
