@@ -22,10 +22,10 @@ class Catalog {
     static Catalog* instancePtr;
 
     // singleton instance - constructor protector
-    Catalog();
+    Catalog() = default;
 
     // singleton instance - destructor protector
-    ~Catalog();
+    ~Catalog() = default;
 
    public:
     // singleton instance - assignment-blocker

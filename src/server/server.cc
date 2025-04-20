@@ -58,6 +58,7 @@
 // local libraries
 // =====================================================================
 
+#include "src/catalog/catalog.h"
 #include "src/insert/insert.h"
 #include "src/schema/schema.h"
 #include "src/semantics/check.h"
@@ -647,6 +648,9 @@ void start_grpc_server(
 }
 
 int RunServer(const small::server_base::ServerArgs& args) {
+    // initialize singleton instances
+    small::catalog::Catalog::InitInstance();
+
     auto status = small::server_base::init(args);
     if (!status.ok()) {
         SPDLOG_ERROR("failed to init server: {}", status.ToString());

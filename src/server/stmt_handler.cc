@@ -46,6 +46,7 @@
 #include "src/insert/insert.h"
 #include "src/schema/schema.h"
 #include "src/semantics/check.h"
+#include "src/catalog/catalog.h"
 
 // =====================================================================
 // self header
