@@ -40,11 +40,11 @@ namespace insert {
 absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> insert(
     PgQuery__InsertStmt* insert_stmt);
 
-class InsertService final : public ::small::insert::InsertService::Service {
+class InsertService final : public small::insert::InsertService::Service {
    public:
-    virtual ::grpc::Status Insert(::grpc::ServerContext* context,
-                                  const ::small::insert::Row* request,
-                                  ::small::insert::InsertReply* response);
+    virtual grpc::Status Insert(grpc::ServerContext* context,
+                                const small::insert::Row* request,
+                                small::insert::InsertReply* response);
 };
 
 }  // namespace insert

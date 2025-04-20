@@ -172,9 +172,9 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> insert(
     return absl::UnimplementedError("insert statement is not supported yet");
 }
 
-grpc::Status Insert(::grpc::ServerContext* context,
-                    const ::small::insert::Row* request,
-                    ::small::insert::InsertReply* response) {
+grpc::Status InsertService::Insert(grpc::ServerContext* context,
+                                   const small::insert::Row* request,
+                                   small::insert::InsertReply* response) {
     SPDLOG_INFO("insert request: {}", request->DebugString());
     return grpc::Status::OK;
 }
