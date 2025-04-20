@@ -85,7 +85,8 @@ absl::Status insert(PgQuery__InsertStmt* insert_stmt) {
     }
 
     auto table = result.value();
-    if (auto* listP = std::get_if<small::schema::ListPartition>(&table->partition)) {
+    if (auto* listP =
+            std::get_if<small::schema::ListPartition>(&table->partition)) {
         auto partition_column = listP->column_name;
 
         // get partition column id (in the insert statement)

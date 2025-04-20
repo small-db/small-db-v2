@@ -6,6 +6,7 @@ add_library(small_catalog
 target_link_libraries(small_catalog
     PRIVATE
     spdlog::spdlog
+    nlohmann_json::nlohmann_json
     small::schema
 )
 

@@ -18,7 +18,10 @@
 // c++ std
 // =====================================================================
 
+#include <memory>
 #include <string>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 // =====================================================================
@@ -39,6 +42,12 @@ class Catalog {
 
     // singleton instance - destructor protector
     ~Catalog() = default;
+
+    std::unordered_map<std::string, std::shared_ptr<small::schema::Table>>
+        tables;
+
+    std::optional<std::shared_ptr<small::schema::Table>> get_table(
+        const std::string& table_name);
 
    public:
     // singleton instance - assignment-blocker
