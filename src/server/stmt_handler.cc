@@ -42,11 +42,11 @@
 // local libraries
 // =====================================================================
 
-#include "src/query/query.h"
+#include "src/catalog/catalog.h"
 #include "src/insert/insert.h"
+#include "src/query/query.h"
 #include "src/schema/schema.h"
 #include "src/semantics/check.h"
-#include "src/catalog/catalog.h"
 
 // =====================================================================
 // self header
@@ -233,7 +233,8 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> handle_stmt(
             break;
         }
         case PG_QUERY__NODE__NODE_INSERT_STMT: {
-            return insert::insert(stmt->insert_stmt);
+            return WrapEmptyStatus(
+                [&]() { return insert::insert(stmt->insert_stmt); });
             break;
         }
         default:

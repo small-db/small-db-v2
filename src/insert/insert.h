@@ -24,6 +24,7 @@
 
 // absl
 #include "absl/status/statusor.h"
+#include "absl/status/status.h"
 
 // arrow
 #include "arrow/api.h"
@@ -37,7 +38,7 @@
 
 namespace insert {
 
-absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> insert(
+absl::Status insert(
     PgQuery__InsertStmt* insert_stmt);
 
 class InsertService final : public small::insert::InsertService::Service {

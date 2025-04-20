@@ -76,8 +76,7 @@
 
 namespace insert {
 
-absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> insert(
-    PgQuery__InsertStmt* insert_stmt) {
+absl::Status insert(PgQuery__InsertStmt* insert_stmt) {
     auto table_name = insert_stmt->relation->relname;
     auto result = schema::get_table(table_name);
     if (!result) {
