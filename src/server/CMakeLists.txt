@@ -19,6 +19,7 @@ target_link_libraries(server_lib
     small::util::ip
     server_registry_proto
     insert_proto
+    small::catalog
 )
 
 add_executable(server
