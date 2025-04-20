@@ -7,7 +7,7 @@ add_library(server_lib
 
 target_link_libraries(server_lib
     PUBLIC
-    schema_lib
+    small::schema
     spdlog
     libpg_query_lib
     small::semantics

@@ -31,7 +31,7 @@
 // json
 #include "nlohmann/json.hpp"
 
-namespace schema {
+namespace small::schema {
 
 class NullPartition {};
 
@@ -61,4 +61,4 @@ void to_json(nlohmann::json& j, const partition_t& p);
 
 void from_json(const nlohmann::json& j, partition_t& p);
 
-}  // namespace schema
+}  // namespace small::schema

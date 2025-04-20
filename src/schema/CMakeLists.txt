@@ -1,4 +1,4 @@
-add_library(schema_lib
+add_library(small_schema
     const.h
     schema.cc
     schema.h
@@ -6,7 +6,7 @@ add_library(schema_lib
     partition.h
 )
 
-target_link_libraries(schema_lib
+target_link_libraries(small_schema
     PUBLIC
     rocksdb
     spdlog
@@ -20,3 +20,5 @@ target_link_libraries(schema_lib
     server_base_lib
     insert_lib
 )
+
+add_library(small::schema ALIAS small_schema)

@@ -53,7 +53,7 @@
 #include "src/schema/partition.h"
 #include "src/type/type.h"
 
-namespace schema {
+namespace small::schema {
 
 class Column {
    public:
@@ -103,4 +103,4 @@ absl::Status add_partition_constraint(
     const std::string& partition_name,
     const std::pair<std::string, std::string>& constraint);
 
-}  // namespace schema
+}  // namespace small::schema

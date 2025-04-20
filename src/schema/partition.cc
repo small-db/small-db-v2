@@ -24,7 +24,7 @@
 
 #include "src/schema/partition.h"
 
-namespace schema {
+namespace small::schema {
 
 void to_json(nlohmann::json& j, const ListPartition::SinglePartition& p) {
     j = nlohmann::json{
@@ -86,4 +86,4 @@ std::optional<ListPartition::SinglePartition> ListPartition::lookup(
     return std::nullopt;
 }
 
-}  // namespace schema
+}  // namespace small::schema

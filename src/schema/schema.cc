@@ -60,7 +60,7 @@
 
 #include "src/schema/schema.h"
 
-namespace schema {
+namespace small::schema {
 
 void to_json(nlohmann::json& j, const Column& c) {
     j = nlohmann::json{
@@ -374,4 +374,4 @@ absl::Status add_partition_constraint(
                                                             constraint);
 }
 
-}  // namespace schema
+}  // namespace small::schema

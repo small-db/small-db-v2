@@ -10,7 +10,7 @@ target_link_libraries(query_lib
     libpg_query_lib
     arrow_lib
     rocksdb_wrapper_lib
-    schema_lib
+    small::schema
     magic_enum
     server_base_lib
 )

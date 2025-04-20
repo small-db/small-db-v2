@@ -14,6 +14,19 @@
 
 #pragma once
 
+// =====================================================================
+// c++ std
+// =====================================================================
+
+#include <string>
+#include <vector>
+
+// =====================================================================
+// local libraries
+// =====================================================================
+
+#include "src/schema/schema.h"
+
 namespace small::catalog {
 
 class Catalog {
@@ -39,6 +52,10 @@ class Catalog {
 
     // singleton instance - init api
     static void InitInstance();
+
+    absl::Status create_table(
+        const std::string& table_name,
+        const std::vector<small::schema::Column>& columns);
 };
 
 }  // namespace small::catalog

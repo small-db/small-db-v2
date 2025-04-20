@@ -21,4 +21,4 @@
 #include <cstdint>
 #include <string>
 
-namespace schema {}  // namespace schema
+namespace small::schema {}  // namespace small::schema
