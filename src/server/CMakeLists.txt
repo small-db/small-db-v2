@@ -17,6 +17,8 @@ target_link_libraries(server_lib
     crypto
     server_base_lib
     small::util::ip
+    server_registry_proto
+    insert_proto
 )
 
 add_executable(server

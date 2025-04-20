@@ -58,6 +58,7 @@
 // local libraries
 // =====================================================================
 
+#include "src/insert/insert.h"
 #include "src/schema/schema.h"
 #include "src/semantics/check.h"
 #include "src/server/stmt_handler.h"
@@ -659,7 +660,10 @@ int RunServer(const small::server_base::ServerArgs& args) {
 
     start_grpc_server(
         args.grpc_addr,
-        {std::make_shared<small::server_registry::RegistryService>()});
+        {
+            std::make_shared<small::server_registry::RegistryService>(),
+            std::make_shared<insert::InsertService>(),
+        });
 
     status = small::server_registry::join(args);
     if (!status.ok()) {
