@@ -20,6 +20,7 @@ target_link_libraries(server_lib
     server_registry_proto
     insert_proto
     small::catalog
+    absl::status
 )
 
 add_executable(server

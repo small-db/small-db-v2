@@ -26,7 +26,7 @@
 #include "spdlog/spdlog.h"
 
 // CLI11
-#include <CLI/CLI.hpp>
+#include "CLI/CLI.hpp"
 
 // =====================================================================
 // local libraries
