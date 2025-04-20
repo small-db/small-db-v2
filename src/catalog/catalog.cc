@@ -33,6 +33,12 @@
 #include "nlohmann/json.hpp"
 
 // =====================================================================
+// local libraries
+// =====================================================================
+
+#include "src/server_base/args.h"
+
+// =====================================================================
 // self header
 // =====================================================================
 
@@ -56,6 +62,34 @@ Catalog* Catalog::GetInstance() {
         return nullptr;
     }
     return instancePtr;
+}
+
+Catalog::Catalog() {
+    std::vector<small::schema::Column> columns;
+    columns.emplace_back("table_name", small::type::Type::String, true);
+    columns.emplace_back("columns", small::type::Type::String);
+    this->tables["system.tables"] =
+        std::make_shared<small::schema::Table>("system.tables", columns);
+    this->system_tables = this->tables["system.tables"];
+
+    columns.clear();
+    columns.emplace_back("table_name", small::type::Type::String);
+    columns.emplace_back("partition_name", small::type::Type::String, true);
+    columns.emplace_back("constraint", small::type::Type::String);
+    columns.emplace_back("column_name", small::type::Type::String);
+    columns.emplace_back("partition_value", small::type::Type::String);
+    this->tables["system.partitions"] =
+        std::make_shared<small::schema::Table>("system.partitions", columns);
+    this->system_partitions = this->tables["system.partitions"];
+
+    auto info = small::server_base::get_info();
+    if (!info.ok()) {
+        SPDLOG_ERROR("failed to get server info");
+        return;
+    }
+    std::string db_path = info.value()->db_path;
+    this->db = small::rocks::RocksDBWrapper::GetInstance(
+        db_path, {"TablesCF", "PartitionCF"});
 }
 
 std::optional<std::shared_ptr<small::schema::Table>> Catalog::get_table(
@@ -86,7 +120,7 @@ absl::Status Catalog::create_table(
     row.emplace_back(table_name);
     row.emplace_back(nlohmann::json(columns).dump());
 
-    // write_row(db, this->system_tables, row);
+    db->WriteRow(this->system_tables, row);
 
     return absl::OkStatus();
 }

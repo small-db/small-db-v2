@@ -28,6 +28,7 @@
 // local libraries
 // =====================================================================
 
+#include "src/rocks/rocks.h"
 #include "src/schema/schema.h"
 
 namespace small::catalog {
@@ -38,16 +39,20 @@ class Catalog {
     static Catalog* instancePtr;
 
     // singleton instance - constructor protector
-    Catalog() = default;
+    Catalog();
 
     // singleton instance - destructor protector
     ~Catalog() = default;
 
     std::unordered_map<std::string, std::shared_ptr<small::schema::Table>>
         tables;
+    std::shared_ptr<small::schema::Table> system_tables;
+    std::shared_ptr<small::schema::Table> system_partitions;
 
     std::optional<std::shared_ptr<small::schema::Table>> get_table(
         const std::string& table_name);
+
+    small::rocks::RocksDBWrapper* db;
 
    public:
     // singleton instance - assignment-blocker
