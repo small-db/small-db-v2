@@ -13,7 +13,7 @@ target_link_libraries(small_schema
     absl_status
     libpg_query_lib
     nlohmann_json::nlohmann_json
-    rocksdb_wrapper_lib
+    small::rocks
     id_lib
     small::type
     small::encode

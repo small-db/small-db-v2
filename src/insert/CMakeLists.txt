@@ -9,7 +9,7 @@ target_link_libraries(insert_lib
     absl_status
     libpg_query_lib
     arrow_lib
-    rocksdb_wrapper_lib
+    small::rocks
     small::schema
     server_registry
     magic_enum

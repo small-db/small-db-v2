@@ -85,8 +85,7 @@ absl::Status Catalog::create_table(
     std::vector<small::type::Datum> row;
     row.emplace_back(table_name);
 
-    // TODO: serialize (imported) type
-    // row.emplace_back(nlohmann::json(columns).dump());
+    row.emplace_back(nlohmann::json(columns).dump());
 
     // TODO: write (use api from small::kv_store)
     // write_row(db, this->system_tables, row);

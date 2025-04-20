@@ -31,7 +31,7 @@
 #include "rocksdb/db.h"
 #include "rocksdb/options.h"
 
-namespace rocks_wrapper {
+namespace small::rocks {
 
 class RocksDBWrapper {
    private:
@@ -87,4 +87,4 @@ class RocksDBWrapper {
         const std::string& cf_name);
 };
 
-}  // namespace rocks_wrapper
+}  // namespace small::rocks

@@ -47,7 +47,7 @@
 
 #include "src/encode/encode.h"
 #include "src/id/generator.h"
-#include "src/rocks/wrapper.h"
+#include "src/rocks/rocks.h"
 #include "src/schema/const.h"
 #include "src/schema/partition.h"
 #include "src/server_base/args.h"
@@ -85,7 +85,7 @@ void from_json(const nlohmann::json& j, Table& t) {
     j.at("columns").get_to(t.columns);
 }
 
-void write_row(rocks_wrapper::RocksDBWrapper* db,
+void write_row(small::rocks::RocksDBWrapper* db,
                const std::shared_ptr<Table>& table,
                const std::vector<small::type::Datum>& values) {
     int pk_index = -1;
@@ -111,7 +111,7 @@ class Catalog {
     // mutex to ensure thread safety
     static std::mutex mtx;
 
-    rocks_wrapper::RocksDBWrapper* db;
+    small::rocks::RocksDBWrapper* db;
 
     std::shared_ptr<small::schema::Table> system_tables;
     std::shared_ptr<small::schema::Table> system_partitions;
@@ -141,7 +141,7 @@ class Catalog {
             return;
         }
         std::string db_path = info.value()->db_path;
-        this->db = rocks_wrapper::RocksDBWrapper::GetInstance(
+        this->db = small::rocks::RocksDBWrapper::GetInstance(
             db_path, {"TablesCF", "PartitionCF"});
     }
 

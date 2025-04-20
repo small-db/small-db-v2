@@ -69,6 +69,10 @@ class Column {
     void set_primary_key(bool set);
 };
 
+void to_json(nlohmann::json& j, const Column& c);
+
+void from_json(const nlohmann::json& j, Column& c);
+
 class Table {
    public:
     std::string name;

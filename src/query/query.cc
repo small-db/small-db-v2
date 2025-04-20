@@ -51,7 +51,7 @@
 // local libraries
 // =====================================================================
 
-#include "src/rocks/wrapper.h"
+#include "src/rocks/rocks.h"
 #include "src/schema/const.h"
 #include "src/schema/schema.h"
 #include "src/server_base/args.h"
@@ -152,7 +152,7 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> query(
         return absl::Status(absl::StatusCode::kInternal,
                             "failed to get server info");
     std::string db_path = info.value()->db_path;
-    auto db = rocks_wrapper::RocksDBWrapper::GetInstance(db_path, {});
+    auto db = small::rocks::RocksDBWrapper::GetInstance(db_path, {});
     auto scan_preix = "/" + table_name + "/";
     auto kv_pairs = db->GetAll(scan_preix);
 

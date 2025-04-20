@@ -37,9 +37,9 @@
 // self header
 // =====================================================================
 
-#include "src/rocks/wrapper.h"
+#include "src/rocks/rocks.h"
 
-namespace rocks_wrapper {
+namespace small::rocks {
 
 RocksDBWrapper::RocksDBWrapper(
     const std::string& db_path,
@@ -190,4 +190,4 @@ void RocksDBWrapper::PrintAllKV() {
     }
 }
 
-}  // namespace rocks_wrapper
+}  // namespace small::rocks
