@@ -113,8 +113,8 @@ class Catalog {
 
     rocks_wrapper::RocksDBWrapper* db;
 
-    std::shared_ptr<schema::Table> system_tables;
-    std::shared_ptr<schema::Table> system_partitions;
+    std::shared_ptr<small::schema::Table> system_tables;
+    std::shared_ptr<small::schema::Table> system_partitions;
 
     // private Constructor
     Catalog() {
@@ -259,7 +259,7 @@ class Catalog {
         return absl::NotFoundError("table not found");
     }
 
-    void write_partition(const std::shared_ptr<schema::Table>& table) {
+    void write_partition(const std::shared_ptr<small::schema::Table>& table) {
         // nlohmann::json j(table->partition);
         // auto key = absl::StrFormat("P:%d", table->id);
         // db->Put("PartitionCF", key, j.dump());

@@ -58,7 +58,7 @@ namespace stmt_handler {
 
 absl::Status handle_create_table(PgQuery__CreateStmt* create_stmt) {
     std::string table_name = create_stmt->relation->relname;
-    std::vector<schema::Column> columns;
+    std::vector<small::schema::Column> columns;
 
     for (int i = 0; i < create_stmt->n_table_elts; i++) {
         auto node_case = create_stmt->table_elts[i]->node_case;
