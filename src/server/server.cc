@@ -648,14 +648,15 @@ void start_grpc_server(
 }
 
 int RunServer(const small::server_base::ServerArgs& args) {
-    // initialize singleton instances
-    small::catalog::Catalog::InitInstance();
-
+    // === initialize singleton instances start ===
     auto status = small::server_base::init(args);
     if (!status.ok()) {
         SPDLOG_ERROR("failed to init server: {}", status.ToString());
         return EXIT_FAILURE;
     }
+
+    small::catalog::Catalog::InitInstance();
+    // === initialize singleton instances end ===
 
     SPDLOG_INFO(
         "start server: sql_address: {}, grpc_address: {}, region: {}"
