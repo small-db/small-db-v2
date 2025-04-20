@@ -31,6 +31,14 @@
 #include "rocksdb/db.h"
 #include "rocksdb/options.h"
 
+// =====================================================================
+// local libraries
+// =====================================================================
+
+#include "src/encode/encode.h"
+#include "src/schema/schema.h"
+#include "src/type/type.h"
+
 namespace small::rocks {
 
 class RocksDBWrapper {
@@ -77,6 +85,9 @@ class RocksDBWrapper {
     bool Delete(const std::string& cf_name, const std::string& key);
 
     void PrintAllKV();
+
+    void WriteRow(const std::shared_ptr<small::schema::Table>& table,
+                  const std::vector<small::type::Datum>& values);
 
    private:
     rocksdb::DB* db_;

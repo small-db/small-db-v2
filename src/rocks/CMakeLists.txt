@@ -6,7 +6,6 @@ add_library(small_rocks
 target_link_libraries(small_rocks
     PUBLIC
     rocksdb
-    PRIVATE
     spdlog
     absl::status
     small::type

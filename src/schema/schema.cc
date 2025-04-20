@@ -47,12 +47,12 @@
 
 #include "src/encode/encode.h"
 #include "src/id/generator.h"
+#include "src/insert/insert.h"
 #include "src/rocks/rocks.h"
 #include "src/schema/const.h"
 #include "src/schema/partition.h"
 #include "src/server_base/args.h"
 #include "src/type/type.h"
-#include "src/insert/insert.h"
 
 // =====================================================================
 // self header
@@ -83,24 +83,6 @@ void to_json(nlohmann::json& j, const Table& t) {
 void from_json(const nlohmann::json& j, Table& t) {
     j.at("name").get_to(t.name);
     j.at("columns").get_to(t.columns);
-}
-
-void write_row(small::rocks::RocksDBWrapper* db,
-               const std::shared_ptr<Table>& table,
-               const std::vector<small::type::Datum>& values) {
-    int pk_index = -1;
-    for (int i = 0; i < table->columns.size(); ++i) {
-        if (table->columns[i].is_primary_key) {
-            pk_index = i;
-            break;
-        }
-    }
-
-    for (int i = 0; i < table->columns.size(); ++i) {
-        auto key = absl::StrFormat("/%s/%s/column_%d", table->name,
-                                   small::encode::encode(values[pk_index]), i);
-        db->Put(key, small::encode::encode(values[i]));
-    }
 }
 
 class Catalog {
@@ -206,7 +188,7 @@ class Catalog {
         std::vector<small::type::Datum> row;
         row.emplace_back(table_name);
         row.emplace_back(nlohmann::json(columns).dump());
-        write_row(db, this->system_tables, row);
+        db->WriteRow(this->system_tables, row);
 
         return absl::OkStatus();
     }
@@ -260,17 +242,6 @@ class Catalog {
     }
 
     void write_partition(const std::shared_ptr<small::schema::Table>& table) {
-        // nlohmann::json j(table->partition);
-        // auto key = absl::StrFormat("P:%d", table->id);
-        // db->Put("PartitionCF", key, j.dump());
-
-        // std::vector<small::type::Datum> row;
-        // row.emplace_back(id::generate_id());
-        // row.emplace_back(table_name);
-        // row.emplace_back(nlohmann::json(columns).dump());
-        // write_row(db, this->system_tables, row);
-        // return absl::OkStatus();
-
         std::visit(
             [&](auto&& partition) {
                 using T = std::decay_t<decltype(partition)>;
@@ -283,7 +254,7 @@ class Catalog {
                         row.emplace_back(nlohmann::json(p.constraints).dump());
                         row.emplace_back(partition.column_name);
                         row.emplace_back(nlohmann::json(p.values).dump());
-                        write_row(db, this->system_partitions, row);
+                        db->WriteRow(this->system_partitions, row);
                     }
                 } else if constexpr (std::is_same_v<T, NullPartition>) {
                     // do nothing
