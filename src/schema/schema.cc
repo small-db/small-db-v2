@@ -52,6 +52,7 @@
 #include "src/schema/partition.h"
 #include "src/server_base/args.h"
 #include "src/type/type.h"
+#include "src/insert/insert.h"
 
 // =====================================================================
 // self header

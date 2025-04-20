@@ -167,9 +167,15 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> insert(
                                 server.grpc_addr, status.error_message()));
             }
         }
-    }
 
-    return absl::UnimplementedError("insert statement is not supported yet");
+        return absl::OkStatus();
+    } else {
+        // no partition, unimplemented
+        return absl::UnimplementedError(
+            fmt::format("insert into table {} without partition is not "
+                        "supported yet",
+                        table_name));
+    }
 }
 
 grpc::Status InsertService::Insert(grpc::ServerContext* context,

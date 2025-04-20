@@ -639,7 +639,7 @@ void start_grpc_server(
     }
 
     auto server = builder.BuildAndStart();
-    std::thread([server = std::move(server), addr]() mutable {
+    std::thread([server = std::move(server), addr, services]() mutable {
         SPDLOG_INFO("server started, address: {}", addr);
         server->Wait();
         SPDLOG_INFO("server stopped, address: {}", addr);
@@ -654,7 +654,7 @@ int RunServer(const small::server_base::ServerArgs& args) {
     }
 
     SPDLOG_INFO(
-        "start server: sql_address: {}, rpc_address: {}, region: {}"
+        "start server: sql_address: {}, grpc_address: {}, region: {}"
         " data_dir: {}",
         args.sql_addr, args.grpc_addr, args.region, args.data_dir);
 

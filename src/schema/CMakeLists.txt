@@ -18,4 +18,5 @@ target_link_libraries(schema_lib
     small::type
     small::encode
     server_base_lib
+    insert_lib
 )

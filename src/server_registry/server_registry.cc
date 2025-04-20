@@ -77,9 +77,9 @@ ServerRegister* ServerRegister::GetInstance() {
     return &instance;
 }
 
-::grpc::Status RegistryService::Register(::grpc::ServerContext* context,
-                                         const RegistryRequest* request,
-                                         RegistryReply* response) {
+grpc::Status RegistryService::Register(grpc::ServerContext* context,
+                                       const RegistryRequest* request,
+                                       RegistryReply* response) {
     SPDLOG_INFO(
         "[server] register server: sql_address: {}, rpc_address: {}, "
         "region: {}",
@@ -172,11 +172,11 @@ absl::Status join(const small::server_base::ServerArgs& args) {
         grpc::CreateChannel(peer_addr, grpc::InsecureChannelCredentials());
     std::unique_ptr<small::server_registry::ServerRegistry::Stub> stub =
         small::server_registry::ServerRegistry::NewStub(channel);
-    grpc::ClientContext context;
     small::server_registry::RegistryReply result;
 
     const int max_retries = 5;
     for (int attempt = 1; attempt <= max_retries; ++attempt) {
+        grpc::ClientContext context;
         grpc::Status status = stub->Register(&context, request, &result);
         if (!status.ok() && attempt < max_retries) {
             SPDLOG_WARN("failed to join peer: {}, retrying...", peer_addr);
