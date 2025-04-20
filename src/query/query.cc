@@ -99,7 +99,8 @@ std::tuple<std::string_view, std::string_view, int> parse_key(
     return {table_name, pk, column_id};
 }
 
-std::shared_ptr<arrow::Schema> get_input_schema(const small::schema::Table& table) {
+std::shared_ptr<arrow::Schema> get_input_schema(
+    const small::schema::Table& table) {
     arrow::FieldVector fields;
     for (const auto& column : table.columns) {
         fields.push_back(arrow::field(
