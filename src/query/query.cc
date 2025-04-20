@@ -99,7 +99,7 @@ std::tuple<std::string_view, std::string_view, int> parse_key(
     return {table_name, pk, column_id};
 }
 
-std::shared_ptr<arrow::Schema> get_input_schema(const schema::Table& table) {
+std::shared_ptr<arrow::Schema> get_input_schema(const small::schema::Table& table) {
     arrow::FieldVector fields;
     for (const auto& column : table.columns) {
         fields.push_back(arrow::field(
@@ -109,7 +109,7 @@ std::shared_ptr<arrow::Schema> get_input_schema(const schema::Table& table) {
 }
 
 std::vector<std::shared_ptr<arrow::ArrayBuilder>> get_builders(
-    const schema::Table& table) {
+    const small::schema::Table& table) {
     std::vector<std::shared_ptr<arrow::ArrayBuilder>> builders;
     for (const auto& column : table.columns) {
         switch (column.type) {
@@ -136,7 +136,7 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> query(
     auto table_name = std::string(schemaname) + "." + std::string(relname);
 
     // get the input schema
-    auto table = schema::get_table(table_name);
+    auto table = small::schema::get_table(table_name);
     if (!table) {
         SPDLOG_ERROR("table not found: {}", table_name);
         return absl::Status(absl::StatusCode::kNotFound,

@@ -97,7 +97,7 @@ absl::Status handle_create_table(PgQuery__CreateStmt* create_stmt) {
                     SPDLOG_ERROR("unknown type: {}", type_name.value());
                     return type.status();
                 }
-                schema::Column column(column_def->colname, type.value());
+                small::schema::Column column(column_def->colname, type.value());
                 if (primary_key) {
                     column.set_primary_key(true);
                 }
@@ -116,7 +116,7 @@ absl::Status handle_create_table(PgQuery__CreateStmt* create_stmt) {
         }
     }
 
-    auto status = schema::create_table(table_name, columns);
+    auto status = small::schema::create_table(table_name, columns);
     if (!status.ok()) {
         SPDLOG_ERROR("create table failed: {}", status.ToString());
         return status;
@@ -134,7 +134,7 @@ absl::Status handle_create_table(PgQuery__CreateStmt* create_stmt) {
             create_stmt->partspec->part_params[0]->partition_elem->name);
 
         auto status =
-            schema::set_partition(table_name, partition_column, strategy);
+            small::schema::set_partition(table_name, partition_column, strategy);
         if (!status.ok()) {
             SPDLOG_ERROR("set partitioning failed: {}", status.ToString());
             return status;
@@ -146,7 +146,7 @@ absl::Status handle_create_table(PgQuery__CreateStmt* create_stmt) {
 
 absl::Status handle_drop_table(PgQuery__DropStmt* drop_stmt) {
     auto table_name = drop_stmt->objects[0]->list->items[0]->string->sval;
-    return schema::drop_table(table_name);
+    return small::schema::drop_table(table_name);
 }
 
 absl::Status handle_add_partition(PgQuery__CreateStmt* create_stmt) {
@@ -159,7 +159,7 @@ absl::Status handle_add_partition(PgQuery__CreateStmt* create_stmt) {
         values.push_back(datum->a_const->sval->sval);
     }
 
-    return schema::add_list_partition(table_name, partition_name, values);
+    return small::schema::add_list_partition(table_name, partition_name, values);
 }
 
 absl::Status handle_add_constraint(PgQuery__AlterTableStmt* alter_stmt) {
@@ -173,7 +173,7 @@ absl::Status handle_add_constraint(PgQuery__AlterTableStmt* alter_stmt) {
     auto rexpr = expr->rexpr->a_const->sval->sval;
     SPDLOG_INFO("partition_name: {}, lexpr: {}, op: {}, rexpr: {}",
                 partition_name, lexpr, op, rexpr);
-    return schema::add_partition_constraint(partition_name,
+    return small::schema::add_partition_constraint(partition_name,
                                             std::make_pair(lexpr, rexpr));
 }
 

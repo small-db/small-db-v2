@@ -78,7 +78,7 @@ namespace insert {
 
 absl::Status insert(PgQuery__InsertStmt* insert_stmt) {
     auto table_name = insert_stmt->relation->relname;
-    auto result = schema::get_table(table_name);
+    auto result = small::schema::get_table(table_name);
     if (!result) {
         return absl::InternalError(
             fmt::format("table {} not found", table_name));
