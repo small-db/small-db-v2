@@ -26,6 +26,10 @@
 // third-party libraries
 // =====================================================================
 
+// absl
+#include "absl/status/status.h"
+#include "absl/status/statusor.h"
+
 // pg_query
 #include "pg_query.h"
 #include "pg_query.pb-c.h"
@@ -154,6 +158,7 @@ absl::Status insert(PgQuery__InsertStmt* insert_stmt) {
                 request.add_column_names(column_name);
                 request.add_column_values(column_value);
             }
+            request.set_table_name(table_name);
             SPDLOG_INFO("insert row: {}", request.DebugString());
 
             auto channel = grpc::CreateChannel(
@@ -183,6 +188,30 @@ grpc::Status InsertService::Insert(grpc::ServerContext* context,
                                    const small::insert::Row* request,
                                    small::insert::InsertReply* response) {
     SPDLOG_INFO("insert request: {}", request->DebugString());
+
+    auto info = small::server_base::get_info();
+    if (!info.ok())
+        return grpc::Status(grpc::StatusCode::INTERNAL,
+                            "failed to get server info");
+    std::string db_path = info.value()->db_path;
+    auto db = small::rocks::RocksDBWrapper::GetInstance(db_path, {});
+
+    // get the table
+    auto result =
+        small::catalog::Catalog::GetInstance()->GetTable(request->table_name());
+    if (!result) {
+        return grpc::Status(
+            grpc::StatusCode::NOT_FOUND,
+            fmt::format("table {} not found", request->table_name()));
+    }
+    auto table = result.value();
+
+    const auto& column_values = request->column_values();
+    std::vector<std::string> values;
+    for (const auto& value : column_values) {
+        values.push_back(value);
+    }
+    db->WriteRowWire(table, values);
     return grpc::Status::OK;
 }
 

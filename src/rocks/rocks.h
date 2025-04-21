@@ -89,6 +89,9 @@ class RocksDBWrapper {
     void WriteRow(const std::shared_ptr<small::schema::Table>& table,
                   const std::vector<small::type::Datum>& values);
 
+    void WriteRowWire(const std::shared_ptr<small::schema::Table>& table,
+                      const std::vector<std::string>& values);
+
    private:
     rocksdb::DB* db_;
     std::unordered_map<std::string, rocksdb::ColumnFamilyHandle*> cf_handles_;
