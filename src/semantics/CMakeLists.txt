@@ -7,7 +7,6 @@ add_library(small_semantics
 
 target_link_libraries(small_semantics
     PRIVATE
-    absl_base
     libpg_query_lib
     magic_enum
     spdlog
