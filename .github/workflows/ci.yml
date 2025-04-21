@@ -18,13 +18,3 @@ jobs:
         run: ./scripts/ci/build
       - name: Test
         run: ./scripts/ci/test
-
-  play:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install Dependencies
-        run: ./scripts/ci/install-deps
-      - name: Build
-        run: ./play/scripts/build
