@@ -12,8 +12,4 @@ sudo apt-get install -y \
     libpqxx-dev
 
 cmake --preset=debug
-
-ls -l ~/local/cpplib/lib/libabsl_base*
-cat ./build/debug/compile_commands.json
-
 cmake --build ./build/debug
