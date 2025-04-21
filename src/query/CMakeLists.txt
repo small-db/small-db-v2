@@ -6,7 +6,7 @@ add_library(query_lib
 target_link_libraries(query_lib
     PUBLIC
     spdlog
-    absl_status
+    absl::status
     libpg_query_lib
     arrow_lib
     small::rocks

@@ -6,7 +6,7 @@ add_library(small_encode
 target_link_libraries(small_encode
     PUBLIC
     spdlog
-    absl_status
+    absl::status
     small::type
 )
 

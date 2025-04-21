@@ -6,5 +6,5 @@ add_library(id_lib
 target_link_libraries(id_lib
     PUBLIC
     spdlog
-    absl_status
+    absl::status
 )

@@ -10,7 +10,7 @@ target_link_libraries(small_schema
     PUBLIC
     rocksdb
     spdlog
-    absl_status
+    absl::status
     libpg_query_lib
     nlohmann_json::nlohmann_json
     small::rocks
