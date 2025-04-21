@@ -41,9 +41,11 @@ find_package(Protobuf CONFIG REQUIRED)
 # "gRPC" must comes after "Protobuf" since it depends on "Protobuf"
 find_package(gRPC CONFIG REQUIRED)
 
-# Some packages are imported via "find_package" command. If we include them locally
-# (e.g. via FetchContent) instead, we will violate the "one definition rule" (ODR)
-# and cause linking errors.
+# Find "absl" and "re2" from system wide installation.
+# 
+# We cannot use our local installation of these packages since "gRPC" brings its own
+# version of these packages. If we include them locally (e.g. via FetchContent),
+# ODR ("one definition rule" violation) will be violated and cause linking errors.
 # 
 # Some explanations about ODR:
 # - https://github.com/abseil/abseil-cpp/blob/master/FAQ.md#what-is-abi-and-why-dont-you-recommend-using-a-pre-compiled-version-of-abseil
