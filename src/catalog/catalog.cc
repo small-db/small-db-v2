@@ -92,7 +92,7 @@ Catalog::Catalog() {
         db_path, {"TablesCF", "PartitionCF"});
 }
 
-std::optional<std::shared_ptr<small::schema::Table>> Catalog::get_table(
+std::optional<std::shared_ptr<small::schema::Table>> Catalog::GetTable(
     const std::string& table_name) {
     auto it = tables.find(table_name);
     if (it != tables.end()) {
@@ -102,10 +102,10 @@ std::optional<std::shared_ptr<small::schema::Table>> Catalog::get_table(
     }
 }
 
-absl::Status Catalog::create_table(
+absl::Status Catalog::CreateTable(
     const std::string& table_name,
     const std::vector<small::schema::Column>& columns) {
-    auto table = get_table(table_name);
+    auto table = GetTable(table_name);
     if (table.has_value()) {
         return absl::AlreadyExistsError("Table already exists");
     }
@@ -123,6 +123,65 @@ absl::Status Catalog::create_table(
     db->WriteRow(this->system_tables, row);
 
     return absl::OkStatus();
+}
+
+absl::Status Catalog::SetPartition(const std::string& table_name,
+                                   const std::string& partition_column,
+                                   PgQuery__PartitionStrategy strategy) {
+    switch (strategy) {
+        case PG_QUERY__PARTITION_STRATEGY__PARTITION_STRATEGY_LIST: {
+            auto p = small::schema::ListPartition(partition_column);
+            auto table = GetTable(table_name);
+            if (!table.has_value()) {
+                return absl::NotFoundError("Table not found");
+            }
+
+            // write to in-memory cache
+            this->parititions[table_name] =
+                std::make_shared<small::schema::partition_t>(p);
+            table.value()->partition = p;
+
+            // write to disk
+            WritePartition(table.value());
+
+            return absl::OkStatus();
+        }
+
+        default: {
+            return absl::InternalError(
+                "Unsupported partition strategy: " +
+                std::to_string(static_cast<int>(strategy)));
+        }
+    }
+
+    return absl::OkStatus();
+}
+void Catalog::WritePartition(
+    const std::shared_ptr<small::schema::Table>& table) {
+    // std::visit(
+    //     [&](auto&& partition) {
+    //         using T = std::decay_t<decltype(partition)>;
+
+    //         if constexpr (std::is_same_v<T, small::schema::ListPartition>) {
+    //             for (auto& [p_name, p] : partition.partitions) {
+    //                 std::vector<small::type::Datum> row;
+    //                 row.emplace_back(table->name);
+    //                 row.emplace_back(p_name);
+    //                 row.emplace_back(nlohmann::json(p.constraints).dump());
+    //                 row.emplace_back(partition.column_name);
+    //                 row.emplace_back(nlohmann::json(p.values).dump());
+    //                 db->WriteRow(this->system_partitions, row);
+    //             }
+    //         } else if constexpr (std::is_same_v<T,
+    //                                             small::schema::NullPartition>)
+    //                                             {
+    //             // do nothing
+    //         } else {
+    //             SPDLOG_ERROR("unsupported partition type: {}",
+    //                          typeid(T).name());
+    //         }
+    //     },
+    //     table->partition);
 }
 
 }  // namespace small::catalog

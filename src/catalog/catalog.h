@@ -44,15 +44,32 @@ class Catalog {
     // singleton instance - destructor protector
     ~Catalog() = default;
 
+    small::rocks::RocksDBWrapper* db;
+
     std::unordered_map<std::string, std::shared_ptr<small::schema::Table>>
         tables;
     std::shared_ptr<small::schema::Table> system_tables;
     std::shared_ptr<small::schema::Table> system_partitions;
 
-    std::optional<std::shared_ptr<small::schema::Table>> get_table(
+    std::unordered_map<std::string, std::shared_ptr<small::schema::partition_t>>
+        parititions;
+
+    std::optional<std::shared_ptr<small::schema::Table>> GetTable(
         const std::string& table_name);
 
-    small::rocks::RocksDBWrapper* db;
+    void WritePartition(const std::shared_ptr<small::schema::Table>& table);
+
+    // singleton instance - assignment-blocker
+    Catalog& operator=(const Catalog&) = delete;
+
+    // singleton instance - copy-blocker
+    Catalog(const Catalog&) = delete;
+
+    // singleton instance - get api
+    static Catalog* GetInstance();
+
+    // singleton instance - init api
+    static void InitInstance();
 
    public:
     // singleton instance - assignment-blocker
@@ -67,9 +84,12 @@ class Catalog {
     // singleton instance - init api
     static void InitInstance();
 
-    absl::Status create_table(
-        const std::string& table_name,
-        const std::vector<small::schema::Column>& columns);
+    absl::Status CreateTable(const std::string& table_name,
+                             const std::vector<small::schema::Column>& columns);
+
+    absl::Status Catalog::SetPartition(const std::string& table_name,
+                                       const std::string& partition_column,
+                                       PgQuery__PartitionStrategy strategy);
 };
 
 }  // namespace small::catalog
