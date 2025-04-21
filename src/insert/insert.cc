@@ -56,6 +56,7 @@
 // local libraries
 // =====================================================================
 
+#include "src/catalog/catalog.h"
 #include "src/encode/encode.h"
 #include "src/schema/schema.h"
 #include "src/semantics/extract.h"
@@ -78,7 +79,7 @@ namespace insert {
 
 absl::Status insert(PgQuery__InsertStmt* insert_stmt) {
     auto table_name = insert_stmt->relation->relname;
-    auto result = small::schema::get_table(table_name);
+    auto result = small::catalog::Catalog::GetInstance()->GetTable(table_name);
     if (!result) {
         return absl::InternalError(
             fmt::format("table {} not found", table_name));

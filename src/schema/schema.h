@@ -86,25 +86,4 @@ class Table {
     int get_pk_index();
 };
 
-std::optional<std::shared_ptr<Table>> get_table(const std::string& table_name);
-
-absl::Status create_table(const std::string& table_name,
-                          const std::vector<Column>& columns);
-
-absl::Status drop_table(const std::string& table_name);
-
-// Set the partition strategy for a table, reset the partition strategy if
-// the table already has one.
-absl::Status set_partition(const std::string& table_name,
-                           const std::string& partition_column,
-                           PgQuery__PartitionStrategy strategy);
-
-absl::Status add_list_partition(const std::string& table_name,
-                                const std::string& partition_name,
-                                const std::vector<std::string>& values);
-
-absl::Status add_partition_constraint(
-    const std::string& partition_name,
-    const std::pair<std::string, std::string>& constraint);
-
 }  // namespace small::schema

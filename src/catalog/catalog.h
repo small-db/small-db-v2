@@ -54,9 +54,6 @@ class Catalog {
     std::unordered_map<std::string, std::shared_ptr<small::schema::partition_t>>
         parititions;
 
-    std::optional<std::shared_ptr<small::schema::Table>> GetTable(
-        const std::string& table_name);
-
     void WritePartition(const std::shared_ptr<small::schema::Table>& table);
 
    public:
@@ -76,6 +73,9 @@ class Catalog {
                              const std::vector<small::schema::Column>& columns);
 
     absl::Status DropTable(const std::string& table_name);
+
+    std::optional<std::shared_ptr<small::schema::Table>> GetTable(
+        const std::string& table_name);
 
     absl::Status SetPartition(const std::string& table_name,
                               const std::string& partition_column,

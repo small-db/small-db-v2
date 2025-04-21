@@ -51,6 +51,7 @@
 // local libraries
 // =====================================================================
 
+#include "src/catalog/catalog.h"
 #include "src/rocks/rocks.h"
 #include "src/schema/const.h"
 #include "src/schema/schema.h"
@@ -137,7 +138,7 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> query(
     auto table_name = std::string(schemaname) + "." + std::string(relname);
 
     // get the input schema
-    auto table = small::schema::get_table(table_name);
+    auto table = small::catalog::Catalog::GetInstance()->GetTable(table_name);
     if (!table) {
         SPDLOG_ERROR("table not found: {}", table_name);
         return absl::Status(absl::StatusCode::kNotFound,
