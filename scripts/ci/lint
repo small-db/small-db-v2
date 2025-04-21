@@ -11,3 +11,8 @@ uv tool install cpplint
 # run cpplint
 export PYTHONPATH=.
 uv run ./scripts/format/run-cpplint.py
+
+# clang-tidy-18 src/schema/schema.cc -checks='-*,llvm-include-order,llvm-header-guard,readability-*,misc-unused-using-decls' -p build/debug
+# clang-tidy-18 src/schema/schema.cc -checks='clang-analyzer-deadcode.*' -p build/debug
+# clang-tidy-18 src/schema/schema.cc -checks='*' -p build/debug
+# clang-tidy your_file.cc -checks='-*,llvm-include-order,llvm-header-guard,readability-*,misc-unused-using-decls' --fix
