@@ -52,11 +52,6 @@ find_package(gRPC CONFIG REQUIRED)
 find_package(absl CONFIG REQUIRED)
 find_package(re2 CONFIG REQUIRED)
 
-# get_property(imported_targets GLOBAL PROPERTY INTERFACE_LINK_LIBRARIES)
-# foreach(target ${imported_targets})
-#     message(STATUS "Imported INTERFACE target: ${target}")
-# endforeach()
-
 # ======================================================================== #
 # third-party packages (local)
 # ======================================================================== #
