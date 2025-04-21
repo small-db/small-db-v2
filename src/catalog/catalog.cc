@@ -158,30 +158,26 @@ absl::Status Catalog::SetPartition(const std::string& table_name,
 }
 void Catalog::WritePartition(
     const std::shared_ptr<small::schema::Table>& table) {
-    // std::visit(
-    //     [&](auto&& partition) {
-    //         using T = std::decay_t<decltype(partition)>;
+    std::visit(
+        [&](auto&& partition) {
+            using T = std::decay_t<decltype(partition)>;
 
-    //         if constexpr (std::is_same_v<T, small::schema::ListPartition>) {
-    //             for (auto& [p_name, p] : partition.partitions) {
-    //                 std::vector<small::type::Datum> row;
-    //                 row.emplace_back(table->name);
-    //                 row.emplace_back(p_name);
-    //                 row.emplace_back(nlohmann::json(p.constraints).dump());
-    //                 row.emplace_back(partition.column_name);
-    //                 row.emplace_back(nlohmann::json(p.values).dump());
-    //                 db->WriteRow(this->system_partitions, row);
-    //             }
-    //         } else if constexpr (std::is_same_v<T,
-    //                                             small::schema::NullPartition>)
-    //                                             {
-    //             // do nothing
-    //         } else {
-    //             SPDLOG_ERROR("unsupported partition type: {}",
-    //                          typeid(T).name());
-    //         }
-    //     },
-    //     table->partition);
+            if constexpr (std::is_same_v<T, small::schema::ListPartition>) {
+                for (auto& [p_name, p] : partition.partitions) {
+                    std::vector<small::type::Datum> row;
+                    row.emplace_back(table->name);
+                    row.emplace_back(p_name);
+                    row.emplace_back(nlohmann::json(p.constraints).dump());
+                    row.emplace_back(partition.column_name);
+                    row.emplace_back(nlohmann::json(p.values).dump());
+                    db->WriteRow(this->system_partitions, row);
+                }
+            } else {
+                SPDLOG_ERROR("unsupported partition type: {}",
+                             typeid(T).name());
+            }
+        },
+        table->partition);
 }
 
 }  // namespace small::catalog

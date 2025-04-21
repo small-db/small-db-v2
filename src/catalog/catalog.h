@@ -59,18 +59,6 @@ class Catalog {
 
     void WritePartition(const std::shared_ptr<small::schema::Table>& table);
 
-    // singleton instance - assignment-blocker
-    Catalog& operator=(const Catalog&) = delete;
-
-    // singleton instance - copy-blocker
-    Catalog(const Catalog&) = delete;
-
-    // singleton instance - get api
-    static Catalog* GetInstance();
-
-    // singleton instance - init api
-    static void InitInstance();
-
    public:
     // singleton instance - assignment-blocker
     void operator=(const Catalog&) = delete;
@@ -87,9 +75,9 @@ class Catalog {
     absl::Status CreateTable(const std::string& table_name,
                              const std::vector<small::schema::Column>& columns);
 
-    absl::Status Catalog::SetPartition(const std::string& table_name,
-                                       const std::string& partition_column,
-                                       PgQuery__PartitionStrategy strategy);
+    absl::Status SetPartition(const std::string& table_name,
+                              const std::string& partition_column,
+                              PgQuery__PartitionStrategy strategy);
 };
 
 }  // namespace small::catalog

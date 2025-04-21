@@ -116,8 +116,7 @@ absl::Status handle_create_table(PgQuery__CreateStmt* create_stmt) {
         }
     }
 
-    // auto status = small::schema::create_table(table_name, columns);
-    auto status = small::catalog::Catalog::GetInstance()->create_table(
+    auto status = small::catalog::Catalog::GetInstance()->CreateTable(
         table_name, columns);
     if (!status.ok()) {
         SPDLOG_ERROR("create table failed: {}", status.ToString());
@@ -135,8 +134,8 @@ absl::Status handle_create_table(PgQuery__CreateStmt* create_stmt) {
         auto partition_column = std::string(
             create_stmt->partspec->part_params[0]->partition_elem->name);
 
-        auto status = small::schema::set_partition(table_name, partition_column,
-                                                   strategy);
+        auto status = small::catalog::Catalog::GetInstance()->SetPartition(
+            table_name, partition_column, strategy);
         if (!status.ok()) {
             SPDLOG_ERROR("set partitioning failed: {}", status.ToString());
             return status;
