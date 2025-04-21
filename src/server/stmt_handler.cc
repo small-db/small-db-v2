@@ -147,7 +147,7 @@ absl::Status handle_create_table(PgQuery__CreateStmt* create_stmt) {
 
 absl::Status handle_drop_table(PgQuery__DropStmt* drop_stmt) {
     auto table_name = drop_stmt->objects[0]->list->items[0]->string->sval;
-    return small::schema::drop_table(table_name);
+    return small::catalog::Catalog::GetInstance()->DropTable(table_name);
 }
 
 absl::Status handle_add_partition(PgQuery__CreateStmt* create_stmt) {
@@ -160,8 +160,8 @@ absl::Status handle_add_partition(PgQuery__CreateStmt* create_stmt) {
         values.push_back(datum->a_const->sval->sval);
     }
 
-    return small::schema::add_list_partition(table_name, partition_name,
-                                             values);
+    return small::catalog::Catalog::GetInstance()->AddListPartition(
+        table_name, partition_name, values);
 }
 
 absl::Status handle_add_constraint(PgQuery__AlterTableStmt* alter_stmt) {
@@ -175,7 +175,7 @@ absl::Status handle_add_constraint(PgQuery__AlterTableStmt* alter_stmt) {
     auto rexpr = expr->rexpr->a_const->sval->sval;
     SPDLOG_INFO("partition_name: {}, lexpr: {}, op: {}, rexpr: {}",
                 partition_name, lexpr, op, rexpr);
-    return small::schema::add_partition_constraint(
+    return small::catalog::Catalog::GetInstance()->AddPartitionConstraint(
         partition_name, std::make_pair(lexpr, rexpr));
 }
 

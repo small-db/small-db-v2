@@ -75,9 +75,19 @@ class Catalog {
     absl::Status CreateTable(const std::string& table_name,
                              const std::vector<small::schema::Column>& columns);
 
+    absl::Status DropTable(const std::string& table_name);
+
     absl::Status SetPartition(const std::string& table_name,
                               const std::string& partition_column,
                               PgQuery__PartitionStrategy strategy);
+
+    absl::Status AddListPartition(const std::string& table_name,
+                                  const std::string& partition_name,
+                                  const std::vector<std::string>& values);
+
+    absl::Status AddPartitionConstraint(
+        const std::string& partition_name,
+        const std::pair<std::string, std::string>& constraint);
 };
 
 }  // namespace small::catalog

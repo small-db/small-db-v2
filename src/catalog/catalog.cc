@@ -125,6 +125,16 @@ absl::Status Catalog::CreateTable(
     return absl::OkStatus();
 }
 
+absl::Status Catalog::DropTable(const std::string& table_name) {
+    auto it = tables.find(table_name);
+    if (it != tables.end()) {
+        tables.erase(it);
+    }
+
+    db->Delete("TablesCF", table_name);
+    return absl::OkStatus();
+}
+
 absl::Status Catalog::SetPartition(const std::string& table_name,
                                    const std::string& partition_column,
                                    PgQuery__PartitionStrategy strategy) {
@@ -178,6 +188,39 @@ void Catalog::WritePartition(
             }
         },
         table->partition);
+}
+
+absl::Status Catalog::AddListPartition(const std::string& table_name,
+                                       const std::string& partition_name,
+                                       const std::vector<std::string>& values) {
+    for (const auto& [table_name, table] : tables) {
+        if (auto* listP =
+                std::get_if<small::schema::ListPartition>(&table->partition)) {
+            listP->partitions[partition_name] =
+                small::schema::ListPartition::SinglePartition{values, {}};
+            WritePartition(table);
+            return absl::OkStatus();
+        }
+    }
+    return absl::NotFoundError("table not found");
+}
+
+absl::Status Catalog::AddPartitionConstraint(
+    const std::string& partition_name,
+    const std::pair<std::string, std::string>& constraint) {
+    for (const auto& [table_name, table] : tables) {
+        if (auto* listP =
+                std::get_if<small::schema::ListPartition>(&table->partition)) {
+            auto it = listP->partitions.find(partition_name);
+            if (it != listP->partitions.end()) {
+                auto& p = it->second;
+                p.constraints.insert(constraint);
+                WritePartition(table);
+                return absl::OkStatus();
+            }
+        }
+    }
+    return absl::NotFoundError("Partition not found");
 }
 
 }  // namespace small::catalog
