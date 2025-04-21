@@ -4,8 +4,6 @@ set -o xtrace
 set -o errexit
 set -o nounset
 
-ls -l /lib/x86_64-linux-gnu/libabsl_*
-
 # install uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
 uv tool install cpplint
