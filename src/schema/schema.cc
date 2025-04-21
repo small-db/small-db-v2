@@ -85,4 +85,22 @@ void from_json(const nlohmann::json& j, Table& t) {
     j.at("columns").get_to(t.columns);
 }
 
+Column::Column(const std::string& name, const small::type::Type& type,
+               bool is_primary_key)
+    : name(name), type(type), is_primary_key(is_primary_key) {}
+
+void Column::set_primary_key(bool set) { is_primary_key = set; }
+
+Table::Table(const std::string& name, const std::vector<Column>& columns)
+    : name(name), columns(columns) {}
+
+int Table::get_pk_index() {
+    for (int i = 0; i < columns.size(); ++i) {
+        if (columns[i].is_primary_key) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 }  // namespace small::schema

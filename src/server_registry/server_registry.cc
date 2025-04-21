@@ -179,7 +179,7 @@ absl::Status join(const small::server_base::ServerArgs& args) {
         grpc::ClientContext context;
         grpc::Status status = stub->Register(&context, request, &result);
         if (!status.ok() && attempt < max_retries) {
-            SPDLOG_WARN("failed to join peer: {}, retrying...", peer_addr);
+            SPDLOG_INFO("failed to join peer: {}, retrying...", peer_addr);
             std::this_thread::sleep_for(std::chrono::seconds(1));
         } else {
             break;

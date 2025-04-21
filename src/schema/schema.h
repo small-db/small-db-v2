@@ -59,10 +59,12 @@ class Column {
    public:
     std::string name;
     small::type::Type type;
-
     bool is_primary_key = false;
 
-    Column();
+    // The type must be DefaultConstructible to be converted from JSON.
+    // (https://github.com/nlohmann/json)
+    Column() = default;
+
     Column(const std::string& name, const small::type::Type& type,
            bool is_primary_key = false);
 
@@ -80,7 +82,8 @@ class Table {
 
     partition_t partition;
 
-    Table();
+    Table() = default;
+
     Table(const std::string& name, const std::vector<Column>& columns);
 
     int get_pk_index();
