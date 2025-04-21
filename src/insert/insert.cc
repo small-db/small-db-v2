@@ -200,9 +200,9 @@ grpc::Status InsertService::Insert(grpc::ServerContext* context,
     auto result =
         small::catalog::Catalog::GetInstance()->GetTable(request->table_name());
     if (!result) {
-        return grpc::Status(
-            grpc::StatusCode::NOT_FOUND,
-            fmt::format("table {} not found", request->table_name()));
+        return grpc::Status(grpc::StatusCode::NOT_FOUND,
+                            fmt::format("table {} not found, server: {}",
+                                        request->table_name(), db_path));
     }
     auto table = result.value();
 
