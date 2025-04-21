@@ -52,6 +52,11 @@ find_package(gRPC CONFIG REQUIRED)
 find_package(absl CONFIG REQUIRED)
 find_package(re2 CONFIG REQUIRED)
 
+# get_property(imported_targets GLOBAL PROPERTY INTERFACE_LINK_LIBRARIES)
+# foreach(target ${imported_targets})
+#     message(STATUS "Imported INTERFACE target: ${target}")
+# endforeach()
+
 # ======================================================================== #
 # third-party packages (local)
 # ======================================================================== #
@@ -72,7 +77,6 @@ find_package(RocksDB REQUIRED)
 find_package(Json REQUIRED)
 find_package(MagicEnum REQUIRED)
 find_package(CLI11 REQUIRED)
-# find_package(Abseil REQUIRED)
 
 # ============================================================================== #
 # source code
@@ -87,5 +91,3 @@ add_compile_definitions(SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE)
 
 add_subdirectory(src)
 add_subdirectory(test)
-
-# add_subdirectory(src/fuck_cpp/grpc)

@@ -7,14 +7,6 @@ add_executable(server
     main.cc
 )
 
-# if (TARGET absl::status)
-#     message(WARNING "Target absl::status is available.")
-# endif()
-
-# if (TARGET absl::status)
-#     message(WARNING "Target absl::status is available.")
-# endif()
-
 target_link_libraries(server
     PRIVATE
     absl::status

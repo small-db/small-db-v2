@@ -41,8 +41,7 @@
             "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "CMAKE_FIND_DEBUG_MODE": "ON"
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
             }
         }
     ]
