@@ -46,7 +46,7 @@ find_package(gRPC CONFIG REQUIRED)
 # We cannot use our local installation of these packages since "gRPC" brings its own
 # version of these packages. If we include them locally (e.g. via FetchContent),
 # ODR ("one definition rule" violation) will be violated and cause linking errors.
-# 
+#
 # Some explanations about ODR:
 # - https://github.com/abseil/abseil-cpp/blob/master/FAQ.md#what-is-abi-and-why-dont-you-recommend-using-a-pre-compiled-version-of-abseil
 find_package(absl CONFIG REQUIRED)
