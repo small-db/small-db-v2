@@ -64,6 +64,8 @@ class ServerInfo {
 
     std::string db_path;
 
+    std::string id;
+
     static absl::Status Init(const ServerArgs& args);
 
     // singleton instance - get instance

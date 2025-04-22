@@ -7,4 +7,5 @@ target_link_libraries(server_base_lib
     PRIVATE
     absl::statusor
     spdlog::spdlog
+    uuid
 )

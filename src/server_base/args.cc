@@ -26,6 +26,9 @@
 // spdlog
 #include "spdlog/spdlog.h"
 
+// uuid
+#include "uuid/uuid.h"
+
 // =====================================================================
 // self header
 // =====================================================================
@@ -46,7 +49,18 @@ ServerArgs::ServerArgs(const std::string& sql_addr,
       region(region),
       join(join) {}
 
-ServerInfo::ServerInfo() = default;
+ServerInfo::ServerInfo() {
+    // UUIDv4::UUIDGenerator<std::mt19937_64> uuidGenerator;
+    // UUIDv4::UUID uuid = uuidGenerator.getUUID();
+    // SPDLOG_INFO("server uuid: {}", uuid.str());
+    uuid_t uuid;
+    uuid_generate(uuid);  // generates random UUID
+    char str[37];
+    uuid_unparse(uuid, str);
+    SPDLOG_INFO("server uuid: {}", str);
+    // std::string(str);
+}
+
 ServerInfo::~ServerInfo() = default;
 
 absl::Status ServerInfo::Init(const ServerArgs& args) {
