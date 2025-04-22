@@ -23,22 +23,8 @@ block()
 
   set(ARROW_GANDIVA ON CACHE BOOL "build the gandiva library")
 
-  # set(ARROW_WITH_BROTLI ON CACHE BOOL "build with brotli support")
-  # set(ARROW_WITH_BZ2 ON CACHE BOOL "build with bzip2 support")
-  # set(ARROW_WITH_LZ4 ON CACHE BOOL "build with lz4 support")
-  # set(ARROW_WITH_RE2 ON CACHE BOOL "build with re2 support")
-  # set(ARROW_WITH_SNAPPY ON CACHE BOOL "build with snappy support")
-  # set(ARROW_WITH_UTF8PROC ON CACHE BOOL "build with utf8proc support")
-  # set(ARROW_WITH_ZLIB ON CACHE BOOL "build with zlib support")
-  # set(ARROW_WITH_ZSTD ON CACHE BOOL "build with zstd support")
-  # "ARROW_WITH_BROTLI": "ON",
-  # "ARROW_WITH_BZ2": "ON",
-  # "ARROW_WITH_LZ4": "ON",
-  # "ARROW_WITH_RE2": "ON",
-  # "ARROW_WITH_SNAPPY": "ON",
-  # "ARROW_WITH_UTF8PROC": "ON",
-  # "ARROW_WITH_ZLIB": "ON",
-  # "ARROW_WITH_ZSTD": "ON"
+  # "re2" comes with "gRPC", so we have to use the system version to comply with ODR.
+  set(re2_SOURCE "SYSTEM")
 
   # due to a problem compiling on clang++ 18.1.3 we need to disable deprecated
   # declaration errors
