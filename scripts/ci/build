@@ -4,12 +4,5 @@ set -o xtrace
 set -o errexit
 set -o nounset
 
-cmake --version
-clang++ --version
-
-sudo apt-get install -y \
-    libpq-dev \
-    libpqxx-dev
-
 cmake --preset=debug
 cmake --build ./build/debug

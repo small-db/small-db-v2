@@ -4,9 +4,13 @@ set -o xtrace
 set -o errexit
 set -o nounset
 
-# "git clone" treat tag as branch
-git clone --branch=v1.71.0 --recurse-submodules --depth=1 https://github.com/grpc/grpc.git
+sudo apt-get install -y \
+    libpq-dev \
+    libpqxx-dev \
+    uuid-dev
 
+# grpc
+git clone --branch=v1.71.0 --recurse-submodules --depth=1 https://github.com/grpc/grpc.git
 cd grpc
 cmake -S . -B ./cmake/build -DCMAKE_CXX_STANDARD=17 -DgRPC_INSTALL=ON -DCMAKE_INSTALL_PREFIX=~/local/cpplib -G Ninja
 cmake -S . -B ./cmake/build -DCMAKE_CXX_STANDARD=17 -DgRPC_INSTALL=ON -G Ninja
