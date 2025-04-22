@@ -50,15 +50,12 @@ ServerArgs::ServerArgs(const std::string& sql_addr,
       join(join) {}
 
 ServerInfo::ServerInfo() {
-    // UUIDv4::UUIDGenerator<std::mt19937_64> uuidGenerator;
-    // UUIDv4::UUID uuid = uuidGenerator.getUUID();
-    // SPDLOG_INFO("server uuid: {}", uuid.str());
     uuid_t uuid;
-    uuid_generate(uuid);  // generates random UUID
+    uuid_generate(uuid);
     char str[37];
     uuid_unparse(uuid, str);
     SPDLOG_INFO("server uuid: {}", str);
-    // std::string(str);
+    this->id = std::string(str);
 }
 
 ServerInfo::~ServerInfo() = default;
