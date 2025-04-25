@@ -51,7 +51,7 @@
 #include "src/rocks/rocks.h"
 #include "src/schema/const.h"
 #include "src/schema/partition.h"
-#include "src/server_base/args.h"
+#include "src/server_info/info.h"
 #include "src/type/type.h"
 
 // =====================================================================

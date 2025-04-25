@@ -36,7 +36,7 @@
 // local libraries
 // =====================================================================
 
-#include "src/server_base/args.h"
+#include "src/server_info/info.h"
 
 // =====================================================================
 // self header
@@ -82,7 +82,7 @@ Catalog::Catalog() {
         std::make_shared<small::schema::Table>("system.partitions", columns);
     this->system_partitions = this->tables["system.partitions"];
 
-    auto info = small::server_base::get_info();
+    auto info = small::server_info::get_info();
     if (!info.ok()) {
         SPDLOG_ERROR("failed to get server info");
         return;

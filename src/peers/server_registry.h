@@ -37,7 +37,7 @@
 // local libraries
 // =====================================================================
 
-#include "src/server_base/args.h"
+#include "src/server_info/info.h"
 
 // =====================================================================
 // protobuf generated files
@@ -48,45 +48,45 @@
 
 namespace small::server_registry {
 
-class ServerRegister {
+class Peers {
    private:
-    // singleton instance - constructor protector
-    ServerRegister();
-    // singleton instance - destructor protector
-    ~ServerRegister();
+    // singleton instance - protected constructor
+    Peers();
+    // singleton instance - protected destructor
+    ~Peers();
 
     std::mutex mutex_;
 
    public:
     // singleton instance - copy blocker
-    ServerRegister(const ServerRegister&) = delete;
+    Peers(const Peers&) = delete;
 
     // singleton instance - assignment blocker
-    void operator=(const ServerRegister&) = delete;
+    void operator=(const Peers&) = delete;
 
     // singleton instance - get instance
-    static ServerRegister* GetInstance();
+    static Peers* get_instance();
 
-    std::vector<small::server_base::ServerArgs> servers;
+    std::vector<small::server_info::ImmutableInfo> peers;
 
-    absl::Status RegisterServer(const small::server_base::ServerArgs& args);
+    absl::Status add(const small::server_info::ImmutableInfo& args);
 };
 
 void start_server(std::string addr);
 
 // get servers according to the constraints, pass an empty constraints to get
 // all servers
-std::vector<small::server_base::ServerArgs> get_servers(
+std::vector<small::server_info::ImmutableInfo> get_servers(
     std::unordered_map<std::string, std::string>& constraints);
 
-absl::Status join(const small::server_base::ServerArgs& args);
+absl::Status join(const small::server_info::ImmutableInfo& args);
 
 class RegistryService final
     : public ::small::server_registry::ServerRegistry::Service {
    public:
-    virtual ::grpc::Status Register(::grpc::ServerContext* context,
-                                    const RegistryRequest* request,
-                                    RegistryReply* response);
+    ::grpc::Status Register(::grpc::ServerContext* context,
+                            const RegistryRequest* request,
+                            RegistryReply* response) override;
 };
 
 }  // namespace small::server_registry

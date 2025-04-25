@@ -16,12 +16,12 @@
 
 #include <chrono>
 
-#include "src/server_base/args.h"
+#include "src/server_info/info.h"
 
-namespace server {
+namespace small::server {
 
-int RunServer(const small::server_base::ServerArgs& args);
+int RunServer(const small::server_info::ImmutableInfo& args);
 
 void StopServer();
 
-}  // namespace server
+}  // namespace small::server

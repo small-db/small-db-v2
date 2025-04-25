@@ -1,12 +1,12 @@
-add_library(server_lib
+add_library(small_server
     server.cc
     server.h
     stmt_handler.cc
     stmt_handler.h
 )
 
-target_link_libraries(server_lib
-    PUBLIC
+target_link_libraries(small_server
+    PRIVATE
     small::schema
     spdlog
     libpg_query_lib
@@ -15,13 +15,16 @@ target_link_libraries(server_lib
     insert_lib
     ssl
     crypto
-    server_base_lib
+    small::server_info
     small::util::ip
     server_registry_proto
     insert_proto
     small::catalog
     absl::status
+    small::gossip
 )
+
+add_library(small::server ALIAS small_server)
 
 add_executable(server
     main.cc
@@ -29,6 +32,6 @@ add_executable(server
 
 target_link_libraries(server
     PRIVATE
-    server_lib
+    small::server
     CLI11::CLI11
 )

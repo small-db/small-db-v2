@@ -17,7 +17,7 @@ target_link_libraries(small_schema
     id_lib
     small::type
     small::encode
-    server_base_lib
+    small::server_info
     insert_lib
 )
 

@@ -9,7 +9,7 @@ target_link_libraries(
     small::type
     GTest::gtest_main
     pqxx
-    server_lib
+    small::server
     parser_lib
 )
 

@@ -78,7 +78,7 @@ constexpr std::string_view CONNECTION_STRING =
 class SQLTest : public ::testing::Test {
    protected:
     static void SetUpTestSuite() {
-        std::vector<small::server_base::ServerArgs> server_args = {
+        std::vector<small::server_info::ImmutableInfo> server_args = {
             {"127.0.0.1:5001", "127.0.0.1:50001", "./data/us", "us", ""},
             {"127.0.0.1:5002", "127.0.0.1:50002", "./data/eu", "eu",
              "127.0.0.1:50001"},
@@ -94,7 +94,7 @@ class SQLTest : public ::testing::Test {
     inline static std::vector<int> server_pids = {};
 
     static void StartServers(
-        const std::vector<small::server_base::ServerArgs>& args) {
+        const std::vector<small::server_info::ImmutableInfo>& args) {
         const std::string server_path = "./build/debug/src/server/server";
 
         for (auto& arg : args) {

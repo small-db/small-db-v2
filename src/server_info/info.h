@@ -27,23 +27,30 @@
 // absl
 #include "absl/status/statusor.h"
 
-namespace small::server_base {
-class ServerArgs {
+namespace small::server_info {
+
+// Immutable information of a server.
+class ImmutableInfo {
    public:
+    // IPv4 SQL address in the form of <ip>:<port>.
+    //
+    // Don't use broadcast or multicast address since this field will be used to
+    // connect to the server.
     std::string sql_addr;
+
+    // IPv4 gRPC address in the form of <ip>:<port>.
+    //
+    // Don't use broadcast or multicast address since this field will be used to
+    // connect to the server.
     std::string grpc_addr;
+
     std::string data_dir;
     std::string region;
     std::string join;
 
-    ServerArgs(const std::string& sql_addr, const std::string& grpc_addr,
-               const std::string& data_dir, const std::string& region,
-               const std::string& join);
-
-    ServerArgs(const ServerArgs&) = default;
-    ServerArgs(ServerArgs&&) = default;
-    ServerArgs& operator=(const ServerArgs&) = default;
-    ServerArgs& operator=(ServerArgs&&) = default;
+    ImmutableInfo(const std::string& sql_addr, const std::string& grpc_addr,
+                  const std::string& data_dir, const std::string& region,
+                  const std::string& join);
 };
 
 class ServerInfo {
@@ -66,14 +73,14 @@ class ServerInfo {
 
     std::string id;
 
-    static absl::Status Init(const ServerArgs& args);
+    static absl::Status Init(const ImmutableInfo& args);
 
     // singleton instance - get instance
     static absl::StatusOr<ServerInfo*> GetInstance();
 };
 
-absl::Status init(const ServerArgs& args);
+absl::Status init(const ImmutableInfo& args);
 
 absl::StatusOr<ServerInfo*> get_info();
 
-}  // namespace small::server_base
+}  // namespace small::server_info

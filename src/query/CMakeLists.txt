@@ -12,5 +12,5 @@ target_link_libraries(query_lib
     small::rocks
     small::schema
     magic_enum
-    server_base_lib
+    small::server_info
 )

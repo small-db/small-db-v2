@@ -59,11 +59,12 @@
 // =====================================================================
 
 #include "src/catalog/catalog.h"
+#include "src/gossip/gossip.h"
 #include "src/insert/insert.h"
 #include "src/schema/schema.h"
 #include "src/semantics/check.h"
 #include "src/server/stmt_handler.h"
-#include "src/server_base/args.h"
+#include "src/server_info/info.h"
 #include "src/server_registry/server_registry.h"
 #include "src/util/ip/ip.h"
 
@@ -77,7 +78,7 @@
 #define MAX_EVENTS 128
 #define MAX_MESSAGE_LEN 2048
 
-namespace server {
+namespace small::server {
 
 std::atomic<bool> stopSignal = false;
 
@@ -647,15 +648,17 @@ void start_grpc_server(
     }).detach();
 }
 
-int RunServer(const small::server_base::ServerArgs& args) {
+int RunServer(const small::server_info::ImmutableInfo& args) {
     // === initialize singleton instances start ===
-    auto status = small::server_base::init(args);
+    auto status = small::server_info::init(args);
     if (!status.ok()) {
         SPDLOG_ERROR("failed to init server: {}", status.ToString());
         return EXIT_FAILURE;
     }
 
     small::catalog::Catalog::InitInstance();
+
+    small::gossip::GossipServer::init_instance();
     // === initialize singleton instances end ===
 
     SPDLOG_INFO(
@@ -922,4 +925,4 @@ void StopServer() {
     stopSignal = true;
 }
 
-}  // namespace server
+}  // namespace small::server

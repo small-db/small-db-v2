@@ -33,16 +33,16 @@
 // self header
 // =====================================================================
 
-#include "src/server_base/args.h"
+#include "src/server_info/info.h"
 
-namespace small::server_base {
+namespace small::server_info {
 // Static instance pointer definition (must be outside class)
 ServerInfo* ServerInfo::instance = nullptr;
 
-ServerArgs::ServerArgs(const std::string& sql_addr,
-                       const std::string& grpc_addr,
-                       const std::string& data_dir, const std::string& region,
-                       const std::string& join)
+ImmutableInfo::ImmutableInfo(const std::string& sql_addr,
+                             const std::string& grpc_addr,
+                             const std::string& data_dir,
+                             const std::string& region, const std::string& join)
     : sql_addr(sql_addr),
       grpc_addr(grpc_addr),
       data_dir(data_dir),
@@ -60,7 +60,7 @@ ServerInfo::ServerInfo() {
 
 ServerInfo::~ServerInfo() = default;
 
-absl::Status ServerInfo::Init(const ServerArgs& args) {
+absl::Status ServerInfo::Init(const ImmutableInfo& args) {
     if (instance == nullptr) {
         instance = new ServerInfo();
         instance->db_path = args.data_dir;
@@ -77,8 +77,8 @@ absl::StatusOr<ServerInfo*> ServerInfo::GetInstance() {
     return instance;
 }
 
-absl::Status init(const ServerArgs& args) { return ServerInfo::Init(args); }
+absl::Status init(const ImmutableInfo& args) { return ServerInfo::Init(args); }
 
 absl::StatusOr<ServerInfo*> get_info() { return ServerInfo::GetInstance(); }
 
-}  // namespace small::server_base
+}  // namespace small::server_info

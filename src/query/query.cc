@@ -55,7 +55,7 @@
 #include "src/rocks/rocks.h"
 #include "src/schema/const.h"
 #include "src/schema/schema.h"
-#include "src/server_base/args.h"
+#include "src/server_info/info.h"
 
 // =====================================================================
 // self header
@@ -148,7 +148,7 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> query(
     SPDLOG_INFO("schema: {}", input_schema->ToString());
 
     // read kv pairs from rocksdb
-    auto info = small::server_base::get_info();
+    auto info = small::server_info::get_info();
     if (!info.ok())
         return absl::Status(absl::StatusCode::kInternal,
                             "failed to get server info");

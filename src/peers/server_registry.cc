@@ -38,7 +38,7 @@
 // local libraries
 // =====================================================================
 
-#include "src/server_base/args.h"
+#include "src/server_info/info.h"
 #include "src/util/ip/ip.h"
 
 // =====================================================================
@@ -56,8 +56,8 @@
 
 namespace small::server_registry {
 
-absl::Status ServerRegister::RegisterServer(
-    const small::server_base::ServerArgs& args) {
+absl::Status Peers::add(
+    const small::server_info::ImmutableInfo& args) {
     std::lock_guard<std::mutex> lock(this->mutex_);
 
     SPDLOG_INFO(
@@ -65,15 +65,15 @@ absl::Status ServerRegister::RegisterServer(
         "region: "
         "{}",
         args.sql_addr, args.grpc_addr, args.region);
-    this->servers.push_back(args);
+    this->peers.push_back(args);
     return absl::OkStatus();
 }
 
-ServerRegister::ServerRegister() = default;
-ServerRegister::~ServerRegister() = default;
+Peers::Peers() = default;
+Peers::~Peers() = default;
 
-ServerRegister* ServerRegister::GetInstance() {
-    static ServerRegister instance;
+Peers* Peers::get_instance() {
+    static Peers instance;
     return &instance;
 }
 
@@ -86,8 +86,8 @@ grpc::Status RegistryService::Register(grpc::ServerContext* context,
         request->sql_address(), request->rpc_address(), request->region());
 
     auto status =
-        small::server_registry::ServerRegister::GetInstance()->RegisterServer(
-            small::server_base::ServerArgs(request->sql_address(),
+        small::server_registry::Peers::get_instance()->add(
+            small::server_info::ImmutableInfo(request->sql_address(),
                                            request->rpc_address(), "",
                                            request->region(), ""));
 
@@ -102,11 +102,11 @@ grpc::Status RegistryService::Register(grpc::ServerContext* context,
     return grpc::Status::OK;
 }
 
-std::vector<small::server_base::ServerArgs> get_servers(
+std::vector<small::server_info::ImmutableInfo> get_servers(
     std::unordered_map<std::string, std::string>& constraints) {
-    std::vector<small::server_base::ServerArgs> result;
+    std::vector<small::server_info::ImmutableInfo> result;
     auto servers =
-        small::server_registry::ServerRegister::GetInstance()->servers;
+        small::server_registry::Peers::get_instance()->peers;
     SPDLOG_INFO("get servers: {}", servers.size());
     for (const auto& server : servers) {
         SPDLOG_INFO("server: sql_address: {}, rpc_address: {}, region: {}",
@@ -150,7 +150,7 @@ void start_server(std::string addr) {
     }).detach();
 }
 
-absl::Status join(const small::server_base::ServerArgs& args) {
+absl::Status join(const small::server_info::ImmutableInfo& args) {
     std::string peer_addr = args.join;
     if (peer_addr.empty()) {
         auto addr = small::util::ip::str_to_sockaddr(args.grpc_addr);
