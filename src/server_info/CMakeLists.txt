@@ -1,6 +1,6 @@
 add_library(small_server_info
-    server_info.h
-    server_info.cc
+    info.h
+    info.cc
 )
 
 target_link_libraries(small_server_info
