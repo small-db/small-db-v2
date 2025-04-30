@@ -163,7 +163,7 @@ absl::Status insert(PgQuery__InsertStmt* insert_stmt) {
 
             auto channel = grpc::CreateChannel(
                 server.grpc_addr, grpc::InsecureChannelCredentials());
-            auto stub = small::insert::InsertService::NewStub(channel);
+            auto stub = small::insert::Insert::NewStub(channel);
             grpc::ClientContext context;
             small::insert::InsertReply result;
             grpc::Status status = stub->Insert(&context, request, &result);
