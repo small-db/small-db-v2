@@ -42,6 +42,8 @@ GossipMessage::GossipMessage(const std::string& message) : message(message) {
     SPDLOG_ERROR("unimplemented");
 }
 
+GossipServer* GossipServer::instance_ptr = nullptr;
+
 void GossipServer::init_instance() {
     if (instance_ptr == nullptr) {
         instance_ptr = new GossipServer();

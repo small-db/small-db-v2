@@ -43,7 +43,7 @@ class GossipServer {
     static GossipServer* instance_ptr;
 
     // singleton instance - protected constructor
-    GossipServer();
+    GossipServer() = default;
 
     // singleton instance - protected destructor
     ~GossipServer() = default;
