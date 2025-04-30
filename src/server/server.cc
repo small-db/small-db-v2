@@ -65,7 +65,7 @@
 #include "src/semantics/check.h"
 #include "src/server/stmt_handler.h"
 #include "src/server_info/info.h"
-#include "src/server_registry/server_registry.h"
+#include "src/peers/server_registry.h"
 #include "src/util/ip/ip.h"
 
 // =====================================================================

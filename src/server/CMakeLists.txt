@@ -8,7 +8,7 @@ add_library(small_server
 target_link_libraries(small_server
     PRIVATE
     small::schema
-    spdlog
+    spdlog::spdlog
     libpg_query_lib
     small::semantics
     query_lib
@@ -33,5 +33,6 @@ add_executable(server
 target_link_libraries(server
     PRIVATE
     small::server
+    spdlog::spdlog
     CLI11::CLI11
 )

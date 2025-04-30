@@ -64,7 +64,7 @@
 #include "src/encode/encode.h"
 #include "src/schema/schema.h"
 #include "src/semantics/extract.h"
-#include "src/server_registry/server_registry.h"
+#include "src/peers/server_registry.h"
 
 // =====================================================================
 // protobuf generated files
