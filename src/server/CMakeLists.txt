@@ -6,6 +6,8 @@ add_library(small_server
 )
 
 target_link_libraries(small_server
+    PUBLIC
+    small::server_info
     PRIVATE
     small::schema
     spdlog::spdlog
@@ -15,7 +17,6 @@ target_link_libraries(small_server
     insert_lib
     ssl
     crypto
-    small::server_info
     small::util::ip
     server_registry_proto
     insert_proto

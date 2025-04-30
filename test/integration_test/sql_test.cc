@@ -101,7 +101,7 @@ class SQLTest : public ::testing::Test {
             pid_t pid = fork();
             if (pid == 0) {
                 // In child process
-                server::RunServer(arg);
+                small::server::RunServer(arg);
                 std::exit(1);  // Only reached if exec fails
             } else if (pid > 0) {
                 // Parent process

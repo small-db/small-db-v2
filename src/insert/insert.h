@@ -36,7 +36,7 @@
 #include "insert.grpc.pb.h"
 #include "insert.pb.h"
 
-namespace insert {
+namespace small::insert {
 
 absl::Status insert(
     PgQuery__InsertStmt* insert_stmt);
@@ -48,4 +48,4 @@ class InsertService final : public small::insert::InsertService::Service {
                                 small::insert::InsertReply* response);
 };
 
-}  // namespace insert
+}  // namespace small::insert

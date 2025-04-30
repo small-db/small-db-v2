@@ -79,7 +79,7 @@
 
 #include "src/insert/insert.h"
 
-namespace insert {
+namespace small::insert {
 
 absl::Status insert(PgQuery__InsertStmt* insert_stmt) {
     auto table_name = insert_stmt->relation->relname;
@@ -215,4 +215,4 @@ grpc::Status InsertService::Insert(grpc::ServerContext* context,
     return grpc::Status::OK;
 }
 
-}  // namespace insert
+}  // namespace small::insert

@@ -1,10 +1,10 @@
-add_library(insert_lib
+add_library(small_insert
     insert.cc
     insert.h
 )
 
-target_link_libraries(insert_lib
-    PUBLIC
+target_link_libraries(small_insert
+    PRIVATE
     spdlog
     absl::status
     libpg_query_lib
@@ -17,6 +17,8 @@ target_link_libraries(insert_lib
     small::encode
     insert_proto
 )
+
+add_library(small::insert ALIAS small_insert)
 
 # ======================================================================== #
 # protobuf target

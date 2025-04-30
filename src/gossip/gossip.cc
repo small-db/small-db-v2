@@ -30,8 +30,6 @@
 // local libraries
 // =====================================================================
 
-#include "src/server_info/info.h"
-
 // =====================================================================
 // self header
 // =====================================================================
@@ -41,14 +39,7 @@
 namespace small::gossip {
 
 GossipMessage::GossipMessage(const std::string& message) : message(message) {
-    auto info = small::server_info::ServerInfo::GetInstance();
-    if (!info.ok()) {
-        SPDLOG_ERROR("failed to get server info");
-        return;
-    }
-
-    auto server_id = info.value()->id;
-    recipient_ids.insert(server_id);
+    SPDLOG_ERROR("unimplemented");
 }
 
 void GossipServer::init_instance() {

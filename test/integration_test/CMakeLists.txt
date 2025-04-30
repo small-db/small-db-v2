@@ -4,13 +4,16 @@ add_executable(
     sql_test
     sql_test.cc
 )
+
 target_link_libraries(
     sql_test
+    PRIVATE
     small::type
+    small::server
     GTest::gtest_main
     pqxx
-    small::server
     parser_lib
+    spdlog::spdlog
 )
 
 # Avoid letting gtest use gcc's cxxabi.h, as it conflicts with llvm's cxxabi.h.  
