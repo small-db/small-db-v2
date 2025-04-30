@@ -62,9 +62,9 @@
 
 #include "src/catalog/catalog.h"
 #include "src/encode/encode.h"
+#include "src/peers/server_registry.h"
 #include "src/schema/schema.h"
 #include "src/semantics/extract.h"
-#include "src/peers/server_registry.h"
 
 // =====================================================================
 // protobuf generated files
@@ -184,9 +184,9 @@ absl::Status insert(PgQuery__InsertStmt* insert_stmt) {
     }
 }
 
-grpc::Status Insert::Insert(grpc::ServerContext* context,
-                                   const small::insert::Row* request,
-                                   small::insert::InsertReply* response) {
+grpc::Status InsertService::Insert(grpc::ServerContext* context,
+                            const small::insert::Row* request,
+                            small::insert::InsertReply* response) {
     SPDLOG_INFO("insert request: {}", request->DebugString());
 
     // auto info = small::server_base::get_info();
