@@ -236,7 +236,7 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> handle_stmt(
         }
         case PG_QUERY__NODE__NODE_INSERT_STMT: {
             return WrapEmptyStatus(
-                [&]() { return insert::insert(stmt->insert_stmt); });
+                [&]() { return small::insert::insert(stmt->insert_stmt); });
             break;
         }
         default:
