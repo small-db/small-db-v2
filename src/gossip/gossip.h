@@ -21,6 +21,12 @@
 #include <set>
 #include <string>
 
+// =====================================================================
+// local libraries
+// =====================================================================
+
+#include "src/server_info/info.h"
+
 namespace small::gossip {
 
 class GossipMessage {
@@ -45,10 +51,15 @@ class GossipServer {
     // singleton instance - protected constructor
     GossipServer() = default;
 
+    explicit GossipServer(const small::server_info::ImmutableInfo& self_info)
+        : self_info(self_info) {}
+
     // singleton instance - protected destructor
     ~GossipServer() = default;
 
     void transmit_message(const GossipMessage& message);
+
+    small::server_info::ImmutableInfo self_info;
 
    public:
     // singleton instance - assignment-blocker
@@ -58,7 +69,8 @@ class GossipServer {
     GossipServer(const GossipServer&) = delete;
 
     // singleton instance - init api
-    static void init_instance();
+    static void init_instance(
+        const small::server_info::ImmutableInfo& self_info);
 
     // singleton instance - get api
     static GossipServer* get_instance();

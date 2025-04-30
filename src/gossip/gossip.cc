@@ -30,6 +30,8 @@
 // local libraries
 // =====================================================================
 
+#include "src/server_info/info.h"
+
 // =====================================================================
 // self header
 // =====================================================================
@@ -44,9 +46,10 @@ GossipMessage::GossipMessage(const std::string& message) : message(message) {
 
 GossipServer* GossipServer::instance_ptr = nullptr;
 
-void GossipServer::init_instance() {
+void GossipServer::init_instance(
+    const small::server_info::ImmutableInfo& self_info) {
     if (instance_ptr == nullptr) {
-        instance_ptr = new GossipServer();
+        instance_ptr = new GossipServer(self_info);
     } else {
         SPDLOG_ERROR("gossip server instance already initialized");
     }

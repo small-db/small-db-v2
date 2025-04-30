@@ -5,6 +5,7 @@ add_library(small_gossip
 
 target_link_libraries(small_gossip
     PRIVATE
+    small::server_info
     spdlog
     absl::status
 )
