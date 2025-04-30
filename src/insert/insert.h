@@ -41,7 +41,7 @@ namespace small::insert {
 absl::Status insert(
     PgQuery__InsertStmt* insert_stmt);
 
-class InsertService final : public small::insert::InsertService::Service {
+class InsertService final : public small::insert::Insert::Service {
    public:
     virtual grpc::Status Insert(grpc::ServerContext* context,
                                 const small::insert::Row* request,

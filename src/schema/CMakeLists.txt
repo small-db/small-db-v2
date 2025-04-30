@@ -18,7 +18,7 @@ target_link_libraries(small_schema
     small::type
     small::encode
     small::server_info
-    insert_lib
+    small::insert
 )
 
 add_library(small::schema ALIAS small_schema)

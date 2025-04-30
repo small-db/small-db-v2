@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package small.insert;
 
-service InsertService {
+service Insert {
   rpc Insert(Row) returns (InsertReply) {}
 }
 

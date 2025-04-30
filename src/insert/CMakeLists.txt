@@ -4,6 +4,8 @@ add_library(small_insert
 )
 
 target_link_libraries(small_insert
+    PUBLIC
+    small::insert_proto
     PRIVATE
     spdlog
     absl::status
@@ -15,7 +17,6 @@ target_link_libraries(small_insert
     magic_enum
     small::semantics
     small::encode
-    insert_proto
 )
 
 add_library(small::insert ALIAS small_insert)
@@ -24,17 +25,21 @@ add_library(small::insert ALIAS small_insert)
 # protobuf target
 # ======================================================================== #
 
-add_library(insert_proto
+add_library(small_insert_proto
     insert.proto
 )
-target_link_libraries(insert_proto
+
+target_link_libraries(small_insert_proto
     PUBLIC
     protobuf::libprotobuf
     gRPC::grpc
     gRPC::grpc++
 )
-target_include_directories(insert_proto PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+
+target_include_directories(small_insert_proto PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 get_target_property(grpc_cpp_plugin_location gRPC::grpc_cpp_plugin LOCATION)
-protobuf_generate(TARGET insert_proto LANGUAGE cpp)
-protobuf_generate(TARGET insert_proto LANGUAGE grpc GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc PLUGIN "protoc-gen-grpc=${grpc_cpp_plugin_location}")
+protobuf_generate(TARGET small_insert_proto LANGUAGE cpp)
+protobuf_generate(TARGET small_insert_proto LANGUAGE grpc GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc PLUGIN "protoc-gen-grpc=${grpc_cpp_plugin_location}")
+
+add_library(small::insert_proto ALIAS small_insert_proto)
