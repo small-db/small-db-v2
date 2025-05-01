@@ -19,6 +19,7 @@
 // =====================================================================
 
 #include <memory>
+#include <string>
 
 // =====================================================================
 // third-party libraries
@@ -28,6 +29,12 @@
 
 namespace small::pg_wire {
 
+void send_ready(int sockfd);
+
 void send_batch(int sockfd, const std::shared_ptr<arrow::RecordBatch>& batch);
+
+void send_empty_result(int sockfd);
+
+void send_error(int sockfd, const std::string& error_message);
 
 }  // namespace small::pg_wire

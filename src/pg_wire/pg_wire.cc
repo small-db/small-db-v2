@@ -55,7 +55,6 @@
 #include "src/pg_wire/pg_wire.h"
 
 namespace small::pg_wire {
-using std::string;
 
 class Message {
    protected:
@@ -82,7 +81,8 @@ class Message {
         memcpy(buffer.data() + offset, data, sizeof(network_value));
     }
 
-    static void append_cstring(std::vector<char>& buffer, const string& value) {
+    static void append_cstring(std::vector<char>& buffer,
+                               const std::string& value) {
         buffer.insert(buffer.end(), value.begin(), value.end());
         buffer.push_back('\x00');
     }
@@ -94,6 +94,25 @@ class Message {
 
    public:
     virtual void encode(std::vector<char>& buffer) = 0;
+};
+
+class AuthenticationOk : public Message {
+   public:
+    AuthenticationOk() = default;
+    void encode(std::vector<char>& buffer) override {
+        append_char(buffer, 'R');
+        append_int32(buffer, 8);
+        append_int32(buffer, 0);
+    }
+};
+
+class EmptyQueryResponse : public Message {
+   public:
+    EmptyQueryResponse() = default;
+    void encode(std::vector<char>& buffer) override {
+        append_char(buffer, 'I');
+        append_int32(buffer, 4);
+    }
 };
 
 class RowDescriptionResponse : public Message {
@@ -381,11 +400,43 @@ class NetworkPackage {
     }
 };
 
+void send_ready(int sockfd) {
+    NetworkPackage* network_package = new NetworkPackage();
+    network_package->add_message(new AuthenticationOk());
+
+    std::unordered_map<std::string, std::string> params{
+        {"server_encoding", "UTF8"}, {"client_encoding", "UTF8"},
+        {"DateStyle", "ISO YMD"},    {"integer_datetimes", "on"},
+        {"server_version", "17.0"},
+    };
+    for (const auto& kv : params) {
+        network_package->add_message(new ParameterStatus(kv.first, kv.second));
+    }
+    network_package->add_message(new BackendKeyData());
+    network_package->add_message(new ReadyForQuery());
+
+    network_package->send_all(sockfd);
+}
+
 void send_batch(int sockfd, const std::shared_ptr<arrow::RecordBatch>& batch) {
     NetworkPackage* network_package = new NetworkPackage();
     network_package->add_message(new RowDescriptionResponse(batch->schema()));
     network_package->add_message(new DataRowResponse(batch));
     network_package->add_message(new CommandCompleteResponse());
+    network_package->add_message(new ReadyForQuery());
+    network_package->send_all(sockfd);
+}
+
+void send_empty_result(int sockfd) {
+    NetworkPackage* network_package = new NetworkPackage();
+    network_package->add_message(new EmptyQueryResponse());
+    network_package->add_message(new ReadyForQuery());
+    network_package->send_all(sockfd);
+}
+
+void send_error(int sockfd, const std::string& error_message) {
+    NetworkPackage* network_package = new NetworkPackage();
+    network_package->add_message(new ErrorResponse(error_message));
     network_package->add_message(new ReadyForQuery());
     network_package->send_all(sockfd);
 }
