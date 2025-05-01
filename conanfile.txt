@@ -1,6 +1,8 @@
 [requires]
 arrow/19.0.1
 grpc/1.69.0
+rocksdb/10.0.1
+spdlog/1.15.1
 
 [generators]
 CMakeDeps
