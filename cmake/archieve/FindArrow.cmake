@@ -30,6 +30,8 @@ block()
   # declaration errors
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
 
+  set(ARROW_OPTIONAL_INSTALL ON CACHE BOOL "")
+
   FetchContent_Declare(Arrow
     GIT_REPOSITORY https://github.com/apache/arrow.git
     GIT_TAG apache-arrow-19.0.1
