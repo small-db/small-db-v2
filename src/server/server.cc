@@ -17,11 +17,7 @@
 // =====================================================================
 
 #include <arpa/inet.h>
-#include <errno.h>
 #include <netinet/in.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/epoll.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -31,7 +27,10 @@
 // c++ std
 // =====================================================================
 
-#include <iostream>
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -61,11 +60,11 @@
 #include "src/catalog/catalog.h"
 #include "src/gossip/gossip.h"
 #include "src/insert/insert.h"
+#include "src/peers/server_registry.h"
 #include "src/schema/schema.h"
 #include "src/semantics/check.h"
 #include "src/server/stmt_handler.h"
 #include "src/server_info/info.h"
-#include "src/peers/server_registry.h"
 #include "src/util/ip/ip.h"
 
 // =====================================================================
@@ -261,7 +260,7 @@ class Message {
 class AuthenticationOk : public Message {
    public:
     AuthenticationOk() = default;
-    void encode(std::vector<char>& buffer) {
+    void encode(std::vector<char>& buffer) override {
         append_char(buffer, 'R');
         append_int32(buffer, 8);
         append_int32(buffer, 0);
@@ -271,7 +270,7 @@ class AuthenticationOk : public Message {
 class EmptyQueryResponse : public Message {
    public:
     EmptyQueryResponse() = default;
-    void encode(std::vector<char>& buffer) {
+    void encode(std::vector<char>& buffer) override {
         append_char(buffer, 'I');
         append_int32(buffer, 4);
     }

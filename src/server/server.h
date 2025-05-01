@@ -14,8 +14,6 @@
 
 #pragma once
 
-#include <chrono>
-
 #include "src/server_info/info.h"
 
 namespace small::server {
