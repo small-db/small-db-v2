@@ -11,25 +11,3 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-#pragma once
-
-// =====================================================================
-// third-party libraries
-// =====================================================================
-
-// absl
-#include "absl/status/statusor.h"
-
-// arrow
-#include "arrow/api.h"
-
-// pg_query
-#include "pg_query.pb-c.h"
-
-namespace small::stmt_handler {
-
-absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> handle_stmt(
-    PgQuery__Node* stmt);
-
-}  // namespace small::stmt_handler

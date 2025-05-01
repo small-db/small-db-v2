@@ -29,7 +29,6 @@
 #include "magic_enum/magic_enum.hpp"
 
 // pg_query
-#include "pg_query.h"
 #include "pg_query.pb-c.h"
 
 // spdlog
@@ -54,7 +53,7 @@
 
 #include "src/server/stmt_handler.h"
 
-namespace stmt_handler {
+namespace small::stmt_handler {
 
 absl::Status handle_create_table(PgQuery__CreateStmt* create_stmt) {
     std::string table_name = create_stmt->relation->relname;
@@ -251,4 +250,4 @@ absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> handle_stmt(
     return EmptyBatch();
 }
 
-}  // namespace stmt_handler
+}  // namespace small::stmt_handler

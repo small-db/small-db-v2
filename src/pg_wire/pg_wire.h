@@ -15,21 +15,19 @@
 #pragma once
 
 // =====================================================================
+// c++ std
+// =====================================================================
+
+#include <memory>
+
+// =====================================================================
 // third-party libraries
 // =====================================================================
 
-// absl
-#include "absl/status/statusor.h"
-
-// arrow
 #include "arrow/api.h"
 
-// pg_query
-#include "pg_query.pb-c.h"
+namespace small::gp_wire {
 
-namespace small::stmt_handler {
+void sendBatch(int sockfd, const std::shared_ptr<arrow::RecordBatch>& batch);
 
-absl::StatusOr<std::shared_ptr<arrow::RecordBatch>> handle_stmt(
-    PgQuery__Node* stmt);
-
-}  // namespace small::stmt_handler
+}  // namespace small::gp_wire

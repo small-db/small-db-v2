@@ -15,6 +15,7 @@ target_link_libraries(small_server
     small::gossip
     small::semantics
     small::util::ip
+    small::pg_wire
     spdlog::spdlog
     libpg_query_lib
     query_lib

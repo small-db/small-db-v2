@@ -42,9 +42,6 @@
 // third-party libraries
 // =====================================================================
 
-// absl
-#include "absl/base/options.h"
-
 // pg_query
 #include "pg_query.h"
 #include "pg_query.pb-c.h"
@@ -61,11 +58,10 @@
 #include "src/gossip/gossip.h"
 #include "src/insert/insert.h"
 #include "src/peers/server_registry.h"
-#include "src/schema/schema.h"
-#include "src/semantics/check.h"
 #include "src/server/stmt_handler.h"
 #include "src/server_info/info.h"
 #include "src/util/ip/ip.h"
+#include "src/pg_wire/pg_wire.h"
 
 // =====================================================================
 // self header
@@ -608,7 +604,8 @@ void handle_query(std::string& query, int sockfd) {
     auto node_case = unpacked->stmts[0]->stmt->node_case;
 
     for (int i = 0; i < unpacked->n_stmts; i++) {
-        auto result = stmt_handler::handle_stmt(unpacked->stmts[i]->stmt);
+        auto result =
+            small::stmt_handler::handle_stmt(unpacked->stmts[i]->stmt);
         if (!result.ok()) {
             SPDLOG_ERROR("error handling statement: {}",
                          result.status().ToString());
