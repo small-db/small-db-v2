@@ -5,6 +5,8 @@ add_library(small_pg_wire
 
 target_link_libraries(small_pg_wire
     PRIVATE
+    small::type
+    spdlog::spdlog
     arrow_lib
 )
 

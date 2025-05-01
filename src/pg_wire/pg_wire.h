@@ -26,8 +26,8 @@
 
 #include "arrow/api.h"
 
-namespace small::gp_wire {
+namespace small::pg_wire {
 
-void sendBatch(int sockfd, const std::shared_ptr<arrow::RecordBatch>& batch);
+void send_batch(int sockfd, const std::shared_ptr<arrow::RecordBatch>& batch);
 
-}  // namespace small::gp_wire
+}  // namespace small::pg_wire

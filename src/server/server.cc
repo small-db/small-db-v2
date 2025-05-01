@@ -620,7 +620,7 @@ void handle_query(std::string& query, int sockfd) {
             return;
         } else {
             SPDLOG_INFO("result batch: {}", record_batch->ToString());
-            sendBatch(sockfd, record_batch);
+            small::pg_wire::send_batch(sockfd, record_batch);
             return;
         }
     }
