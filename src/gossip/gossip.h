@@ -51,9 +51,6 @@ class GossipServer {
     // singleton instance - protected constructor
     GossipServer() = default;
 
-    explicit GossipServer(const small::server_info::ImmutableInfo& self_info)
-        : self_info(self_info) {}
-
     // singleton instance - protected destructor
     ~GossipServer() = default;
 
@@ -74,6 +71,9 @@ class GossipServer {
 
     // singleton instance - get api
     static GossipServer* get_instance();
+
+    explicit GossipServer(const small::server_info::ImmutableInfo& self_info)
+        : self_info(self_info) {}
 
     void broadcast_message(const std::string& message);
 };
