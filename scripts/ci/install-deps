@@ -15,8 +15,8 @@ cd grpc
 cmake \
     -S . \
     -B ./cmake/build \
+    -G Ninja \
     -DCMAKE_CXX_STANDARD=17 \
     -DgRPC_INSTALL=ON \
-    -G Ninja \
     -DCMAKE_INSTALL_PREFIX=~/local/cpplib
 cmake --build ./cmake/build --target install
