@@ -221,11 +221,11 @@ class SSLRequest : ReaderWriter {
 
 class Message {
    protected:
-    void append_char(std::vector<char>& buffer, char value) {
+    static void append_char(std::vector<char>& buffer, char value) {
         buffer.push_back(value);
     }
 
-    void append_int16(std::vector<char>& buffer, int16_t value) {
+    static void append_int16(std::vector<char>& buffer, int16_t value) {
         int16_t network_value = htons(value);
         const char* data = reinterpret_cast<const char*>(&network_value);
         buffer.insert(buffer.end(), data, data + sizeof(network_value));

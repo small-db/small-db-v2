@@ -16,10 +16,8 @@
 // c++ std
 // =====================================================================
 
-#include <iostream>
 #include <memory>
 #include <string>
-#include <tuple>
 #include <vector>
 
 // =====================================================================
@@ -28,33 +26,15 @@
 
 // absl
 #include "absl/status/status.h"
-#include "absl/status/statusor.h"
 
 // pg_query
-#include "pg_query.h"
 #include "pg_query.pb-c.h"
 
 // spdlog
 #include "spdlog/spdlog.h"
 
-// arrow
-#include "arrow/api.h"
-#include "arrow/compute/api_vector.h"
-#include "arrow/status.h"
-
-// arrow gandiva
-#include "gandiva/filter.h"
-#include "gandiva/projector.h"
-#include "gandiva/selection_vector.h"
-#include "gandiva/tree_expr_builder.h"
-
-// magic_enum
-#include "magic_enum/magic_enum.hpp"
-
 // grpc
-#include "grpc/grpc.h"
 #include "grpcpp/create_channel.h"
-#include "grpcpp/server_builder.h"
 
 // =====================================================================
 // local libraries
@@ -63,7 +43,6 @@
 #include "src/catalog/catalog.h"
 #include "src/encode/encode.h"
 #include "src/peers/server_registry.h"
-#include "src/schema/schema.h"
 #include "src/semantics/extract.h"
 
 // =====================================================================
@@ -89,7 +68,7 @@ absl::Status insert(PgQuery__InsertStmt* insert_stmt) {
             fmt::format("table {} not found", table_name));
     }
 
-    auto table = result.value();
+    const auto& table = result.value();
     if (auto* listP =
             std::get_if<small::schema::ListPartition>(&table->partition)) {
         auto partition_column = listP->column_name;
@@ -185,8 +164,8 @@ absl::Status insert(PgQuery__InsertStmt* insert_stmt) {
 }
 
 grpc::Status InsertService::Insert(grpc::ServerContext* context,
-                            const small::insert::Row* request,
-                            small::insert::InsertReply* response) {
+                                   const small::insert::Row* request,
+                                   small::insert::InsertReply* response) {
     SPDLOG_INFO("insert request: {}", request->DebugString());
 
     // auto info = small::server_base::get_info();
