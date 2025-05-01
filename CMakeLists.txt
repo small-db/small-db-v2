@@ -36,7 +36,7 @@ add_subdirectory(cmake/helper)
 # - "re2" (<CMAKE_INSTALL_PREFIX>/lib/cmake/re2/re2Config.cmake)
 # - "utf_range" (<CMAKE_INSTALL_PREFIX>/lib/cmake/utf_range/utf_range-config.cmake)
 
-find_package(Protobuf CONFIG REQUIRED)
+# find_package(Protobuf CONFIG REQUIRED)
 
 # "gRPC" must comes after "Protobuf" since it depends on "Protobuf"
 find_package(gRPC CONFIG REQUIRED)
@@ -49,8 +49,8 @@ find_package(gRPC CONFIG REQUIRED)
 #
 # Some explanations about ODR:
 # - https://github.com/abseil/abseil-cpp/blob/master/FAQ.md#what-is-abi-and-why-dont-you-recommend-using-a-pre-compiled-version-of-abseil
-find_package(absl CONFIG REQUIRED)
-find_package(re2 CONFIG REQUIRED)
+# find_package(absl CONFIG REQUIRED)
+# find_package(re2 CONFIG REQUIRED)
 
 # ======================================================================== #
 # third-party packages (local)
