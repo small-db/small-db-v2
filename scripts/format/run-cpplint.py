@@ -7,7 +7,8 @@
 import argparse
 import sys
 
-import cxc_toolkit.exec
+import cxc_toolkit
+
 
 from scripts import format
 
@@ -38,8 +39,6 @@ def main():
     )
 
     for file in files:
-        import cxc_toolkit
-
         cxc_toolkit.exec.run_command(f"cpplint {file}", raise_on_failure=True)
 
 

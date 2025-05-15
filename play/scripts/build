@@ -1,3 +1,0 @@
-rm -rf ./build/play
-cmake -S ./play -B ./build/play -G Ninja -DCMAKE_PREFIX_PATH="~/local/cpplib"
-cmake --build ./build/play --verbose
